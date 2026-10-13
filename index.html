@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       :root{
         --bg:#0B1132;
@@ -587,6 +588,10 @@
             <input class="text-input" id="suPass" type="password" maxlength="64" placeholder="At least 6 characters" autocomplete="new-password" />
           </div>
           <div class="form-field">
+            <label for="suDob">Date of birth <span style="text-transform:none; letter-spacing:0; color:var(--muted-2);">(optional)</span></label>
+            <input class="text-input" id="suDob" type="date" autocomplete="bday" />
+          </div>
+          <div class="form-field">
             <label for="suRef">Referral code <span style="text-transform:none; letter-spacing:0; color:var(--muted-2);">(optional)</span></label>
             <input class="text-input" id="suRef" type="text" maxlength="16" placeholder="e.g. TRYB-XXXXX" autocomplete="off" />
           </div>
@@ -607,7 +612,7 @@
           <button class="btn" type="submit">Log In</button>
         </form>
 
-        <p class="auth-note">Demo only — accounts live in this browser.</p>
+        <p class="auth-note">Demo only — virtual funds, synced across your devices.</p>
       </div>
     </div>
 
@@ -764,7 +769,7 @@
         <!-- History -->
         <section class="panel" id="historyPanel" aria-label="History">
           <h2 class="sec">History</h2>
-          <p class="sec-sub">Every trade and wallet movement in this simulation, saved on this device.</p>
+          <p class="sec-sub">Every trade and wallet movement in this simulation, synced to your account.</p>
           <div class="tabs" role="tablist">
             <button type="button" id="tabTrades" class="active">Trades</button>
             <button type="button" id="tabWallet">Wallet</button>
@@ -786,7 +791,7 @@
       <!-- Referrals -->
       <section class="panel ref-panel" aria-label="Referral program">
         <h2 class="sec">Refer &amp; Earn</h2>
-        <p class="sec-sub">Earn a <b style="color:var(--gold-bright);">3 USDT</b> bonus for every referral whose first deposit is <b style="color:var(--gold-bright);">12 USDT</b>. Rewards land in your Main Balance. Referrals are simulated here so you can test the flow.</p>
+        <p class="sec-sub">Earn a <b style="color:var(--gold-bright);">3 USDT</b> bonus for every referral whose first deposit is <b style="color:var(--gold-bright);">12 USDT</b>. Rewards land in your Main Balance. Signups with your code are recorded automatically, on any device.</p>
         <div class="ref-code-row">
           <div class="ref-code">
             <div>
@@ -916,7 +921,7 @@
     <div class="overlay" id="profileOverlay">
       <div class="sheet page-sheet" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
         <h3 id="profileTitle">Edit Profile</h3>
-        <p class="sheet-sub">Saved on this device and shown in the header and menu.</p>
+        <p class="sheet-sub">Saved to your account and shown in the header and menu.</p>
         <div class="profile-head">
           <span class="avatar" id="profileAvatarPreview">DT</span>
           <div>
@@ -934,7 +939,7 @@
             <input id="profilePhoto" type="file" accept="image/*" style="display:none;" />
             <button class="photo-remove" id="photoRemove" type="button" style="display:none;">Remove photo</button>
           </div>
-          <p class="photo-note" style="margin:8px 0 0;">Pick an image from your device — it's resized and stored only in this browser. Without a photo, your initials avatar is used.</p>
+          <p class="photo-note" style="margin:8px 0 0;">Pick an image from your device — it's resized and saved to your account. Without a photo, your initials avatar is used.</p>
         </div>
         <div class="form-field">
           <label for="profileName">Full name</label>
@@ -968,7 +973,7 @@
     <div class="overlay" id="paymentOverlay">
       <div class="sheet page-sheet" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
         <h3 id="paymentTitle">Payment Method</h3>
-        <p class="sheet-sub">Add the withdrawal destinations for this account — a crypto wallet address and/or your bank account details. Saved on this device. Demo only — withdrawals are simulated and no real payouts are sent to these details.</p>
+        <p class="sheet-sub">Add the withdrawal destinations for this account — a crypto wallet address and/or your bank account details. Demo only — withdrawals are simulated and no real payouts are sent to these details.</p>
         <div id="payList"></div>
         <div class="pay-form">
           <h4>Add a withdrawal method</h4>
@@ -1058,17 +1063,19 @@
     <script>
       "use strict";
       /* ================= Config ================= */
-      var LS_KEY = "trybnetwork-trade-save-v2";
-      var APY = 0.15;                    // 15% per year
+      var SUPABASE_URL = "https://zvubytosshkxpbpvgcsw.supabase.co";
+      var SUPABASE_ANON_KEY = "sb_publishable_c1sl1Mw4Y5EMWjkmYSzEow_m5Yowqk0";
+      var sb = null;
+      try { sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null; } catch(e){ sb = null; }
+
+      var APY = 0.15;
       var YEAR_SECS = 365 * 24 * 3600;
-      var LOCK_MS = 7 * 24 * 3600 * 1000; // each Savings transfer-in is locked for 7 days
-      var PAYOUT_RATE = 0.85;            // 85% profit on a win
-      var START_MAIN = 0;                // no starting grant — new users open at $0 plus the welcome bonus
-      var WELCOME_BONUS = 3;             // 3 USDT, treated 1:1 with USD
-      var BONUS_UNLOCK_VOLUME = 10;      // trade 10 USDT total to unlock the bonus
-      var REFERRAL_REWARD = 3;           // 3 USDT per qualifying referral
-      var REFERRAL_DEPOSIT = 12;         // referral's first deposit that triggers the reward
-      var INTEREST_LOG_AT = 0.10;        // log an interest entry once $0.10 unlogged accrues
+      var LOCK_MS = 7 * 24 * 3600 * 1000;
+      var PAYOUT_RATE = 0.85;
+      var WELCOME_BONUS = 3;
+      var BONUS_UNLOCK_VOLUME = 10;
+      var REFERRAL_REWARD = 3;
+      var INTEREST_LOG_AT = 0.10;
 
       var ASSETS = {
         BTCUSD: { name: "Bitcoin / USD",  tv: "COINBASE:BTCUSD", dec: 2 },
@@ -1091,211 +1098,231 @@
                d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
       }
       function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-      function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
-
+      function esc(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
       function toast(title, sub, kind){
         var box = $("toasts");
+        if (!box) return;
         var el = document.createElement("div");
         el.className = "toast" + (kind ? " " + kind : "");
         el.innerHTML = esc(title) + (sub ? '<span class="t-sub">' + esc(sub) + "</span>" : "");
         box.appendChild(el);
         setTimeout(function(){ el.style.opacity = "0"; el.style.transition = "opacity .4s"; setTimeout(function(){ el.remove(); }, 420); }, 4600);
       }
-
-      /* ================= State ================= */
+      function netErrorToast(what){
+        toast("Connection problem", (what || "That action") + " couldn't reach the server. Check your connection and try again.", "lose");
+      }
       function makeRefCode(){
         var chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", out = "";
         for (var i = 0; i < 5; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
         return "TRYB-" + out;
       }
-      function freshState(){
+      function dirToDb(dir){ return dir === "higher" ? "high" : "low"; }
+      function dirFromDb(d){ return d === "high" ? "higher" : "lower"; }
+      function reqTypeToDb(t){ return t === "withdraw" ? "withdrawal" : "deposit"; }
+      function reqTypeFromDb(t){ return t === "withdrawal" ? "withdraw" : "deposit"; }
+
+      /* ================= State (mirrors the Supabase rows) ================= */
+      var currentUser = null;      // supabase auth user
+      var profileRow = null;       // tn_profiles row
+      var walletRow = null;        // tn_wallets row
+      var lastAccrualAt = Date.now();
+      var settledBidIds = {};      // bid ids already turned into history (no double payout)
+      var realtimeChannels = [];
+
+      function blankState(){
         return {
-          main: START_MAIN + WELCOME_BONUS,   // $0 start + the silent 3 USDT welcome bonus = $3.00
-          startGrantRemoved: true,            // this state never carried the old $10,000 starting grant
-          savings: 0,
-          savingsLots: [],                    // each transfer-in: { id, amount, remaining, time, unlockAt }
-          interestPool: 0,                    // accrued interest inside Savings — never locked
-          totalInterest: 0,
-          interestUnlogged: 0,
-          trades: [],
-          txs: [],   // the welcome bonus is credited silently — no history entry
-          bids: [],   // High/Low bids: { id, username, name, asset, dir, stake, status: "awaiting"|"won"|"lost", time }
+          main: 0, savings: 0, savingsLots: [], interestPool: 0, totalInterest: 0, interestUnlogged: 0,
+          trades: [], txs: [], bids: [],
           mgOn: false, mgStep: 0,
           bonusLocked: true, bonusTraded: 0,
-          refCode: makeRefCode(),
-          referrals: [], referralEarned: 0,
+          refCode: "—", referrals: [], referralEarned: 0,
           adminRequests: [],
           profile: { name: "Demo Trader", email: "", avatar: 0, username: "", dob: "", photo: "" },
           paymentMethods: [],
           lastTick: Date.now()
         };
       }
-      /* ================= Demo accounts & session =================
-         Accounts and sessions live in localStorage (demo only). Each
-         account's app state is stored under its own key so balances,
-         history, and referrals stay separate per user. */
-      var ACCOUNTS_KEY = "trybnetwork-accounts-v1";
-      var SESSION_KEY = "trybnetwork-session-v1";
-      function stateKey(username){ return LS_KEY + "::" + username; }
-      function loadAccounts(){
-        try { var a = JSON.parse(localStorage.getItem(ACCOUNTS_KEY)); return Array.isArray(a) ? a : []; }
-        catch(e){ return []; }
-      }
-      function saveAccounts(list){ try { localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list)); } catch(e){} }
-      function findAccount(id){
-        var key = String(id || "").trim().toLowerCase();
-        if (!key) return null;
-        var list = loadAccounts();
-        for (var i = 0; i < list.length; i++){
-          if (list[i].username.toLowerCase() === key || list[i].email.toLowerCase() === key) return list[i];
-        }
-        return null;
-      }
-      function findAccountByRefCode(code){
-        var key = String(code || "").trim().toUpperCase();
-        if (!key) return null;
-        var list = loadAccounts();
-        for (var i = 0; i < list.length; i++){
-          if ((list[i].refCode || "").toUpperCase() === key) return list[i];
-        }
-        return null;
-      }
-      function updateAccount(username, patch){
-        var list = loadAccounts();
-        for (var i = 0; i < list.length; i++){
-          if (list[i].username === username){ for (var k in patch) list[i][k] = patch[k]; saveAccounts(list); return list[i]; }
-        }
-        return null;
-      }
-      var currentUser = null;   // the signed-in account record, or null
-      (function bootSession(){
-        var un = null;
-        try { un = localStorage.getItem(SESSION_KEY); } catch(e){}
-        if (un){ var acct = findAccount(un); if (acct) currentUser = acct; }
-      })();
+      var state = blankState();
 
-      var state;
-      function save(){
-        if (!currentUser) return;   // nothing persists while signed out
-        try { localStorage.setItem(stateKey(currentUser.username), JSON.stringify(state)); } catch(e){}
+      function savingsPrincipal(){
+        return state.savingsLots.reduce(function(a, l){ return a + (l.remaining || 0); }, 0);
       }
-      function loadForUser(username){
-        try {
-          var raw = localStorage.getItem(stateKey(username));
-          if (!raw){
-            // Adopt a state saved before accounts existed (single legacy
-            // key) so earlier demo progress carries into the first account.
-            var legacy = localStorage.getItem(LS_KEY);
-            if (legacy){
-              raw = legacy;
-              localStorage.setItem(stateKey(username), legacy);
-              localStorage.removeItem(LS_KEY);
-            }
-          }
-          if (!raw) return null;
-          var s = JSON.parse(raw);
-          if (typeof s.main !== "number" || !Array.isArray(s.txs)) return null;
-          return s;
-        } catch(e){ return null; }
-      }
-      state = (currentUser ? loadForUser(currentUser.username) : null) || freshState();
-      function normalizeState(){
-      // Fill any fields introduced after a state was first saved.
-      if (state.bonusLocked === undefined){ state.bonusLocked = true; state.bonusTraded = 0; }
-      if (typeof state.bonusTraded !== "number") state.bonusTraded = 0;
-      if (!state.refCode) state.refCode = makeRefCode();
-      if (!Array.isArray(state.referrals)){ state.referrals = []; state.referralEarned = 0; }
-      if (typeof state.referralEarned !== "number") state.referralEarned = 0;
-      if (!Array.isArray(state.adminRequests)) state.adminRequests = [];
-      if (!Array.isArray(state.bids)) state.bids = [];
-      // Bids placed under the old price-expiry rules carry over as bids
-      // awaiting an admin result — their stakes were already deducted.
-      if (Array.isArray(state.openTrades) && state.openTrades.length){
-        state.openTrades.forEach(function(t){
-          state.bids.push({ id: t.id, username: currentUser ? currentUser.username : "", name: state.profile ? state.profile.name : "", asset: t.asset, dir: t.dir, stake: t.stake, status: "awaiting", time: t.openedAt || Date.now() });
-        });
-      }
-      state.openTrades = [];
-      if (!state.profile || typeof state.profile !== "object") state.profile = { name: "Demo Trader", email: "", avatar: 0, username: "", dob: "", photo: "" };
-      if (typeof state.profile.name !== "string" || !state.profile.name) state.profile.name = "Demo Trader";
-      if (typeof state.profile.email !== "string") state.profile.email = "";
-      if (typeof state.profile.avatar !== "number") state.profile.avatar = 0;
-      if (typeof state.profile.username !== "string") state.profile.username = "";
-      if (typeof state.profile.dob !== "string") state.profile.dob = "";
-      if (typeof state.profile.photo !== "string") state.profile.photo = "";
-      if (!Array.isArray(state.paymentMethods)) state.paymentMethods = [];
-      if (typeof state.interestPool !== "number") state.interestPool = 0;
-      // One-time correction: states saved before the starting grant was
-      // removed still carry the old $10,000 in their balances. Take it back
-      // out — from Main first, then from Savings (interest first, then the
-      // newest lots) — so existing users land on the same footing as new
-      // ones: $0 start plus the 3 USDT welcome bonus and whatever they
-      // genuinely earned, deposited, or won since.
-      if (!state.startGrantRemoved){
-        state.startGrantRemoved = true;
-        var grantLeft = 10000;
-        var fromMain = Math.min(Math.max(0, state.main), grantLeft);
-        state.main -= fromMain; grantLeft -= fromMain;
-        if (grantLeft > 0 && state.savings > 0){
-          var fromPool = Math.min(state.interestPool, grantLeft);
-          state.interestPool -= fromPool; state.savings -= fromPool; grantLeft -= fromPool;
-          if (!Array.isArray(state.savingsLots)) state.savingsLots = [];
-          for (var gi = state.savingsLots.length - 1; gi >= 0 && grantLeft > 0; gi--){
-            var gtake = Math.min(state.savingsLots[gi].remaining, grantLeft);
-            state.savingsLots[gi].remaining -= gtake; state.savings -= gtake; grantLeft -= gtake;
-          }
-          state.savingsLots = state.savingsLots.filter(function(l){ return l.remaining > 0.004; });
-          if (state.savings < 0) state.savings = 0;
-        }
-      }
-      // The welcome bonus is silent: drop any bonus announcement entries an
-      // older saved state may still carry in its wallet history.
-      state.txs = state.txs.filter(function(tx){ return tx.type !== "bonus" && tx.type !== "unlock"; });
-      delete state.showWelcome;
-      if (!Array.isArray(state.savingsLots)){
-        state.savingsLots = [];
-        // Savings held from before the 7-day lot lock become one already-unlocked lot.
-        if (state.savings > 0){
-          state.savingsLots.push({ id: uid(), amount: state.savings, remaining: state.savings, time: Date.now() - LOCK_MS, unlockAt: Date.now() });
-        }
-      }
-      }
-      normalizeState();
-      applyBidResults();   // settle any bids the admin decided while this device was away
+      function syncSavingsTotal(){ state.savings = savingsPrincipal() + state.interestPool; }
 
-      // Accrue savings interest for time elapsed while the page was closed.
-      (function accrueOffline(){
-        var now = Date.now();
-        var dt = Math.max(0, (now - (state.lastTick || now)) / 1000);
-        if (dt > 1 && state.savings > 0) addInterest(state.savings * APY * dt / YEAR_SECS);
-        state.lastTick = now;
-      })();
-
-      function addInterest(gain){
-        if (!(gain > 0)) return;
-        state.savings += gain;
-        state.interestPool += gain;   // interest is earned, not transferred in — it never locks
+      /* Interest: 15% APY on the savings total (lots + interest), accrued
+         client-side. Persisted into tn_wallets.savings_interest on every
+         wallet write and every 60 seconds. */
+      function accrueInterest(now){
+        now = now || Date.now();
+        var dt = Math.max(0, (now - lastAccrualAt) / 1000);
+        lastAccrualAt = now;
+        if (dt <= 0) return 0;
+        syncSavingsTotal();
+        if (state.savings <= 0) return 0;
+        var gain = state.savings * APY * dt / YEAR_SECS;
+        if (!(gain > 0)) return 0;
+        state.interestPool += gain;
         state.totalInterest += gain;
         state.interestUnlogged += gain;
+        syncSavingsTotal();
         if (state.interestUnlogged >= INTEREST_LOG_AT){
           state.txs.unshift({ id: uid(), type: "interest", amount: state.interestUnlogged, note: "Savings interest · 15% APY", time: Date.now() });
           state.interestUnlogged = 0;
           if (state.txs.length > 120) state.txs.length = 120;
         }
+        return gain;
       }
 
-      /* ================= Live chart (TradingView) =================
-         The arena chart is TradingView's Advanced Chart widget streaming
-         real market data, for reference only — bid results are decided
-         by the admin, never by the chart. Switching asset reloads the
-         widget on the matching symbol. */
+      /* Persist the wallet row (accruing interest first). Returns success. */
+      function persistWallet(){
+        if (!sb || !currentUser) return Promise.resolve(false);
+        accrueInterest(Date.now());
+        var payload = {
+          user_id: currentUser.id,
+          main_balance: Math.round(state.main * 100) / 100,
+          savings_interest: state.interestPool,
+          traded_volume: state.bonusTraded,
+          bonus_locked: state.bonusLocked,
+          updated_at: new Date().toISOString()
+        };
+        return sb.from("tn_wallets").upsert(payload).then(function(res){
+          if (res.error){ netErrorToast("Saving your balance"); return false; }
+          walletRow = payload;
+          return true;
+        }).catch(function(){ netErrorToast("Saving your balance"); return false; });
+      }
+      // Kept for call-site compatibility with the old local save points:
+      // every former save() is now a wallet write to Supabase.
+      function save(){ persistWallet(); }
+
+      /* ================= Data loading ================= */
+      function mapLots(rows){
+        return (rows || []).map(function(r){
+          var created = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+          var unlock = r.unlock_at ? new Date(r.unlock_at).getTime() : created + LOCK_MS;
+          return { id: r.id, amount: Number(r.amount) || 0, remaining: Number(r.amount) || 0, time: created, unlockAt: unlock };
+        }).sort(function(a, b){ return a.time - b.time; });
+      }
+      function mapRequests(rows){
+        return (rows || []).map(function(r){
+          return {
+            id: r.id, user: "You (this account)", self: true,
+            type: reqTypeFromDb(r.type), amount: Number(r.amount) || 0,
+            status: r.status, time: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
+            decidedAt: r.decided_at ? new Date(r.decided_at).getTime() : null
+          };
+        });
+      }
+      function bidToTrade(b){
+        var stake = Number(b.stake) || 0;
+        var won = b.status === "won";
+        return {
+          id: b.id, asset: b.asset, dir: dirFromDb(b.direction), stake: stake,
+          entry: null, exit: null, result: b.status,
+          pnl: won ? stake * PAYOUT_RATE : -stake,
+          openedAt: b.created_at ? new Date(b.created_at).getTime() : Date.now(),
+          closedAt: b.decided_at ? new Date(b.decided_at).getTime() : Date.now(),
+          decidedBy: "admin"
+        };
+      }
+      function buildWalletTxs(requests, lots){
+        var txs = [];
+        (requests || []).forEach(function(r){
+          var t = reqTypeFromDb(r.type), amt = Number(r.amount) || 0;
+          var when = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+          if (r.status === "approved"){
+            txs.push({ id: "req-" + r.id, type: t, amount: amt, note: (t === "deposit" ? "Deposit approved · credited to Main Balance" : "Withdrawal approved · paid out of Main Balance"), time: when });
+          } else if (r.status === "rejected"){
+            txs.push({ id: "req-" + r.id, type: "rejected", amount: null, note: (t === "deposit" ? "Deposit" : "Withdrawal") + " request of " + fmtUSD(amt) + " rejected · Main Balance unchanged", time: when });
+          }
+        });
+        (lots || []).forEach(function(l){
+          var when = l.created_at ? new Date(l.created_at).getTime() : Date.now();
+          var unlock = l.unlock_at ? new Date(l.unlock_at).getTime() : when + LOCK_MS;
+          txs.push({ id: "lot-" + l.id, type: "transfer_in", amount: Number(l.amount) || 0, note: "Main Balance → Savings · locked until " + fmtTime(unlock), time: when });
+        });
+        txs.sort(function(a, b){ return b.time - a.time; });
+        return txs.slice(0, 120);
+      }
+
+      function loadUserData(userId, opts){
+        opts = opts || {};
+        if (!sb) return Promise.resolve(false);
+        return Promise.all([
+          sb.from("tn_profiles").select("*").eq("id", userId).maybeSingle(),
+          sb.from("tn_wallets").select("*").eq("user_id", userId).maybeSingle(),
+          sb.from("tn_savings_lots").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
+          sb.from("tn_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+          sb.from("tn_bids").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+          sb.from("tn_referrals").select("*").eq("referrer_id", userId).order("created_at", { ascending: false })
+        ]).then(function(res){
+          var prof = res[0], wal = res[1], lots = res[2], reqs = res[3], bids = res[4], refs = res[5];
+          if (prof.error || wal.error){ if (!opts.silent) netErrorToast("Loading your account"); return false; }
+          profileRow = prof.data;
+          walletRow = wal.data;
+          if (!profileRow) return false;
+          // Preserve session-local UI state across reloads of the data.
+          var keep = { mgOn: state.mgOn, mgStep: state.mgStep, paymentMethods: state.paymentMethods,
+                       avatar: state.profile ? state.profile.avatar : 0, interestLog: state.txs.filter(function(t){ return t.type === "interest" || t.type === "transfer_out" || t.type === "referral"; }) };
+          var fresh = blankState();
+          fresh.mgOn = keep.mgOn; fresh.mgStep = keep.mgStep; fresh.paymentMethods = keep.paymentMethods;
+          fresh.main = walletRow ? Number(walletRow.main_balance) || 0 : 0;
+          fresh.interestPool = walletRow ? Number(walletRow.savings_interest) || 0 : 0;
+          fresh.totalInterest = fresh.interestPool;
+          fresh.bonusTraded = walletRow ? Number(walletRow.traded_volume) || 0 : 0;
+          fresh.bonusLocked = walletRow ? !!walletRow.bonus_locked : true;
+          fresh.savingsLots = mapLots(lots.data);
+          fresh.adminRequests = mapRequests(reqs.data);
+          var bidRows = bids.data || [];
+          fresh.bids = bidRows.filter(function(b){ return b.status === "pending"; }).map(function(b){
+            return { id: b.id, username: profileRow.username, name: profileRow.full_name, asset: b.asset, dir: dirFromDb(b.direction), stake: Number(b.stake) || 0, status: "awaiting", time: b.created_at ? new Date(b.created_at).getTime() : Date.now() };
+          });
+          fresh.trades = bidRows.filter(function(b){ return b.status === "won" || b.status === "lost"; }).map(bidToTrade);
+          bidRows.forEach(function(b){
+            if ((b.status === "won" || b.status === "lost") && b.payout !== null && b.payout !== undefined) settledBidIds[b.id] = true;
+          });
+          fresh.refCode = profileRow.referral_code || "—";
+          fresh.profile = {
+            name: profileRow.full_name || "Demo Trader",
+            email: profileRow.email || "",
+            avatar: keep.avatar || 0,
+            username: profileRow.username || "",
+            dob: profileRow.date_of_birth || "",
+            photo: profileRow.avatar_url || ""
+          };
+          // Referral stats come from tn_referrals; names need the referred profiles.
+          var refRows = refs.data || [];
+          fresh.referralEarned = refRows.filter(function(r){ return r.reward_paid; }).length * REFERRAL_REWARD;
+          state = fresh;
+          syncSavingsTotal();
+          state.txs = buildWalletTxs(reqs.data, lots.data).concat(keep.interestLog);
+          state.txs.sort(function(a, b){ return b.time - a.time; });
+          lastAccrualAt = Date.now();
+          state.lastTick = Date.now();
+          if (refRows.length){
+            var ids = refRows.map(function(r){ return r.referred_id; });
+            return sb.from("tn_profiles").select("id, full_name, username, created_at").in("id", ids).then(function(pr){
+              var byId = {};
+              (pr.data || []).forEach(function(p){ byId[p.id] = p; });
+              state.referrals = refRows.map(function(r){
+                var p = byId[r.referred_id];
+                return { id: r.id, name: p ? (p.full_name || ("@" + (p.username || ""))) : "Referral", status: r.reward_paid ? "qualified" : "joined", time: r.created_at ? new Date(r.created_at).getTime() : Date.now(), depositTime: r.reward_paid ? (r.created_at ? new Date(r.created_at).getTime() : Date.now()) : null };
+              });
+              return true;
+            }).catch(function(){ state.referrals = []; return true; });
+          }
+          state.referrals = [];
+          return true;
+        }).catch(function(){ if (!opts.silent) netErrorToast("Loading your account"); return false; });
+      }
+
+      /* ================= Live chart (TradingView) ================= */
       var curAsset = "BTCUSD";
       var tvAttempts = 0;
       function loadTvChart(){
         var box = $("tvChart");
         if (!box) return;
         if (typeof TradingView === "undefined" || !TradingView.widget){
-          // tv.js still loading (or blocked): retry briefly, then say so.
           if (tvAttempts++ < 20){ setTimeout(loadTvChart, 500); return; }
           box.innerHTML = '<div class="empty" style="padding:18px;">The live chart could not load — check your connection and reopen the app.</div>';
           return;
@@ -1317,16 +1344,10 @@
       }
 
       /* ================= Rendering ================= */
-      // Part of Main Balance is silently held back from withdrawals and
-      // transfers out until BONUS_UNLOCK_VOLUME has been traded in total.
-      // There is no card, banner, or notice for this — it is only ever
-      // reflected in the amounts available to move.
       function lockedBonusAmount(){
         return state.bonusLocked ? Math.min(WELCOME_BONUS, state.main) : 0;
       }
       function movableMain(){ return Math.max(0, state.main - lockedBonusAmount()); }
-      // Savings availability: unlocked lots (past their 7-day lock) plus
-      // accrued interest, which is never locked.
       function unlockedSavings(now){
         now = now || Date.now();
         var sum = state.interestPool;
@@ -1368,6 +1389,7 @@
         box.innerHTML = html;
       }
       function renderWallets(){
+        syncSavingsTotal();
         $("mainBalance").textContent = fmtUSD(state.main);
         $("savingsBalance").textContent = fmtUSD(state.savings);
         $("interestEarned").textContent = fmtUSD(state.totalInterest);
@@ -1388,9 +1410,6 @@
         renderSavingsLots();
         renderMyRequests();
       }
-      // The signed-in user's own deposit/withdrawal requests with live
-      // status chips. Rebuilt only when the set or a status actually
-      // changes, so the 200ms render loop stays cheap.
       var myReqSig = null;
       function renderMyRequests(){
         var box = $("myReqList");
@@ -1409,8 +1428,7 @@
           var detail = r.status === "pending"
             ? "Waiting for approval · your Main Balance updates the moment it's approved"
             : r.status === "approved"
-              ? (isDep ? "Credited to Main Balance" : "Paid out of Main Balance") +
-                (typeof r.balanceAfter === "number" ? ' · Balance after: <b>' + fmtUSD(r.balanceAfter) + "</b>" : "")
+              ? (isDep ? "Credited to Main Balance" : "Paid out of Main Balance")
               : "Rejected · Main Balance unchanged";
           return '<div class="req-item"><div class="req-top">' +
             '<span class="req-type ' + r.type + '">' + (isDep ? "Deposit" : "Withdrawal") + "</span>" +
@@ -1463,7 +1481,6 @@
         }).join("");
       }
       function renderHistory(){
-        // trades
         var closed = state.trades;
         $("statTrades").textContent = closed.length;
         var wins = closed.filter(function(t){ return t.result === "won"; }).length;
@@ -1481,16 +1498,12 @@
             var resTag = t.result === "won" ? '<span class="res-tag won">Won</span>' :
                          t.result === "lost" ? '<span class="res-tag lost">Lost</span>' : '<span class="res-tag tie">Tie · refunded</span>';
             var pnlTxt = t.pnl > 0 ? "+" + fmtUSD(t.pnl) : t.pnl < 0 ? fmtUSD(t.pnl) : "$0.00";
-            var pricePart = (typeof t.entry === "number" && typeof t.exit === "number")
-              ? " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit)
-              : " · Result decided by admin";
             return '<div class="hist-item"><div class="hi-main">' +
               '<div class="hi-title">' + t.asset + ' <span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" + resTag + "</div>" +
-              '<div class="hi-sub num">Stake ' + fmtUSD(t.stake) + pricePart + "<br>" + fmtTime(t.closedAt) + "</div>" +
+              '<div class="hi-sub num">Stake ' + fmtUSD(t.stake) + " · Result decided by admin<br>" + fmtTime(t.closedAt) + "</div>" +
               '</div><div class="hi-amt num ' + (t.pnl > 0 ? "pos" : t.pnl < 0 ? "neg" : "neu") + '">' + pnlTxt + "</div></div>";
           }).join("");
         }
-        // wallet
         if (!state.txs.length){
           $("walletHistory").innerHTML = '<div class="empty">No wallet activity yet.</div>';
         } else {
@@ -1515,75 +1528,143 @@
       }
 
       /* ================= Bidding =================
-         A bid locks its stake out of Main Balance immediately and waits
-         at "Awaiting result". There is no expiry and no price-based
-         resolution: the admin marks each bid "won" or "lost" in the
-         shared account data, and applyBidResults() settles it here —
-         a win credits stake + 85% profit, a loss forfeits the stake. */
+         A bid locks its stake out of Main Balance immediately (wallet
+         write + tn_bids insert, status pending) and waits for the admin.
+         When the admin marks it won/lost, the realtime event settles it:
+         a win credits stake × 1.85 to Main Balance and resets the
+         martingale; a loss forfeits the stake and doubles the next one. */
+      var bidBusy = false;
       function placeBid(dir){
+        if (bidBusy) return;
+        if (!sb || !currentUser){ toast("Not signed in", "Log in again to place a bid."); return; }
         var stake = effectiveStake();
         if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a bid."); return; }
-        // Bids draw ONLY from Main Balance — savings can never be staked.
         if (stake > state.main){
           toast("Insufficient Main Balance", state.mgOn && state.mgStep > 0
             ? "Martingale stake " + fmtUSD(stake) + " exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked."
             : "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked.");
           return;
         }
+        bidBusy = true;
+        $("btnHigher").disabled = true; $("btnLower").disabled = true;
+        var prevMain = state.main, prevVol = state.bonusTraded, prevLock = state.bonusLocked;
         state.main -= stake;
-        state.bids.unshift({
-          id: uid(),
-          username: currentUser ? currentUser.username : "",
-          name: state.profile.name,
-          asset: curAsset, dir: dir, stake: stake,
-          status: "awaiting", time: Date.now()
-        });
-        save(); renderWallets(); renderOpenTrades();
-        toast("Bid placed · " + curAsset + " " + (dir === "higher" ? "Higher" : "Lower"),
-              "Stake " + fmtUSD(stake) + " locked from Main Balance · awaiting the admin's result.");
-      }
-      // Settle every bid the admin has marked. Runs on boot, on sign-in,
-      // and on every re-sync from shared storage, so a result lands (and
-      // pays out) as soon as this device sees it — no reload needed.
-      function applyBidResults(){
-        if (!state.bids.length) return;
-        var changed = false;
-        var awaiting = [];
-        state.bids.forEach(function(b){
-          if (b.status !== "won" && b.status !== "lost"){ awaiting.push(b); return; }
-          changed = true;
-          var pnl = b.status === "won" ? b.stake * PAYOUT_RATE : -b.stake;
-          if (b.status === "won") state.main += b.stake * (1 + PAYOUT_RATE);
-          state.trades.unshift({
-            id: b.id, asset: b.asset, dir: b.dir, stake: b.stake,
-            entry: null, exit: null, result: b.status, pnl: pnl,
-            openedAt: b.time, closedAt: b.decidedAt || Date.now(), decidedBy: "admin"
+        state.bonusTraded += stake;
+        if (state.bonusTraded >= BONUS_UNLOCK_VOLUME) state.bonusLocked = false;
+        var asset = curAsset;
+        sb.from("tn_bids").insert({
+          user_id: currentUser.id, asset: asset, direction: dirToDb(dir), stake: stake, status: "pending"
+        }).select().single().then(function(res){
+          if (res.error) throw res.error;
+          var row = res.data;
+          state.bids.unshift({
+            id: row.id, username: state.profile.username, name: state.profile.name,
+            asset: asset, dir: dir, stake: stake, status: "awaiting",
+            time: row.created_at ? new Date(row.created_at).getTime() : Date.now()
           });
-          // Silent holdback progress: every decided bid's stake counts
-          // toward the traded-volume threshold; nothing is announced.
-          if (state.bonusLocked){
-            state.bonusTraded += b.stake;
-            if (state.bonusTraded >= BONUS_UNLOCK_VOLUME) state.bonusLocked = false;
-          }
-          // Martingale progression follows the admin's result: a loss
-          // doubles the next stake, a win resets to the base stake.
-          if (state.mgOn){
-            if (b.status === "lost") state.mgStep++;
-            else state.mgStep = 0;
-          }
-          if (b.status === "won") toast("You won · " + b.asset, "Paid " + fmtUSD(b.stake * (1 + PAYOUT_RATE)) + " (" + fmtUSD(pnl) + " profit) to Main Balance.", "win");
-          else toast("Bid lost · " + b.asset, "Locked stake of " + fmtUSD(b.stake) + " forfeited." + (state.mgOn ? " Next martingale stake: " + fmtUSD(effectiveStake()) + "." : ""), "lose");
+          return persistWallet();
+        }).then(function(ok){
+          bidBusy = false;
+          $("btnHigher").disabled = false; $("btnLower").disabled = false;
+          if (ok === false){ /* persistWallet already toasted */ }
+          renderWallets(); renderOpenTrades(); renderPayout();
+          toast("Bid placed · " + asset + " " + (dir === "higher" ? "Higher" : "Lower"),
+                "Stake " + fmtUSD(stake) + " locked from Main Balance · awaiting the admin's result.");
+        }).catch(function(){
+          bidBusy = false;
+          $("btnHigher").disabled = false; $("btnLower").disabled = false;
+          state.main = prevMain; state.bonusTraded = prevVol; state.bonusLocked = prevLock;
+          renderWallets(); renderPayout();
+          netErrorToast("Placing your bid");
         });
-        if (!changed) return;
-        state.bids = awaiting;
-        if (state.trades.length > 100) state.trades.length = 100;
-        save(); renderWallets(); renderHistory(); renderPayout(); renderOpenTrades();
+      }
+      // Settle one decided bid row: credit a win, move it to history,
+      // and advance/reset the martingale. Idempotent per bid id.
+      function settleBid(row){
+        if (!row || settledBidIds[row.id]) return;
+        if (row.status !== "won" && row.status !== "lost") return;
+        settledBidIds[row.id] = true;
+        var stake = Number(row.stake) || 0;
+        var trade = bidToTrade(row);
+        state.trades.unshift(trade);
+        state.bids = state.bids.filter(function(b){ return b.id !== row.id; });
+        var payout = 0;
+        if (row.status === "won"){
+          payout = stake * (1 + PAYOUT_RATE);
+          state.main += payout;
+          if (state.mgOn) state.mgStep = 0;
+        } else {
+          if (state.mgOn) state.mgStep++;
+        }
+        // Record the payout on the bid row, then persist the wallet.
+        var finish = function(){
+          renderWallets(); renderHistory(); renderPayout(); renderOpenTrades();
+          if (row.status === "won") toast("You won · " + row.asset, "Paid " + fmtUSD(payout) + " (" + fmtUSD(stake * PAYOUT_RATE) + " profit) to Main Balance.", "win");
+          else toast("Bid lost · " + row.asset, "Locked stake of " + fmtUSD(stake) + " forfeited." + (state.mgOn ? " Next martingale stake: " + fmtUSD(effectiveStake()) + "." : ""), "lose");
+        };
+        if (sb){
+          sb.from("tn_bids").update({ payout: payout }).eq("id", row.id).then(function(){ persistWallet().then(finish); });
+        } else {
+          persistWallet().then(finish);
+        }
+      }
+
+      /* ================= Realtime ================= */
+      function teardownRealtime(){
+        realtimeChannels.forEach(function(ch){ try { sb.removeChannel(ch); } catch(e){} });
+        realtimeChannels = [];
+      }
+      function setupRealtime(){
+        if (!sb || !currentUser) return;
+        teardownRealtime();
+        var uidv = currentUser.id;
+        var bidsCh = sb.channel("tn-bids-" + uidv)
+          .on("postgres_changes", { event: "*", schema: "public", table: "tn_bids", filter: "user_id=eq." + uidv }, function(payload){
+            var row = payload.new;
+            if (row && (row.status === "won" || row.status === "lost")) settleBid(row);
+            else refreshFromServer(true);
+          })
+          .subscribe();
+        var reqCh = sb.channel("tn-requests-" + uidv)
+          .on("postgres_changes", { event: "*", schema: "public", table: "tn_requests", filter: "user_id=eq." + uidv }, function(){
+            refreshFromServer(true);
+          })
+          .subscribe();
+        var walCh = sb.channel("tn-wallet-" + uidv)
+          .on("postgres_changes", { event: "*", schema: "public", table: "tn_wallets", filter: "user_id=eq." + uidv }, function(){
+            refreshFromServer(true);
+          })
+          .subscribe();
+        realtimeChannels = [bidsCh, reqCh, walCh];
+      }
+      var refreshBusy = false;
+      // Settle decided bids that carry no payout yet — the decision landed
+      // while this device was offline, or realtime was missed.
+      function settleUnpaidBids(){
+        if (!sb || !currentUser) return Promise.resolve();
+        return sb.from("tn_bids").select("*").eq("user_id", currentUser.id)
+          .in("status", ["won", "lost"]).is("payout", null).then(function(res){
+            (res.data || []).forEach(function(r){
+              if (settledBidIds[r.id]) return;
+              state.trades = state.trades.filter(function(t){ return t.id !== r.id; });
+              settleBid(r);
+            });
+          }).catch(function(){});
+      }
+      function refreshFromServer(silent){
+        if (!currentUser || refreshBusy) return;
+        refreshBusy = true;
+        loadUserData(currentUser.id, { silent: true }).then(function(ok){
+          refreshBusy = false;
+          if (!ok) return;
+          myReqSig = null;
+          $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
+          renderWallets(); renderHistory(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods(); renderOpenTrades(); renderPayout();
+          settleUnpaidBids();
+        }).catch(function(){ refreshBusy = false; });
       }
 
       /* ================= Fund sheet ================= */
-      // deposit / withdraw: external <-> Main Balance only, routed through
-      // an approval step. transferIn / transferOut: Main <-> Savings, instant;
-      // every transfer in becomes a lot locked for 7 days.
       var sheetMode = "deposit";
       function openSheet(mode){
         sheetMode = mode;
@@ -1623,69 +1704,112 @@
       function closeSheet(){ $("sheetOverlay").className = "overlay"; }
       function sheetError(msg){ var e = $("sheetErr"); e.textContent = msg; e.className = "sheet-err show"; }
       function createFundRequest(type, amt){
-        state.adminRequests.unshift({
-          id: uid(), user: "You (this account)", self: true, type: type,
-          amount: amt, balance: state.main, status: "pending", time: Date.now()
-        });
-        if (state.adminRequests.length > 60) state.adminRequests.length = 60;
+        if (!sb || !currentUser) return Promise.resolve(false);
+        return sb.from("tn_requests").insert({
+          user_id: currentUser.id, type: reqTypeToDb(type), amount: amt, status: "pending"
+        }).select().single().then(function(res){
+          if (res.error){ netErrorToast("Sending your request"); return false; }
+          var r = res.data;
+          state.adminRequests.unshift({
+            id: r.id, user: "You (this account)", self: true, type: type, amount: amt,
+            status: "pending", time: r.created_at ? new Date(r.created_at).getTime() : Date.now()
+          });
+          myReqSig = null;
+          return true;
+        }).catch(function(){ netErrorToast("Sending your request"); return false; });
       }
       // Draw a transfer-out from unlocked lots first (oldest first, FIFO),
-      // then from accrued interest, which is never locked.
+      // then from accrued interest, which is never locked. Persists the
+      // lot changes to tn_savings_lots.
       function consumeSavings(amt, now){
         var left = amt;
         var lots = state.savingsLots.slice().sort(function(a, b){ return a.time - b.time; });
+        var ops = [];
         for (var i = 0; i < lots.length && left > 0; i++){
           var l = lots[i];
           if (now < l.unlockAt || l.remaining <= 0) continue;
           var take = Math.min(l.remaining, left);
           l.remaining -= take; left -= take;
+          (function(lot, rem){
+            if (rem <= 0.004) ops.push(sb.from("tn_savings_lots").delete().eq("id", lot.id));
+            else ops.push(sb.from("tn_savings_lots").update({ amount: rem }).eq("id", lot.id));
+          })(l, l.remaining);
         }
         if (left > 0){ state.interestPool = Math.max(0, state.interestPool - left); }
-        state.savingsLots = state.savingsLots.filter(function(l){ return l.remaining > 0.004; });
+        state.savingsLots = state.savingsLots.filter(function(x){ return x.remaining > 0.004; });
+        syncSavingsTotal();
+        return Promise.all(ops);
       }
       function confirmSheet(){
         var amt = parseFloat($("sheetAmount").value);
         if (!(amt > 0)){ sheetError("Enter an amount above $0."); return; }
         amt = Math.floor(amt * 100) / 100;
         var now = Date.now();
+        var btn = $("sheetConfirm");
+        btn.disabled = true;
+        function done(){ btn.disabled = false; }
         if (sheetMode === "deposit"){
-          createFundRequest("deposit", amt);
-          toast("Deposit requested", fmtUSD(amt) + " to your Main Balance is pending approval — the funds land as soon as it's approved.");
+          createFundRequest("deposit", amt).then(function(ok){
+            done();
+            if (!ok) return;
+            toast("Deposit requested", fmtUSD(amt) + " to your Main Balance is pending approval — the funds land as soon as it's approved.");
+            renderWallets(); closeSheet();
+          });
         } else if (sheetMode === "withdraw"){
           if (amt > withdrawableMain()){
+            done();
             sheetError("You can withdraw up to " + fmtUSD(withdrawableMain()) + " from your Main Balance right now. Savings can't be withdrawn directly — transfer out to Main first.");
             return;
           }
-          createFundRequest("withdraw", amt);
-          toast("Withdrawal requested", fmtUSD(amt) + " from your Main Balance is pending approval.");
+          createFundRequest("withdraw", amt).then(function(ok){
+            done();
+            if (!ok) return;
+            toast("Withdrawal requested", fmtUSD(amt) + " from your Main Balance is pending approval.");
+            renderWallets(); closeSheet();
+          });
         } else if (sheetMode === "transferIn"){
           if (amt > movableMain()){
+            done();
             sheetError("You can move up to " + fmtUSD(movableMain()) + " from your Main Balance right now.");
             return;
           }
-          state.main -= amt; state.savings += amt;
-          state.savingsLots.push({ id: uid(), amount: amt, remaining: amt, time: now, unlockAt: now + LOCK_MS });
-          state.txs.unshift({ id: uid(), type: "transfer_in", amount: amt, note: "Main Balance → Savings · locked until " + fmtTime(now + LOCK_MS), time: now });
-          toast("Transferred to Savings", fmtUSD(amt) + " moved from Main Balance. It earns 15% APY and unlocks on " + fmtTime(now + LOCK_MS) + ".");
+          var unlockAt = new Date(now + LOCK_MS);
+          sb.from("tn_savings_lots").insert({ user_id: currentUser.id, amount: amt, unlock_at: unlockAt.toISOString() }).select().single().then(function(res){
+            if (res.error) throw res.error;
+            state.main -= amt;
+            state.savingsLots.push({ id: res.data.id, amount: amt, remaining: amt, time: now, unlockAt: now + LOCK_MS });
+            syncSavingsTotal();
+            state.txs.unshift({ id: uid(), type: "transfer_in", amount: amt, note: "Main Balance → Savings · locked until " + fmtTime(now + LOCK_MS), time: now });
+            return persistWallet();
+          }).then(function(){
+            done();
+            if (state.txs.length > 120) state.txs.length = 120;
+            renderWallets(); renderHistory(); closeSheet();
+            toast("Transferred to Savings", fmtUSD(amt) + " moved from Main Balance. It earns 15% APY and unlocks on " + fmtTime(now + LOCK_MS) + ".");
+          }).catch(function(){ done(); netErrorToast("Transferring to Savings"); refreshFromServer(true); });
         } else { // transferOut
           var availOut = unlockedSavings(now);
           if (amt > availOut){
+            done();
             sheetError(amt <= state.savings
               ? "Only " + fmtUSD(availOut) + " of your Savings is unlocked — the rest is still inside its 7-day lock. Check the lots under your Savings balance for unlock dates."
               : "That exceeds your Savings balance of " + fmtUSD(state.savings) + ".");
             return;
           }
-          consumeSavings(amt, now);
-          state.savings -= amt; state.main += amt;
-          state.txs.unshift({ id: uid(), type: "transfer_out", amount: amt, note: "Savings → Main Balance · oldest unlocked lots used first", time: now });
-          toast("Transferred to Main Balance", fmtUSD(amt) + " moved from Savings and is available to trade.");
+          consumeSavings(amt, now).then(function(){
+            state.main += amt;
+            state.txs.unshift({ id: uid(), type: "transfer_out", amount: amt, note: "Savings → Main Balance · oldest unlocked lots used first", time: now });
+            return persistWallet();
+          }).then(function(){
+            done();
+            if (state.txs.length > 120) state.txs.length = 120;
+            renderWallets(); renderHistory(); closeSheet();
+            toast("Transferred to Main Balance", fmtUSD(amt) + " moved from Savings and is available to trade.");
+          }).catch(function(){ done(); netErrorToast("Transferring out of Savings"); refreshFromServer(true); });
         }
-        if (state.txs.length > 120) state.txs.length = 120;
-        save(); renderWallets(); renderHistory(); closeSheet();
       }
 
       /* ================= Referrals ================= */
-      var REF_NAMES = ["Adaeze O.", "Funke A.", "Seun B.", "Mariam D.", "Kelvin T.", "Ruth N.", "Peter G.", "Halima Y.", "Chinedu M.", "Sara L."];
       function renderReferrals(){
         $("refCode").textContent = state.refCode;
         $("refLink").textContent = "trybnetwork.demo/join?ref=" + state.refCode;
@@ -1694,7 +1818,7 @@
         $("statRefQualified").textContent = qualified;
         $("statRefEarned").textContent = fmtUSD(state.referralEarned);
         if (!state.referrals.length){
-          $("refList").innerHTML = '<div class="empty">No referrals yet. Simulate a signup to test how the 3 USDT reward works.</div>';
+          $("refList").innerHTML = '<div class="empty">No referrals yet. Share your code — when someone signs up with it, they appear here automatically.</div>';
           return;
         }
         $("refList").innerHTML = state.referrals.map(function(r){
@@ -1702,31 +1826,14 @@
           return '<div class="ref-item"><div class="ri-main">' +
             '<div class="ri-name">' + esc(r.name) + '</div>' +
             '<div class="ri-sub">' + (done
-              ? "First deposit of 12 USDT made " + fmtTime(r.depositTime) + " · you earned 3 USDT"
-              : "Joined " + fmtTime(r.time) + " · waiting for a first deposit of 12 USDT") + "</div></div>" +
-            '<span class="ref-status' + (done ? " done" : "") + '">' + (done ? "Reward paid" : "Pending deposit") + "</span>" +
-            (done ? "" : '<button class="mini-btn" type="button" data-ref-deposit="' + r.id + '">Simulate 12 USDT deposit</button>') +
+              ? "Qualified · you earned 3 USDT"
+              : "Joined " + fmtTime(r.time) + " · signed up with your referral code") + "</div></div>" +
+            '<span class="ref-status' + (done ? " done" : "") + '">' + (done ? "Reward paid" : "Signed up") + "</span>" +
             "</div>";
         }).join("");
       }
-      function simulateReferral(){
-        var name = REF_NAMES[state.referrals.length % REF_NAMES.length];
-        state.referrals.unshift({ id: uid(), name: name, status: "joined", time: Date.now(), depositTime: null });
-        save(); renderReferrals();
-        toast("Referral joined (simulated)", name + " signed up with your code " + state.refCode + ". Simulate their first deposit of 12 USDT to trigger your 3 USDT reward.");
-      }
-      function simulateReferralDeposit(id){
-        var r = null;
-        state.referrals.forEach(function(x){ if (x.id === id) r = x; });
-        if (!r || r.status === "qualified") return;
-        r.status = "qualified"; r.depositTime = Date.now();
-        state.main += REFERRAL_REWARD;
-        state.referralEarned += REFERRAL_REWARD;
-        state.txs.unshift({ id: uid(), type: "referral", amount: REFERRAL_REWARD, note: "Referral reward · " + r.name + " made a first deposit of 12 USDT", time: Date.now() });
-        if (state.txs.length > 120) state.txs.length = 120;
-        save(); renderWallets(); renderHistory(); renderReferrals();
-        toast("Referral bonus +3 USDT", r.name + " deposited 12 USDT — your 3 USDT referral bonus is in your Main Balance.", "win");
-      }
+</script>
+<script>
       /* ================= Menu, profile & payment methods ================= */
       function avatarInitials(name){
         var parts = String(name || "").trim().split(/\s+/).filter(Boolean);
@@ -1751,9 +1858,8 @@
         paintAvatar($("headerAvatar"), state.profile.avatar, state.profile.name, state.profile.photo);
         $("headerName").textContent = state.profile.name;
         $("headerSub").textContent = profileSubLine(state.profile);
-        $("logoutSub").textContent = currentUser ? "Signed in as @" + currentUser.username : "Sign out of this account";
+        $("logoutSub").textContent = currentUser ? "Signed in as @" + state.profile.username : "Sign out of this account";
       }
-      // ---- Drawer open/close ----
       function openDrawer(){
         $("drawer").classList.add("show");
         $("drawerBackdrop").classList.add("show");
@@ -1767,12 +1873,10 @@
         $("drawer").setAttribute("aria-hidden", "true");
         $("menuBtn").setAttribute("aria-expanded", "false");
       }
-      // ---- Generic screen overlays ----
       function openScreen(id){ $(id).className = "overlay show"; }
       function closeScreen(id){ $(id).className = "overlay"; }
-      // ---- Profile ----
       var profileAvatarPick = 0;
-      var profilePhotoPick = "";   // data URL while editing; "" means no photo
+      var profilePhotoPick = "";
       function profileError(msg){ var e = $("profileErr"); e.textContent = msg; e.className = "sheet-err show"; }
       function renderAvatarRow(){
         var row = $("avatarRow");
@@ -1826,10 +1930,26 @@
           if (isNaN(d.getTime()) || d.getTime() > Date.now()){ profileError("Date of birth can't be in the future."); return; }
         }
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ profileError("That email doesn't look right — check it and try again."); return; }
-        state.profile = { name: name, email: email, avatar: profileAvatarPick, username: username, dob: dob, photo: profilePhotoPick };
-        save(); renderProfileEverywhere();
-        closeScreen("profileOverlay");
-        toast("Profile saved", "Full name, username, date of birth, and picture updated — now shown in the header and menu.");
+        if (!sb || !currentUser){ profileError("You're not signed in."); return; }
+        var btn = $("profileSave");
+        btn.disabled = true;
+        sb.from("tn_profiles").update({
+          full_name: name, username: username, date_of_birth: dob || null, avatar_url: profilePhotoPick || null
+        }).eq("id", currentUser.id).then(function(res){
+          btn.disabled = false;
+          if (res.error){
+            profileError(res.error.message && res.error.message.indexOf("duplicate") > -1 ? "That username is already taken — pick another one." : "Couldn't save your profile — check your connection and try again.");
+            return;
+          }
+          state.profile = { name: name, email: state.profile.email, avatar: profileAvatarPick, username: username, dob: dob, photo: profilePhotoPick };
+          if (profileRow){ profileRow.full_name = name; profileRow.username = username; profileRow.date_of_birth = dob || null; profileRow.avatar_url = profilePhotoPick || null; }
+          renderProfileEverywhere();
+          closeScreen("profileOverlay");
+          toast("Profile saved", "Full name, username, date of birth, and picture updated — synced to your account.");
+        }).catch(function(){
+          btn.disabled = false;
+          profileError("Couldn't save your profile — check your connection and try again.");
+        });
       }
       // ---- Transaction History page ----
       var txFilter = "all";
@@ -1867,7 +1987,6 @@
           if (e.time < cutoff) return false;
           return txFilter === "all" || e.cat === txFilter;
         });
-        // Summary stats describe what's currently shown.
         var walletNet = 0, tradePnl = 0;
         entries.forEach(function(e){
           if (e.kind === "tx"){ var s = txSignedAmount(e.tx); if (s !== null) walletNet += s; }
@@ -1892,12 +2011,9 @@
             var resTag = t.result === "won" ? '<span class="res-tag won">Won</span>' :
                          t.result === "lost" ? '<span class="res-tag lost">Lost</span>' : '<span class="res-tag tie">Tie · refunded</span>';
             var pnlTxt = t.pnl > 0 ? "+" + fmtUSD(t.pnl) : t.pnl < 0 ? fmtUSD(t.pnl) : "$0.00";
-            var pricePart = (typeof t.entry === "number" && typeof t.exit === "number")
-              ? " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit)
-              : " · Result decided by admin";
             return '<div class="hist-item"><div class="tx-ico">' + TX_ICONS.trade + '</div><div class="hi-main">' +
               '<div class="hi-title">' + t.asset + ' <span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" + resTag + "</div>" +
-              '<div class="hi-sub num">Binary trade · Stake ' + fmtUSD(t.stake) + pricePart + "<br>" + fmtTime(t.closedAt) + "</div>" +
+              '<div class="hi-sub num">Binary trade · Stake ' + fmtUSD(t.stake) + " · Result decided by admin<br>" + fmtTime(t.closedAt) + "</div>" +
               '</div><div class="hi-amt num ' + (t.pnl > 0 ? "pos" : t.pnl < 0 ? "neg" : "neu") + '">' + pnlTxt + "</div></div>";
           }
           var tx = e.tx, s = txSignedAmount(tx);
@@ -1908,13 +2024,14 @@
             '<div class="hi-sub">' + esc(tx.note || "") + "<br>" + fmtTime(tx.time) + '</div></div>' + amtHtml + "</div>";
         }).join("");
       }
-      // ---- Payment methods ----
+      // ---- Payment methods (device-local payout details; display only) ----
       function maskTail(s){
         s = String(s || "");
         return s.length > 4 ? "•••• " + s.slice(-4) : s;
       }
       function renderPaymentMethods(){
         var box = $("payList");
+        if (!box) return;
         if (!state.paymentMethods.length){
           box.innerHTML = '<div class="empty">No withdrawal methods yet. Add a bank account or crypto wallet address below.</div>';
           return;
@@ -1953,7 +2070,7 @@
           pm = { id: uid(), type: "crypto", coin: coin || "Crypto (USDT)", address: addr, isDefault: state.paymentMethods.length === 0 };
         }
         state.paymentMethods.push(pm);
-        save(); renderPaymentMethods();
+        renderPaymentMethods();
         $("payBankName").value = ""; $("payAcctName").value = ""; $("payAcctNum").value = "";
         $("payCoin").value = ""; $("payAddress").value = "";
         toast("Payout method added", (pm.type === "bank" ? pm.bankName + " · " + maskTail(pm.acctNum) : pm.coin + " · " + maskTail(pm.address)) + " saved. Demo only — no real payouts are sent.");
@@ -1965,7 +2082,6 @@
       }
 
       /* ================= Wiring ================= */
-      // Asset tabs
       var tabsBox = $("assetTabs");
       Object.keys(ASSETS).forEach(function(sym){
         var b = document.createElement("button");
@@ -1980,25 +2096,18 @@
       $("stakeInput").addEventListener("input", renderPayout);
       $("btnHigher").addEventListener("click", function(){ placeBid("higher"); });
       $("btnLower").addEventListener("click", function(){ placeBid("lower"); });
-      // Martingale
-      $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
       $("mgToggle").addEventListener("click", function(){
         state.mgOn = !state.mgOn;
         $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
         if (!state.mgOn) state.mgStep = 0;
-        save(); renderPayout();
+        renderPayout();
         toast(state.mgOn ? "Martingale Mode on" : "Martingale Mode off",
               state.mgOn ? "Stakes will double after each loss and reset after a win." : "Stakes return to the amount you enter.");
       });
-      // Wallets / sheet — Deposit & Withdraw live on Main Balance;
-      // Transfer In / Out live on Savings.
       $("btnDeposit").addEventListener("click", function(){ openSheet("deposit"); });
       $("btnWithdraw").addEventListener("click", function(){ openSheet("withdraw"); });
       $("btnTransferIn").addEventListener("click", function(){ openSheet("transferIn"); });
       $("btnTransferOut").addEventListener("click", function(){ openSheet("transferOut"); });
-      // Wallet card ⓘ toggles: the explanatory subtexts stay hidden until
-      // the icon is tapped; tapping again collapses them. Balances and the
-      // action buttons are always visible — only .card-info content moves.
       function bindInfoToggle(btnId){
         var btn = $(btnId);
         btn.addEventListener("click", function(){
@@ -2019,7 +2128,6 @@
         $("sheetAmount").value = v.toFixed(2);
       });
       $("sheetConfirm").addEventListener("click", confirmSheet);
-      // History tabs
       $("tabTrades").addEventListener("click", function(){
         $("tabTrades").classList.add("active"); $("tabWallet").classList.remove("active");
         $("tradesPane").style.display = ""; $("walletPane").style.display = "none";
@@ -2028,19 +2136,21 @@
         $("tabWallet").classList.add("active"); $("tabTrades").classList.remove("active");
         $("walletPane").style.display = ""; $("tradesPane").style.display = "none";
       });
-      // View switching (Trade & Save app / Transaction History page)
       function setView(v){
         $("appView").style.display = v === "app" ? "" : "none";
         $("txHistoryView").style.display = v === "history" ? "" : "none";
-        if (v === "app" || v === "history") refreshFromStorage();
+        if (v === "app" || v === "history") refreshFromServer(true);
         if (v === "history"){ renderTxHistory(); window.scrollTo(0, 0); }
       }
-      // Referral wiring
-      $("simRefBtn").addEventListener("click", simulateReferral);
-      $("refList").addEventListener("click", function(e){
-        var b = e.target.closest ? e.target.closest("[data-ref-deposit]") : null;
-        if (b) simulateReferralDeposit(b.getAttribute("data-ref-deposit"));
-      });
+      // Referrals: codes are real now — share the code; signups appear live.
+      var simBtn = $("simRefBtn");
+      if (simBtn){
+        simBtn.textContent = "How referrals work";
+        simBtn.addEventListener("click", function(){
+          toast("Referrals are live", "Share your code " + state.refCode + " — anyone who enters it when they sign up is recorded under Refer & Earn automatically, on every device.");
+        });
+      }
+      $("refList").addEventListener("click", function(){});
       $("copyRefBtn").addEventListener("click", function(){
         var code = state.refCode;
         function done(){ toast("Referral code copied", code + " — share it and earn 3 USDT per qualifying referral."); }
@@ -2048,7 +2158,6 @@
           navigator.clipboard.writeText(code).then(done, function(){ toast("Your referral code", code); });
         } else { toast("Your referral code", code); }
       });
-      // Hamburger menu & screens
       $("menuBtn").addEventListener("click", openDrawer);
       $("drawerClose").addEventListener("click", closeDrawer);
       $("drawerBackdrop").addEventListener("click", closeDrawer);
@@ -2072,7 +2181,6 @@
       $("menuProfile").addEventListener("click", function(){ closeDrawer(); openProfile(); });
       $("menuPayment").addEventListener("click", function(){ closeDrawer(); renderPaymentMethods(); syncPayTypeFields(); openScreen("paymentOverlay"); });
       $("menuHelp").addEventListener("click", function(){ closeDrawer(); openScreen("helpOverlay"); });
-      // Profile screen
       $("headerProfile").addEventListener("click", function(){ openProfile(); });
       $("profileName").addEventListener("input", syncProfilePreview);
       $("profileUsername").addEventListener("input", syncProfilePreview);
@@ -2108,7 +2216,6 @@
       $("profileSave").addEventListener("click", saveProfile);
       $("profileCancel").addEventListener("click", function(){ closeScreen("profileOverlay"); });
       $("profileOverlay").addEventListener("click", function(e){ if (e.target === $("profileOverlay")) closeScreen("profileOverlay"); });
-      // Payment screen
       $("payType").addEventListener("change", syncPayTypeFields);
       $("payAdd").addEventListener("click", addPaymentMethod);
       $("paymentClose").addEventListener("click", function(){ closeScreen("paymentOverlay"); });
@@ -2119,7 +2226,7 @@
         if (def){
           var id = def.getAttribute("data-pay-default");
           state.paymentMethods.forEach(function(pm){ pm.isDefault = pm.id === id; });
-          save(); renderPaymentMethods();
+          renderPaymentMethods();
           toast("Default payout method updated", "Withdrawals in this demo would go to the method marked Default.");
         } else if (rem){
           var rid = rem.getAttribute("data-pay-remove");
@@ -2129,18 +2236,17 @@
             return true;
           });
           if (wasDefault && state.paymentMethods.length) state.paymentMethods[0].isDefault = true;
-          save(); renderPaymentMethods();
+          renderPaymentMethods();
           toast("Payout method removed", "The method was deleted from this device.");
         }
       });
-      // Help screen
       $("helpClose").addEventListener("click", function(){ closeScreen("helpOverlay"); });
       $("helpOverlay").addEventListener("click", function(e){ if (e.target === $("helpOverlay")) closeScreen("helpOverlay"); });
       $("faqList").addEventListener("click", function(e){
         var q = e.target.closest ? e.target.closest(".faq-q") : null;
         if (q) q.parentElement.classList.toggle("open");
       });
-      /* ================= Auth gate (sign up / log in / log out) ================= */
+      /* ================= Auth (Supabase) ================= */
       function authTab(which){
         var signup = which === "signup";
         $("signupForm").style.display = signup ? "" : "none";
@@ -2153,167 +2259,193 @@
       $("authTabSignup").addEventListener("click", function(){ authTab("signup"); });
       $("authTabLogin").addEventListener("click", function(){ authTab("login"); });
       function authError(id, msg){ var e = $(id); e.textContent = msg; e.className = "sheet-err show"; }
-      // Bring the signed-in account's state on screen: hide the gate
-      // and re-render everything from the freshly loaded state.
       function enterApp(){
         $("authGate").classList.remove("show");
-        // Keep the account record's referral code in step with the app
-        // state so codes entered at signup can be matched.
-        if (currentUser) currentUser = updateAccount(currentUser.username, { refCode: state.refCode }) || currentUser;
         $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
         setView("app");
-        applyBidResults();
         renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); loadTvChart();
         renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
-        save();
+        setupRealtime();
+        settleUnpaidBids();
       }
-      function startSession(acct){
-        currentUser = acct;
-        try { localStorage.setItem(SESSION_KEY, acct.username); } catch(e){}
+      function showGate(){
+        teardownRealtime();
+        currentUser = null; profileRow = null; walletRow = null;
+        state = blankState();
+        settledBidIds = {};
+        setView("app");
+        $("liPass").value = "";
+        authTab("login");
+        $("authGate").classList.add("show");
       }
       $("signupForm").addEventListener("submit", function(e){
         e.preventDefault();
+        if (!sb){ authError("suErr", "Couldn't reach the server — check your connection and try again."); return; }
         var name = $("suName").value.trim();
         var username = $("suUsername").value.trim().replace(/^@+/, "");
         var email = $("suEmail").value.trim();
         var pass = $("suPass").value;
+        var dobEl = $("suDob");
+        var dob = dobEl ? dobEl.value : "";
         var ref = $("suRef").value.trim();
         if (!name){ authError("suErr", "Enter your full name."); return; }
         if (!/^[A-Za-z0-9_]{3,20}$/.test(username)){ authError("suErr", "Username needs 3–20 characters: letters, numbers, or underscores only."); return; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ authError("suErr", "That email doesn't look right — check it and try again."); return; }
         if (pass.length < 6){ authError("suErr", "Password must be at least 6 characters."); return; }
-        var accts = loadAccounts();
-        var unameTaken = accts.some(function(a){ return a.username.toLowerCase() === username.toLowerCase(); });
-        if (unameTaken){ authError("suErr", "That username is already taken — pick another one."); return; }
-        var emailTaken = accts.some(function(a){ return a.email.toLowerCase() === email.toLowerCase(); });
-        if (emailTaken){ authError("suErr", "An account with this email already exists — try logging in instead."); return; }
-        var referrer = null;
-        if (ref){
-          referrer = findAccountByRefCode(ref);
-          if (!referrer){ authError("suErr", "That referral code doesn't match any account. Check it, or leave the field empty."); return; }
+        if (dob){
+          var dd = new Date(dob + "T00:00:00");
+          if (isNaN(dd.getTime()) || dd.getTime() > Date.now()){ authError("suErr", "Date of birth can't be in the future."); return; }
         }
-        var acct = {
-          name: name, username: username, email: email, pass: pass,
-          refCode: "", referredBy: referrer ? referrer.username : null,
-          refRewardDone: false, createdAt: Date.now()
-        };
-        accts.push(acct); saveAccounts(accts);
-        startSession(acct);
-        // A brand-new account starts from a fresh state — which already
-        // carries the silent 3 USDT welcome bonus in Main Balance.
-        state = loadForUser(username) || freshState();
-        normalizeState();
-        state.profile.name = name;
-        state.profile.username = username;
-        state.profile.email = email;
-        acct = updateAccount(username, { refCode: state.refCode }) || acct;
-        currentUser = acct;
-        if (referrer){
-          // Record the referral under the referrer, in their own state.
-          var rs = loadForUser(referrer.username);
-          if (rs){
-            if (!Array.isArray(rs.referrals)) rs.referrals = [];
-            rs.referrals.unshift({ id: uid(), name: name, status: "joined", time: Date.now(), depositTime: null, account: username });
-            try { localStorage.setItem(stateKey(referrer.username), JSON.stringify(rs)); } catch(e){}
-          }
+        var form = $("signupForm");
+        var submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true; submitBtn.textContent = "Creating account…";
+        function fail(msg){
+          submitBtn.disabled = false; submitBtn.textContent = "Create account";
+          authError("suErr", msg);
         }
-        enterApp();
-        toast("Welcome to TrybNetwork, " + name.split(" ")[0], "Your account is ready — your Main Balance, Savings, and the Binary Arena are all set up.");
+        // Username / email uniqueness + referral lookup, then auth signup.
+        Promise.all([
+          sb.from("tn_profiles").select("id").eq("username", username).maybeSingle(),
+          sb.from("tn_profiles").select("id").eq("email", email).maybeSingle(),
+          ref ? sb.from("tn_profiles").select("id").eq("referral_code", ref.toUpperCase()).maybeSingle() : Promise.resolve({ data: null })
+        ]).then(function(checks){
+          if (checks[0].data){ fail("That username is already taken — pick another one."); return null; }
+          if (checks[1].data){ fail("An account with this email already exists — try logging in instead."); return null; }
+          if (ref && !checks[2].data){ fail("That referral code doesn't match any account. Check it, or leave the field empty."); return null; }
+          var referredBy = checks[2].data ? checks[2].data.id : null;
+          return sb.auth.signUp({ email: email, password: pass }).then(function(res){
+            if (res.error){
+              var m = (res.error.message || "").toLowerCase();
+              if (m.indexOf("already") > -1) fail("An account with this email already exists — try logging in instead.");
+              else fail("Couldn't create your account — " + (res.error.message || "please try again."));
+              return null;
+            }
+            var user = res.data.user;
+            if (!user){ fail("Account created — check your email to confirm, then log in."); return null; }
+            var refCode = makeRefCode();
+            var profile = {
+              id: user.id, full_name: name, username: username, email: email,
+              date_of_birth: dob || null, avatar_url: null,
+              referral_code: refCode, referred_by: referredBy
+            };
+            return sb.from("tn_profiles").insert(profile).then(function(pr){
+              if (pr.error){ fail("Your login was created but the profile couldn't be saved — try logging in."); return null; }
+              return sb.from("tn_wallets").insert({
+                user_id: user.id, main_balance: WELCOME_BONUS, savings_interest: 0, traded_volume: 0, bonus_locked: true
+              }).then(function(wr){
+                if (wr.error){ fail("Your account was created but the wallet couldn't be set up — try logging in."); return null; }
+                var after = function(){
+                  currentUser = user;
+                  return loadUserData(user.id).then(function(){
+                    submitBtn.disabled = false; submitBtn.textContent = "Create account";
+                    enterApp();
+                    toast("Welcome to TrybNetwork, " + name.split(" ")[0], "Your account is ready — your Main Balance, Savings, and the Binary Arena are all set up, on every device.");
+                  });
+                };
+                if (referredBy){
+                  return sb.from("tn_referrals").insert({ referrer_id: referredBy, referred_id: user.id, reward_paid: false }).then(after, after);
+                }
+                return after();
+              });
+            });
+          });
+        }).catch(function(){
+          fail("Couldn't reach the server — check your connection and try again.");
+        });
       });
       $("loginForm").addEventListener("submit", function(e){
         e.preventDefault();
-        var acct = findAccount($("liId").value);
-        if (!acct || acct.pass !== $("liPass").value){
-          authError("liErr", "Wrong username/email or password — check your details and try again.");
-          return;
+        if (!sb){ authError("liErr", "Couldn't reach the server — check your connection and try again."); return; }
+        var idv = $("liId").value.trim();
+        var pass = $("liPass").value;
+        if (!idv || !pass){ authError("liErr", "Enter your username or email and your password."); return; }
+        var form = $("loginForm");
+        var submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true; submitBtn.textContent = "Logging in…";
+        function fail(msg){
+          submitBtn.disabled = false; submitBtn.textContent = "Log In";
+          authError("liErr", msg);
         }
-        startSession(acct);
-        state = loadForUser(acct.username) || freshState();
-        normalizeState();
-        if (!loadForUser(acct.username)){
-          // First ever sign-in for this account on this browser: seed the
-          // profile from the account record.
-          state.profile.name = acct.name;
-          state.profile.username = acct.username;
-          state.profile.email = acct.email;
+        function doSignIn(email){
+          sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res){
+            if (res.error || !res.data.user){ fail("Wrong username/email or password — check your details and try again."); return; }
+            currentUser = res.data.user;
+            loadUserData(currentUser.id).then(function(ok){
+              submitBtn.disabled = false; submitBtn.textContent = "Log In";
+              if (!ok || !profileRow){ authError("liErr", "Signed in, but your profile couldn't be loaded — try again."); return; }
+              enterApp();
+              toast("Welcome back, " + state.profile.name.split(" ")[0], "Signed in as @" + state.profile.username + ".");
+            });
+          }).catch(function(){ fail("Couldn't reach the server — check your connection and try again."); });
         }
-        currentUser = acct;
-        enterApp();
-        toast("Welcome back, " + acct.name.split(" ")[0], "Signed in as @" + acct.username + ".");
+        if (idv.indexOf("@") > -1){ doSignIn(idv); return; }
+        // Username login: resolve the account's email first.
+        sb.from("tn_profiles").select("email").eq("username", idv.replace(/^@+/, "")).maybeSingle().then(function(res){
+          if (!res.data || !res.data.email){ fail("Wrong username/email or password — check your details and try again."); return; }
+          doSignIn(res.data.email);
+        }).catch(function(){ fail("Couldn't reach the server — check your connection and try again."); });
       });
       $("menuLogout").addEventListener("click", function(){
         closeDrawer();
-        save();
-        currentUser = null;
-        try { localStorage.removeItem(SESSION_KEY); } catch(e){}
-        setView("app");
-        $("liPass").value = "";
-        authTab("login");
-        $("authGate").classList.add("show");
+        persistWallet();
+        if (sb) sb.auth.signOut().catch(function(){});
+        showGate();
       });
-      // Reset demo (two-tap confirm — no blocking dialogs)
-      var resetArmed = false, resetTimer = null;
+      // Reset demo: with synced accounts there is nothing local to wipe —
+      // explain instead of erasing the account.
       $("resetBtn").addEventListener("click", function(){
-        if (!resetArmed){
-          resetArmed = true;
-          $("resetBtn").textContent = "Tap again to erase everything and restart";
-          $("resetBtn").classList.add("armed");
-          resetTimer = setTimeout(function(){
-            resetArmed = false; $("resetBtn").textContent = "Reset demo"; $("resetBtn").classList.remove("armed");
-          }, 4000);
-          return;
-        }
-        clearTimeout(resetTimer);
-        try { localStorage.removeItem(LS_KEY); if (currentUser) localStorage.removeItem(stateKey(currentUser.username)); } catch(e){}
-        state = freshState();
-        $("mgToggle").setAttribute("aria-checked", "false");
-        $("stakeInput").value = "10";
-        save(); renderWallets(); renderHistory(); renderPayout(); renderOpenTrades(); renderPrice(); loadTvChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
-        toast("Demo reset", "Fresh start: balances, lots, and history have been reset.");
-        resetArmed = false; $("resetBtn").textContent = "Reset demo"; $("resetBtn").classList.remove("armed");
+        toast("Accounts are synced now", "Your balance, savings, and history live in your account and follow you across devices — there's no local demo data to reset. Use Log Out in the menu to switch accounts.");
       });
 
-      /* ================= Live sync with admin decisions =================
-         Deposit/withdrawal approvals and bid results are written into the
-         account's saved state (possibly from another tab). Whenever this
-         dashboard regains focus, becomes visible again, or the saved state
-         changes in another tab, reload it, settle any newly decided bids,
-         and re-render — so balances and statuses reflect the decision
-         immediately, with no manual reload. */
-      function refreshFromStorage(){
-        if (!currentUser) return;
-        var fresh = loadForUser(currentUser.username);
-        if (!fresh) return;
-        state = fresh;
-        normalizeState();
-        applyBidResults();   // pay out / settle any bids the admin just decided
-        state.lastTick = Date.now();   // interest keeps accruing from here; no double-count
-        myReqSig = null;               // force the My Requests panel to rebuild
-        $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
-        renderWallets(); renderHistory(); renderReferrals();
-        renderProfileEverywhere(); renderPaymentMethods(); renderOpenTrades(); renderPayout();
-      }
-      window.addEventListener("focus", refreshFromStorage);
-      document.addEventListener("visibilitychange", function(){ if (!document.hidden) refreshFromStorage(); });
-      window.addEventListener("storage", function(e){
-        if (currentUser && e.key === stateKey(currentUser.username)) refreshFromStorage();
-      });
+      /* ================= Live sync ================= */
+      window.addEventListener("focus", function(){ refreshFromServer(true); });
+      document.addEventListener("visibilitychange", function(){ if (!document.hidden) refreshFromServer(true); });
 
-      /* ================= Main loop ================= */
-      var lastSave = 0;
+      /* ================= Main loop =================
+         1s: accrue interest client-side and refresh balances/countdowns.
+         60s: persist the accrued interest to tn_wallets. */
+      var lastSave = 0, lastInterestPersist = Date.now();
       function loop(){
         var now = Date.now();
         var dt = Math.max(0, (now - state.lastTick) / 1000);
         state.lastTick = now;
-        if (state.savings > 0 && dt > 0) addInterest(state.savings * APY * dt / YEAR_SECS);
-        renderWallets();
-        if (now - lastSave > 4000){ save(); lastSave = now; }
+        if (dt > 0 && currentUser) accrueInterest(now);
+        if (currentUser) renderWallets();
+        if (currentUser && now - lastInterestPersist > 60000){
+          lastInterestPersist = now;
+          if (state.savings > 0) persistWallet();
+        }
+        lastSave = now;
       }
       renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); loadTvChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
-      save();
       setInterval(loop, TICK_MS);
-      // No session → the auth gate covers the app until sign up / log in.
-      if (!currentUser) $("authGate").classList.add("show");
+
+      /* ================= Session restore ================= */
+      if (!sb){
+        $("authGate").classList.add("show");
+        toast("Connection problem", "The account service couldn't load — check your connection and reload the app.", "lose");
+      } else {
+        sb.auth.getSession().then(function(res){
+          var session = res.data && res.data.session;
+          if (session && session.user){
+            currentUser = session.user;
+            loadUserData(currentUser.id).then(function(ok){
+              if (ok && profileRow) enterApp();
+              else $("authGate").classList.add("show");
+            });
+          } else {
+            $("authGate").classList.add("show");
+          }
+        }).catch(function(){ $("authGate").classList.add("show"); });
+        sb.auth.onAuthStateChange(function(event, session){
+          if (event === "SIGNED_OUT"){ if (currentUser) showGate(); }
+          else if (event === "SIGNED_IN" && session && session.user && (!currentUser || currentUser.id !== session.user.id)){
+            currentUser = session.user;
+            loadUserData(currentUser.id).then(function(ok){ if (ok && profileRow) enterApp(); });
+          }
+        });
+      }
     </script>
+
   </body>
 </html>
