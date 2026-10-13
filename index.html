@@ -738,7 +738,7 @@
         <!-- Arena -->
         <section class="panel" aria-label="Binary options arena">
           <h2 class="sec">Binary Arena</h2>
-          <p class="sec-sub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays double your stake — your stake back plus profit equal to your stake — a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
+          <p class="sec-sub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays back your stake plus 90% profit on it — a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
 
           <div class="assets" id="assetTabs"></div>
 
@@ -1084,7 +1084,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does the Binary Arena work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Pick an asset (BTC, ETH, EURUSD, or gold), set a stake from your Main Balance, and bid <b>Higher</b> or <b>Lower</b>. Your stake is <b>locked</b> the moment you bid, and the bid sits at <b>Awaiting result</b> until the admin decides it. A win pays <b>double your stake</b> — your stake back plus profit equal to your stake — into your Main Balance; a loss forfeits the locked stake. The chart streams live prices from TradingView for reference — results are decided by the admin, not by the chart.</div>
+            <div class="faq-a">Pick an asset (BTC, ETH, EURUSD, or gold), set a stake from your Main Balance, and bid <b>Higher</b> or <b>Lower</b>. Your stake is <b>locked</b> the moment you bid, and the bid sits at <b>Awaiting result</b> until the admin decides it. A win pays <b>your stake back plus 90% profit</b> on it into your Main Balance; a loss forfeits the locked stake. The chart streams live prices from TradingView for reference — results are decided by the admin, not by the chart.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">What is Martingale Mode?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1114,7 +1114,7 @@
       var APY = 0.15;
       var YEAR_SECS = 365 * 24 * 3600;
       var LOCK_MS = 7 * 24 * 3600 * 1000;
-      var PAYOUT_RATE = 1.0;
+      var PAYOUT_RATE = 0.9;
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
       var REFERRAL_REWARD = 3;
