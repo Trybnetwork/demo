@@ -1569,7 +1569,7 @@
           if (ok === false){ /* persistWallet already toasted */ }
           renderWallets(); renderOpenTrades(); renderPayout();
           toast("Bid placed · " + asset + " " + (dir === "higher" ? "Higher" : "Lower"),
-                "Stake " + fmtUSD(stake) + " locked from Main Balance · awaiting the admin's result.");
+                "Stake " + fmtUSD(stake) + " locked from Main Balance · awaiting result.");
         }).catch(function(){
           bidBusy = false;
           $("btnHigher").disabled = false; $("btnLower").disabled = false;
