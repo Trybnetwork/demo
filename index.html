@@ -115,6 +115,20 @@
       .lock-note svg{flex:0 0 auto; margin-top:1px;}
       .pending-note{margin-top:10px; font-size:12px; color:var(--gold-bright); font-weight:700; line-height:1.5;}
 
+      /* ---------- Card info toggles ---------- */
+      /* Explanatory subtexts stay collapsed until the card's ⓘ is tapped. */
+      .w-head-right{display:flex; align-items:center; gap:6px;}
+      .info-btn{
+        width:22px; height:22px; border-radius:50%; flex:0 0 auto; padding:0; cursor:pointer;
+        border:1px solid var(--line-soft); background:transparent; color:var(--muted);
+        display:inline-flex; align-items:center; justify-content:center;
+      }
+      .info-btn:active{transform:translateY(1px);}
+      .info-btn[aria-expanded="true"]{color:var(--gold-bright); border-color:var(--line); background:rgba(201,162,75,.10);}
+      .wallet .card-info{display:none;}
+      .wallet.info-open .card-info{display:block;}
+      .wallet.info-open .lock-note.card-info{display:flex;}
+
       /* ---------- Savings lots ---------- */
       .lots{margin-top:14px; border-top:1px solid var(--line-soft); padding-top:12px;}
       .lots h4{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:0 0 6px; font-weight:800;}
@@ -648,10 +662,15 @@
         <div class="wallet">
           <div class="w-head">
             <span class="w-label">Main Balance</span>
-            <span class="w-chip plain">Trading wallet</span>
+            <span class="w-head-right">
+              <span class="w-chip plain">Trading wallet</span>
+              <button class="info-btn" id="mainInfoBtn" type="button" aria-expanded="false" aria-controls="mainCardSub" aria-label="About Main Balance">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+              </button>
+            </span>
           </div>
           <div class="w-balance num" id="mainBalance">$0.00</div>
-          <div class="w-sub">Deposits and withdrawals apply to this balance only — and it's the only balance you can trade with.</div>
+          <div class="w-sub card-info" id="mainCardSub">Deposits and withdrawals apply to this balance only — and it's the only balance you can trade with.</div>
           <div class="w-actions">
             <button class="btn" id="btnDeposit" type="button">Deposit</button>
             <button class="btn ghost" id="btnWithdraw" type="button">Withdraw</button>
@@ -661,17 +680,22 @@
         <div class="wallet savings">
           <div class="w-head">
             <span class="w-label">Savings</span>
-            <span class="w-chip">15% APY</span>
+            <span class="w-head-right">
+              <span class="w-chip">15% APY</span>
+              <button class="info-btn" id="savingsInfoBtn" type="button" aria-expanded="false" aria-controls="savingsEarnedSub savingsAvail savingsLots savingsLockNote" aria-label="About Savings">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+              </button>
+            </span>
           </div>
           <div class="w-balance num" id="savingsBalance">$0.00</div>
-          <div class="w-sub">Interest earned so far: <span class="earned num" id="interestEarned">$0.00</span> · accrues every second</div>
-          <div class="w-sub num" id="savingsAvail" style="margin-top:3px;"></div>
+          <div class="w-sub card-info" id="savingsEarnedSub">Interest earned so far: <span class="earned num" id="interestEarned">$0.00</span> · accrues every second</div>
+          <div class="w-sub num card-info" id="savingsAvail" style="margin-top:3px;"></div>
           <div class="w-actions">
             <button class="btn" id="btnTransferIn" type="button">Transfer In</button>
             <button class="btn ghost" id="btnTransferOut" type="button">Transfer Out</button>
           </div>
-          <div id="savingsLots"></div>
-          <div class="lock-note">
+          <div id="savingsLots" class="card-info"></div>
+          <div class="lock-note card-info" id="savingsLockNote">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E77A0" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
             <span>Every transfer into Savings is locked for 7 days before it can move back to Main. Savings has no deposit or withdrawal of its own — money enters and leaves only through Main Balance — and savings funds can never be staked on a trade.</span>
           </div>
@@ -2047,6 +2071,19 @@
       $("btnWithdraw").addEventListener("click", function(){ openSheet("withdraw"); });
       $("btnTransferIn").addEventListener("click", function(){ openSheet("transferIn"); });
       $("btnTransferOut").addEventListener("click", function(){ openSheet("transferOut"); });
+      // Wallet card ⓘ toggles: the explanatory subtexts stay hidden until
+      // the icon is tapped; tapping again collapses them. Balances and the
+      // action buttons are always visible — only .card-info content moves.
+      function bindInfoToggle(btnId){
+        var btn = $(btnId);
+        btn.addEventListener("click", function(){
+          var card = btn.closest(".wallet");
+          var open = card.classList.toggle("info-open");
+          btn.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+      }
+      bindInfoToggle("mainInfoBtn");
+      bindInfoToggle("savingsInfoBtn");
       $("sheetCancel").addEventListener("click", closeSheet);
       $("sheetOverlay").addEventListener("click", function(e){ if (e.target === $("sheetOverlay")) closeSheet(); });
       $("sheetMax").addEventListener("click", function(){
