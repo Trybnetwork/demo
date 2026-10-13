@@ -90,7 +90,7 @@
         border:1px solid var(--line-soft); border-radius:var(--radius);
         padding:18px;
       }
-      .wallet.savings{border-color:var(--line);}
+      .wallet.mining{border-color:var(--line);}
       .wallet .w-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
       .wallet .w-label{font-size:11.5px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--muted);}
       .wallet .w-chip{
@@ -131,15 +131,22 @@
       .wallet.info-open .card-info{display:block;}
       .wallet.info-open .lock-note.card-info{display:flex;}
 
-      /* ---------- Savings lots ---------- */
-      .lots{margin-top:14px; border-top:1px solid var(--line-soft); padding-top:12px;}
-      .lots h4{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:0 0 6px; font-weight:800;}
-      .lot-row{display:flex; gap:12px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--line-soft);}
-      .lot-row:last-child{border-bottom:0;}
-      .lot-amt{font-family:"Sora",sans-serif; font-weight:800; font-size:14.5px; white-space:nowrap; padding-top:1px;}
-      .lot-meta{font-size:12px; color:var(--muted); line-height:1.55;}
-      .lot-open{color:var(--green); font-weight:700;}
-      .lot-count{color:var(--gold-bright); font-weight:800;}
+      /* ---------- Mining ---------- */
+      .cd{color:var(--gold-bright); font-weight:800;}
+      .tier-row{display:flex; gap:12px; align-items:center; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:14px; padding:13px 14px; margin-bottom:10px;}
+      .tier-row .tier-main{flex:1; min-width:0;}
+      .tier-row .tier-name{font-family:"Sora",sans-serif; font-weight:800; font-size:15px;}
+      .tier-row .tier-sub{font-size:12px; color:var(--muted); margin-top:2px; line-height:1.5;}
+      .tier-row .tier-price{font-family:"Sora",sans-serif; font-weight:800; font-size:16px; white-space:nowrap;}
+      .tier-row .buy-btn{flex:0 0 auto; cursor:pointer; border:1px solid var(--line); background:rgba(201,162,75,.10); color:var(--gold-bright); font-family:"Manrope",sans-serif; font-weight:800; font-size:13px; padding:9px 16px; border-radius:10px;}
+      .tier-row .buy-btn:active{transform:translateY(1px);}
+      .tier-row .buy-btn:disabled{opacity:.45; cursor:not-allowed;}
+      .tier-row.owned{border-color:var(--line);}
+      .tier-row.selected{border-color:var(--gold); background:rgba(201,162,75,.06);}
+      .owned-tag{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:3px 7px; border-radius:6px; text-transform:uppercase; background:var(--green-dark); color:var(--green); margin-left:7px; vertical-align:2px;}
+      .pack-form{margin-top:16px; border-top:1px solid var(--line-soft); padding-top:16px;}
+      .pack-preview{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-top:10px; font-size:12.5px; color:var(--muted);}
+      .pack-preview .pp-profit{color:var(--green); font-weight:800;}
 
       /* ---------- Layout ---------- */
       .grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:14px; align-items:start;}
@@ -584,7 +591,7 @@
             <p>Trade &amp; Save</p>
           </div>
         </div>
-        <p class="auth-intro">Create your account to start trading and saving, or log in to pick up right where you left off.</p>
+        <p class="auth-intro">Create your account to start trading and mining, or log in to pick up right where you left off.</p>
         <div class="seg auth-tabs" role="tablist" aria-label="Sign up or log in">
           <button type="button" id="authTabSignup" class="active">Sign Up</button>
           <button type="button" id="authTabLogin">Log In</button>
@@ -702,27 +709,26 @@
           </div>
           <div class="pending-note" id="mainPending" style="display:none;"></div>
         </div>
-        <div class="wallet savings">
+        <div class="wallet mining">
           <div class="w-head">
-            <span class="w-label">Savings</span>
+            <span class="w-label">Mining</span>
             <span class="w-head-right">
-              <span class="w-chip">15% APY</span>
-              <button class="info-btn" id="savingsInfoBtn" type="button" aria-expanded="false" aria-controls="savingsEarnedSub savingsAvail savingsLots savingsLockNote" aria-label="About Savings">
+              <span class="w-chip" id="minerChip">No miner</span>
+              <button class="info-btn" id="miningInfoBtn" type="button" aria-expanded="false" aria-controls="miningInfo" aria-label="About Mining">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
               </button>
             </span>
           </div>
-          <div class="w-balance num" id="savingsBalance">$0.00</div>
-          <div class="w-sub card-info" id="savingsEarnedSub">Interest earned so far: <span class="earned num" id="interestEarned">$0.00</span> · accrues every second</div>
-          <div class="w-sub num card-info" id="savingsAvail" style="margin-top:3px;"></div>
+          <div class="w-balance num" id="miningBalance">$0.00</div>
+          <div class="w-sub num" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
           <div class="w-actions">
-            <button class="btn" id="btnTransferIn" type="button">Transfer In</button>
-            <button class="btn ghost" id="btnTransferOut" type="button">Transfer Out</button>
+            <button class="btn" id="btnBuyMiner" type="button">Buy Miner</button>
+            <button class="btn" id="btnStartMining" type="button" style="display:none;">Start Mining</button>
+            <button class="btn ghost" id="btnCashout" type="button" disabled>Cashout</button>
           </div>
-          <div id="savingsLots" class="card-info"></div>
-          <div class="lock-note card-info" id="savingsLockNote">
+          <div class="lock-note card-info" id="miningInfo">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E77A0" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-            <span>Every transfer into Savings is locked for 7 days before it can move back to Main. Savings has no deposit or withdrawal of its own — money enters and leaves only through Main Balance — and savings funds can never be staked on a trade.</span>
+            <span>Pick a mining pack and put in any amount in its range with your Main Balance — your daily profit is the pack's percentage of what you put in. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining balance. Cashout moves your whole Mining balance into Main Balance once your pack's lock has passed: Starter can cash out any day, Pro after 3 days, Industrial after 7 days, Whale after 30 days. Buying a new pack replaces your current rig; your Mining balance carries over.</span>
           </div>
         </div>
       </section>
@@ -855,7 +861,6 @@
             <button type="button" class="filter-chip" data-txf="deposits">Deposits</button>
             <button type="button" class="filter-chip" data-txf="withdrawals">Withdrawals</button>
             <button type="button" class="filter-chip" data-txf="transfers">Transfers</button>
-            <button type="button" class="filter-chip" data-txf="interest">Interest</button>
             <button type="button" class="filter-chip" data-txf="referrals">Referral bonuses</button>
             <button type="button" class="filter-chip" data-txf="rejected">Rejected</button>
           </div>
@@ -872,7 +877,7 @@
       </div>
 
       <footer>
-        <p>TrybNetwork Trade &amp; Save is a simulation. All balances are virtual and nothing here involves real money or financial advice. The arena chart streams live market prices for reference only, and bid results are decided by the admin. Savings interest and trade payouts are illustrative only.</p>
+        <p>TrybNetwork Trade &amp; Save is a simulation. All balances are virtual and nothing here involves real money or financial advice. The arena chart streams live market prices for reference only, and bid results are decided by the admin. Mining profits and trade payouts are illustrative only.</p>
         <button class="reset-btn" id="resetBtn" type="button">Reset demo</button>
       </footer>
     </div>
@@ -915,6 +920,30 @@
       </div>
     </div>
 
+    <!-- Buy Miner sheet -->
+    <div class="overlay" id="minerOverlay">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="minerTitle">
+        <h3 id="minerTitle">Buy a Mining Pack</h3>
+        <p class="sheet-sub">Pick a pack, then enter how much to put in — the amount comes out of your Main Balance, and your daily profit is the pack's percentage of it. Start it from the Mining card and it runs for 24 hours, then credits its profit to your Mining balance. One miner per account: buying a new pack replaces your current one, and your Mining balance carries over.</p>
+        <div id="minerTiers"></div>
+        <div class="pack-form" id="packForm" style="display:none;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label for="packAmount" id="packAmountLabel">Purchase amount</label>
+            <div class="amt-wrap"><span>$</span><input id="packAmount" class="num" type="number" inputmode="decimal" min="0" step="1" placeholder="0" /></div>
+          </div>
+          <div class="pack-preview">
+            <span id="packAvail"></span>
+            <span class="pp-profit num" id="packProfit"></span>
+          </div>
+        </div>
+        <div class="sheet-err" id="minerErr"></div>
+        <div class="sheet-btns">
+          <button class="btn ghost" id="minerClose" type="button">Cancel</button>
+          <button class="btn" id="minerConfirm" type="button" style="display:none;">Buy pack</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Hamburger drawer -->
     <div class="drawer-backdrop" id="drawerBackdrop"></div>
     <aside class="drawer" id="drawer" aria-label="Menu" aria-hidden="true">
@@ -948,7 +977,7 @@
         </button>
         <button class="drawer-item" id="menuHelp" type="button">
           <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3A2.6 2.6 0 1 1 12 12.4V14"/><path d="M12 17.2h.01"/></svg></span>
-          <span>Help<span class="di-sub">Wallets, savings lock, bonuses &amp; the arena</span></span>
+          <span>Help<span class="di-sub">Wallets, mining, bonuses &amp; the arena</span></span>
           <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
         <button class="drawer-item" id="menuLogout" type="button">
@@ -1068,11 +1097,11 @@
         <div id="faqList">
           <div class="faq-item open">
             <button class="faq-q" type="button">What are the two wallets?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">You have a <b>Main Balance</b> and a <b>Savings</b> wallet, and they never mix. Deposits and withdrawals apply to Main Balance only, and Main is the only balance you can trade with. Savings has no deposit or withdrawal of its own — money enters and leaves Savings only by transferring to or from Main Balance, and savings funds can never be staked on a trade.</div>
+            <div class="faq-a">You have a <b>Main Balance</b> and a <b>Mining</b> balance. Deposits and withdrawals apply to Main Balance only, and Main is the only balance you can trade with. Mining profits collect in your Mining balance and only reach Main when you cash out — mining funds can never be staked on a trade.</div>
           </div>
           <div class="faq-item">
-            <button class="faq-q" type="button">How does Savings earn, and what is the 7-day lock?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Savings earns <b>15% APY</b>, accruing every second on whatever is saved. Every transfer into Savings becomes a separate lot that is <b>locked for 7 days</b> before it can move back to Main — each lot shows its own unlock countdown under your Savings balance. Interest you earn is never locked, and when you transfer out, your oldest unlocked lots are used first.</div>
+            <button class="faq-q" type="button">How does Mining work, and when can I cash out?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Buy a mining pack from the Mining card — <b>Starter</b> ($5–$49, 3% per day), <b>Pro</b> ($50–$499, 7% per day), <b>Industrial</b> ($500–$4,999, 15% per day) or <b>Whale</b> ($5,000+, 30% per day) — and enter any amount in the pack's range; your daily profit is that percentage of your amount. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining balance; you start each new cycle yourself. <b>Cashout</b> locks depend on the pack: Starter can cash out any day, Pro after 3 days, Industrial after 7 days and Whale after 30 days — then it moves your whole Mining balance into Main Balance.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How do deposits and withdrawals work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1080,7 +1109,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">What bonuses are there?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals and transfers out until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every referral whose first deposit is <b>12 USDT</b> — track it in the Refer &amp; Earn panel and share your referral code from there.</div>
+            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every referral whose first deposit is <b>12 USDT</b> — track it in the Refer &amp; Earn panel and share your referral code from there.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does the Binary Arena work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1111,15 +1140,30 @@
       var sb = null;
       try { sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null; } catch(e){ sb = null; }
 
-      var APY = 0.15;
-      var YEAR_SECS = 365 * 24 * 3600;
-      var LOCK_MS = 7 * 24 * 3600 * 1000;
+      var CYCLE_MS = 24 * 3600 * 1000;
+      /* Flexible mining packs: the user puts in any amount within the
+         pack's range and earns rate × amount per 24h cycle. Cashout is
+         locked for lockDays counted from purchased_at (0 = any day). */
+      var MINER_PACKS = [
+        { name: "Starter pack", min: 5, max: 49, rate: 0.03, lockDays: 0 },
+        { name: "Pro pack", min: 50, max: 499, rate: 0.07, lockDays: 3 },
+        { name: "Industrial pack", min: 500, max: 4999, rate: 0.15, lockDays: 7 },
+        { name: "Whale pack", min: 5000, max: null, rate: 0.30, lockDays: 30 }
+      ];
+      function packByName(name){
+        for (var i = 0; i < MINER_PACKS.length; i++) if (MINER_PACKS[i].name === name) return MINER_PACKS[i];
+        return null;
+      }
+      // Cashout lock for a stored miner, derived from its tier name.
+      // Tiers from before the pack system keep the old 7-day lock.
+      function lockMsForTier(tier){
+        var p = packByName(tier);
+        return (p ? p.lockDays : 7) * 24 * 3600 * 1000;
+      }
       var PAYOUT_RATE = 0.9;
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
       var REFERRAL_REWARD = 3;
-      var INTEREST_LOG_AT = 0.10;
-
       var ASSETS = {
         BTCUSD: { name: "Bitcoin / USD",  tv: "COINBASE:BTCUSD", dec: 2 },
         ETHUSD: { name: "Ethereum / USD", tv: "COINBASE:ETHUSD", dec: 2 },
@@ -1168,13 +1212,12 @@
       var currentUser = null;      // supabase auth user
       var profileRow = null;       // tn_profiles row
       var walletRow = null;        // tn_wallets row
-      var lastAccrualAt = Date.now();
       var settledBidIds = {};      // bid ids already turned into history (no double payout)
       var realtimeChannels = [];
 
       function blankState(){
         return {
-          main: 0, savings: 0, savingsLots: [], interestPool: 0, totalInterest: 0, interestUnlogged: 0,
+          main: 0, miner: null,
           trades: [], txs: [], bids: [],
           mgOn: false, mgStep: 0,
           bonusLocked: true, bonusTraded: 0,
@@ -1187,43 +1230,74 @@
       }
       var state = blankState();
 
-      function savingsPrincipal(){
-        return state.savingsLots.reduce(function(a, l){ return a + (l.remaining || 0); }, 0);
+      /* ================= Mining =================
+         One miner per user, stored in tn_miners. A cycle runs 24h from
+         miner_started_at; when it elapses, exactly one cycle's profit is
+         credited to mining_balance and the miner returns to idle. */
+      function mapMiner(r){
+        if (!r) return null;
+        return {
+          tier: r.tier || "",
+          price: Number(r.purchase_price) || 0,
+          profit: Number(r.profit_24h) || 0,
+          balance: Number(r.mining_balance) || 0,
+          purchasedAt: r.purchased_at ? new Date(r.purchased_at).getTime() : Date.now(),
+          startedAt: r.miner_started_at ? new Date(r.miner_started_at).getTime() : null,
+          status: r.miner_status === "running" ? "running" : "idle"
+        };
       }
-      function syncSavingsTotal(){ state.savings = savingsPrincipal() + state.interestPool; }
-
-      /* Interest: 15% APY on the savings total (lots + interest), accrued
-         client-side. Persisted into tn_wallets.savings_interest on every
-         wallet write and every 60 seconds. */
-      function accrueInterest(now){
+      function persistMiner(){
+        if (!sb || !currentUser || !state.miner) return Promise.resolve(false);
+        var m = state.miner;
+        var row = {
+          user_id: currentUser.id,
+          tier: m.tier,
+          purchase_price: m.price,
+          profit_24h: m.profit,
+          mining_balance: Math.round(m.balance * 100) / 100,
+          purchased_at: new Date(m.purchasedAt).toISOString(),
+          miner_started_at: m.startedAt ? new Date(m.startedAt).toISOString() : null,
+          miner_status: m.status
+        };
+        return sb.from("tn_miners").upsert(row).then(function(res){
+          if (res.error){ netErrorToast("Saving your miner"); return false; }
+          return true;
+        }).catch(function(){ netErrorToast("Saving your miner"); return false; });
+      }
+      var minerBusy = false;
+      var minerSettling = false;
+      var minerSettleKey = null; // miner_started_at value already settled this session
+      // Credit a finished 24h cycle exactly once: the miner flips back to
+      // idle locally before the write lands, and the settle key stops the
+      // 1s loop, focus refresh, and realtime events from crediting twice.
+      function checkMinerCycle(now){
         now = now || Date.now();
-        var dt = Math.max(0, (now - lastAccrualAt) / 1000);
-        lastAccrualAt = now;
-        if (dt <= 0) return 0;
-        syncSavingsTotal();
-        if (state.savings <= 0) return 0;
-        var gain = state.savings * APY * dt / YEAR_SECS;
-        if (!(gain > 0)) return 0;
-        state.interestPool += gain;
-        state.totalInterest += gain;
-        state.interestUnlogged += gain;
-        syncSavingsTotal();
-        if (state.interestUnlogged >= INTEREST_LOG_AT){
-          state.txs.unshift({ id: uid(), type: "interest", amount: state.interestUnlogged, note: "Savings interest · 15% APY", time: Date.now() });
-          state.interestUnlogged = 0;
-          if (state.txs.length > 120) state.txs.length = 120;
-        }
-        return gain;
+        var m = state.miner;
+        if (!m || minerSettling) return;
+        if (m.status !== "running" || !m.startedAt) return;
+        if (now - m.startedAt < CYCLE_MS) return;
+        if (minerSettleKey === m.startedAt) return;
+        minerSettling = true;
+        minerSettleKey = m.startedAt;
+        var profit = m.profit;
+        m.balance = Math.round((m.balance + profit) * 100) / 100;
+        m.status = "idle";
+        m.startedAt = null;
+        renderWallets();
+        persistMiner().then(function(ok){
+          minerSettling = false;
+          if (ok) toast("Mining complete: +" + fmtUSD(profit), "Your " + m.tier + " finished its 24h cycle — the profit is in your Mining balance. Start it again from the Mining card for the next cycle.", "win");
+          else refreshFromServer(true);
+          renderWallets();
+        });
       }
 
-      /* Persist the wallet row (accruing interest first). Returns success. */
+      /* Persist the wallet row. Returns success. */
       function persistWallet(){
         if (!sb || !currentUser) return Promise.resolve(false);
-        accrueInterest(Date.now());
         var payload = {
           user_id: currentUser.id,
           main_balance: Math.round(state.main * 100) / 100,
-          savings_interest: state.interestPool,
           traded_volume: state.bonusTraded,
           bonus_locked: state.bonusLocked,
           updated_at: new Date().toISOString()
@@ -1239,13 +1313,6 @@
       function save(){ persistWallet(); }
 
       /* ================= Data loading ================= */
-      function mapLots(rows){
-        return (rows || []).map(function(r){
-          var created = r.created_at ? new Date(r.created_at).getTime() : Date.now();
-          var unlock = r.unlock_at ? new Date(r.unlock_at).getTime() : created + LOCK_MS;
-          return { id: r.id, amount: Number(r.amount) || 0, remaining: Number(r.amount) || 0, time: created, unlockAt: unlock };
-        }).sort(function(a, b){ return a.time - b.time; });
-      }
       function mapRequests(rows){
         return (rows || []).map(function(r){
           return {
@@ -1269,7 +1336,7 @@
           decidedBy: "admin"
         };
       }
-      function buildWalletTxs(requests, lots){
+      function buildWalletTxs(requests){
         var txs = [];
         (requests || []).forEach(function(r){
           var t = reqTypeFromDb(r.type), amt = Number(r.amount) || 0;
@@ -1281,11 +1348,6 @@
             txs.push({ id: "req-" + r.id, type: "rejected", amount: null, note: (t === "deposit" ? "Deposit" : "Withdrawal") + " request of " + fmtUSD(amt) + via + " rejected · Main Balance unchanged", time: when });
           }
         });
-        (lots || []).forEach(function(l){
-          var when = l.created_at ? new Date(l.created_at).getTime() : Date.now();
-          var unlock = l.unlock_at ? new Date(l.unlock_at).getTime() : when + LOCK_MS;
-          txs.push({ id: "lot-" + l.id, type: "transfer_in", amount: Number(l.amount) || 0, note: "Main Balance → Savings · locked until " + fmtTime(unlock), time: when });
-        });
         txs.sort(function(a, b){ return b.time - a.time; });
         return txs.slice(0, 120);
       }
@@ -1296,27 +1358,25 @@
         return Promise.all([
           sb.from("tn_profiles").select("*").eq("id", userId).maybeSingle(),
           sb.from("tn_wallets").select("*").eq("user_id", userId).maybeSingle(),
-          sb.from("tn_savings_lots").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
+          sb.from("tn_miners").select("*").eq("user_id", userId).maybeSingle(),
           sb.from("tn_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
           sb.from("tn_bids").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
           sb.from("tn_referrals").select("*").eq("referrer_id", userId).order("created_at", { ascending: false })
         ]).then(function(res){
-          var prof = res[0], wal = res[1], lots = res[2], reqs = res[3], bids = res[4], refs = res[5];
+          var prof = res[0], wal = res[1], min = res[2], reqs = res[3], bids = res[4], refs = res[5];
           if (prof.error || wal.error){ if (!opts.silent) netErrorToast("Loading your account"); return false; }
           profileRow = prof.data;
           walletRow = wal.data;
           if (!profileRow) return false;
           // Preserve session-local UI state across reloads of the data.
           var keep = { mgOn: state.mgOn, mgStep: state.mgStep, paymentMethods: state.paymentMethods,
-                       avatar: state.profile ? state.profile.avatar : 0, interestLog: state.txs.filter(function(t){ return t.type === "interest" || t.type === "transfer_out" || t.type === "referral"; }) };
+                       avatar: state.profile ? state.profile.avatar : 0, localTxs: state.txs.filter(function(t){ return t.type === "referral" || t.type === "cashout"; }) };
           var fresh = blankState();
           fresh.mgOn = keep.mgOn; fresh.mgStep = keep.mgStep; fresh.paymentMethods = keep.paymentMethods;
           fresh.main = walletRow ? Number(walletRow.main_balance) || 0 : 0;
-          fresh.interestPool = walletRow ? Number(walletRow.savings_interest) || 0 : 0;
-          fresh.totalInterest = fresh.interestPool;
+          fresh.miner = mapMiner(min.data);
           fresh.bonusTraded = walletRow ? Number(walletRow.traded_volume) || 0 : 0;
           fresh.bonusLocked = walletRow ? !!walletRow.bonus_locked : true;
-          fresh.savingsLots = mapLots(lots.data);
           fresh.adminRequests = mapRequests(reqs.data);
           var bidRows = bids.data || [];
           fresh.bids = bidRows.filter(function(b){ return b.status === "pending"; }).map(function(b){
@@ -1339,11 +1399,10 @@
           var refRows = refs.data || [];
           fresh.referralEarned = refRows.filter(function(r){ return r.reward_paid; }).length * REFERRAL_REWARD;
           state = fresh;
-          syncSavingsTotal();
-          state.txs = buildWalletTxs(reqs.data, lots.data).concat(keep.interestLog);
+          state.txs = buildWalletTxs(reqs.data).concat(keep.localTxs);
           state.txs.sort(function(a, b){ return b.time - a.time; });
-          lastAccrualAt = Date.now();
           state.lastTick = Date.now();
+          checkMinerCycle();
           if (refRows.length){
             var ids = refRows.map(function(r){ return r.referred_id; });
             return sb.from("tn_profiles").select("id, full_name, username, created_at").in("id", ids).then(function(pr){
@@ -1393,12 +1452,6 @@
         return state.bonusLocked ? Math.min(WELCOME_BONUS, state.main) : 0;
       }
       function movableMain(){ return Math.max(0, state.main - lockedBonusAmount()); }
-      function unlockedSavings(now){
-        now = now || Date.now();
-        var sum = state.interestPool;
-        state.savingsLots.forEach(function(l){ if (now >= l.unlockAt) sum += l.remaining; });
-        return Math.min(sum, state.savings);
-      }
       function pendingSelfWithdrawals(){
         return state.adminRequests.filter(function(r){ return r.self && r.status === "pending" && r.type === "withdraw"; })
           .reduce(function(a, r){ return a + r.amount; }, 0);
@@ -1411,39 +1464,38 @@
         if (h > 0) return h + "h " + m + "m";
         return m + "m";
       }
-      function renderSavingsLots(){
-        var box = $("savingsLots");
+      function fmtCountdown(ms){
+        var s = Math.max(0, Math.ceil(ms / 1000));
+        var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
+        function p(n){ return (n < 10 ? "0" : "") + n; }
+        return p(h) + ":" + p(m) + ":" + p(ss);
+      }
+      function renderMining(){
+        var m = state.miner;
         var now = Date.now();
-        var lots = state.savingsLots.filter(function(l){ return l.remaining > 0.004; });
-        if (!lots.length && state.interestPool <= 0.004){ box.innerHTML = ""; return; }
-        var html = '<div class="lots"><h4>Savings lots · each locked 7 days</h4>';
-        lots.forEach(function(l){
-          var unlocked = now >= l.unlockAt;
-          html += '<div class="lot-row"><span class="lot-amt num">' + fmtUSD(l.remaining) + "</span>" +
-            '<span class="lot-meta">Transferred in ' + fmtTime(l.time) + "<br>" +
-            (unlocked
-              ? '<span class="lot-open">Unlocked · available to transfer out</span>'
-              : "Unlocks " + fmtTime(l.unlockAt) + ' · <span class="lot-count num">in ' + fmtDuration(l.unlockAt - now) + "</span>") +
-            "</span></div>";
-        });
-        if (state.interestPool > 0.004){
-          html += '<div class="lot-row"><span class="lot-amt num">' + fmtUSD(state.interestPool) + "</span>" +
-            '<span class="lot-meta">Interest earned<br><span class="lot-open">Unlocked · available to transfer out</span></span></div>';
+        $("miningBalance").textContent = fmtUSD(m ? m.balance : 0);
+        $("minerChip").textContent = m ? m.tier : "No miner";
+        var line = $("minerStatusLine");
+        var startBtn = $("btnStartMining");
+        if (!m){
+          line.textContent = "No miner yet — buy a rig and earn every 24 hours.";
+          startBtn.style.display = "none";
+        } else if (m.status === "running" && m.startedAt){
+          var left = Math.max(0, m.startedAt + CYCLE_MS - now);
+          line.innerHTML = 'Status: Running · <span class="cd num">' + fmtCountdown(left) + "</span> left · +" + fmtUSD(m.profit) + " when the cycle completes";
+          startBtn.style.display = "none";
+        } else {
+          line.textContent = "Status: Idle · start a 24h cycle to earn " + fmtUSD(m.profit) + ".";
+          startBtn.style.display = "";
         }
-        html += "</div>";
-        box.innerHTML = html;
+        var co = $("btnCashout");
+        var lockEnd = m ? m.purchasedAt + lockMsForTier(m.tier) : 0;
+        if (!m || m.balance <= 0.004){ co.disabled = true; co.textContent = "Cashout"; }
+        else if (now < lockEnd){ co.disabled = true; co.textContent = "Unlocks in " + fmtDuration(lockEnd - now); }
+        else { co.disabled = minerBusy; co.textContent = "Cashout"; }
       }
       function renderWallets(){
-        syncSavingsTotal();
         $("mainBalance").textContent = fmtUSD(state.main);
-        $("savingsBalance").textContent = fmtUSD(state.savings);
-        $("interestEarned").textContent = fmtUSD(state.totalInterest);
-        var now = Date.now();
-        var avail = unlockedSavings(now), lockedAmt = Math.max(0, state.savings - avail);
-        $("savingsAvail").innerHTML = state.savings > 0
-          ? 'Available to transfer out: <b style="color:var(--green);">' + fmtUSD(avail) + "</b>" +
-            (lockedAmt > 0.004 ? ' · <span style="color:var(--gold-bright); font-weight:700;">' + fmtUSD(lockedAmt) + " still locked</span>" : "")
-          : "Nothing saved yet — transfer in from Main Balance to start earning.";
         var pend = state.adminRequests.filter(function(r){ return r.self && r.status === "pending"; });
         var pn = $("mainPending");
         if (pend.length){
@@ -1452,7 +1504,7 @@
             return (r.type === "deposit" ? "Deposit" : "Withdrawal") + " of " + fmtUSD(r.amount) + " pending approval";
           }).join(" · ");
         } else { pn.style.display = "none"; pn.textContent = ""; }
-        renderSavingsLots();
+        renderMining();
         renderMyRequests();
       }
       var myReqSig = null;
@@ -1555,18 +1607,16 @@
           $("walletHistory").innerHTML = '<div class="empty">No wallet activity yet.</div>';
         } else {
           var icons = {
-            transfer_in: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13M13 3l4 4-4 4M20 17H7M11 13l-4 4 4 4"/></svg>',
-            transfer_out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H7M11 3L7 7l4 4M4 17h13M13 13l4 4-4 4"/></svg>',
             deposit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>',
             withdraw: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>',
-            interest: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>',
             referral: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-            rejected: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>'
+            rejected: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+            cashout: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16V8M8.5 11.5L12 8l3.5 3.5"/></svg>'
           };
-          var titles = { deposit: "Deposit to Main Balance", withdraw: "Withdrawal from Main Balance", transfer_in: "Transfer to Savings", transfer_out: "Transfer to Main Balance", interest: "Savings interest", referral: "Referral bonus", rejected: "Request rejected" };
+          var titles = { deposit: "Deposit to Main Balance", withdraw: "Withdrawal from Main Balance", cashout: "Mining cashout", referral: "Referral bonus", rejected: "Request rejected" };
           $("walletHistory").innerHTML = state.txs.map(function(tx){
             var amt = (tx.amount === null || tx.amount === undefined) ? "" : '<div class="hi-amt num pos">+' + fmtUSD(tx.amount) + "</div>";
-            return '<div class="hist-item"><div class="tx-ico">' + (icons[tx.type] || icons.interest) + '</div>' +
+            return '<div class="hist-item"><div class="tx-ico">' + (icons[tx.type] || icons.cashout) + '</div>' +
               '<div class="hi-main"><div class="hi-title">' + (titles[tx.type] || "Transaction") + '</div>' +
               '<div class="hi-sub">' + esc(tx.note || "") + "<br>" + fmtTime(tx.time) + '</div></div>' + amt + "</div>";
           }).join("");
@@ -1588,8 +1638,8 @@
         if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a bid."); return; }
         if (stake > state.main){
           toast("Insufficient Main Balance", state.mgOn && state.mgStep > 0
-            ? "Martingale stake " + fmtUSD(stake) + " exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked."
-            : "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked.");
+            ? "Martingale stake " + fmtUSD(stake) + " exceeds your Main Balance of " + fmtUSD(state.main) + "."
+            : "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + ".");
           return;
         }
         bidBusy = true;
@@ -1682,7 +1732,12 @@
             refreshFromServer(true);
           })
           .subscribe();
-        realtimeChannels = [bidsCh, reqCh, walCh];
+        var minCh = sb.channel("tn-miners-" + uidv)
+          .on("postgres_changes", { event: "*", schema: "public", table: "tn_miners", filter: "user_id=eq." + uidv }, function(){
+            refreshFromServer(true);
+          })
+          .subscribe();
+        realtimeChannels = [bidsCh, reqCh, walCh, minCh];
       }
       var refreshBusy = false;
       // Settle decided bids that carry no payout yet — the decision landed
@@ -1730,7 +1785,6 @@
       }
       function openSheet(mode){
         sheetMode = mode;
-        var now = Date.now();
         depositMethod = null;
         $("depositMethods").classList.toggle("show", mode === "deposit");
         $("methodBank").classList.remove("active");
@@ -1740,23 +1794,13 @@
         var cfg = {
           deposit: {
             title: "Deposit to Main Balance",
-            sub: "Enter an amount, pick how you're sending it — Bank Transfer or Crypto — then send to the details shown. The deposit lands once the request is approved — deposits never go to Savings.",
+            sub: "Enter an amount, pick how you're sending it — Bank Transfer or Crypto — then send to the details shown. The deposit lands in your Main Balance once the request is approved.",
             avail: "", max: null, btn: "I've sent it"
           },
           withdraw: {
             title: "Withdraw from Main Balance",
-            sub: "Request a withdrawal from your Main Balance. It is paid out once the request is approved — withdrawals never come out of Savings.",
+            sub: "Request a withdrawal from your Main Balance. It is paid out once the request is approved.",
             avail: "Available to withdraw: " + fmtUSD(withdrawableMain()), max: withdrawableMain(), btn: "Request withdrawal"
-          },
-          transferIn: {
-            title: "Transfer In to Savings",
-            sub: "Move virtual funds from your Main Balance into Savings, where they earn 15% APY. Each transfer in is locked for 7 days before it can move back to Main.",
-            avail: "Available to move: " + fmtUSD(movableMain()), max: movableMain(), btn: "Transfer in"
-          },
-          transferOut: {
-            title: "Transfer Out to Main Balance",
-            sub: "Move unlocked Savings back to your Main Balance. Amounts still inside their 7-day lock stay in Savings; unlocked lots are used first, oldest first.",
-            avail: "Available to transfer out: " + fmtUSD(unlockedSavings(now)) + " of " + fmtUSD(state.savings) + " saved", max: unlockedSavings(now), btn: "Transfer out"
           }
         }[mode];
         $("sheetTitle").textContent = cfg.title;
@@ -1805,27 +1849,136 @@
           netErrorToast("Sending your request"); return false;
         }).catch(function(){ netErrorToast("Sending your request"); return false; });
       }
-      // Draw a transfer-out from unlocked lots first (oldest first, FIFO),
-      // then from accrued interest, which is never locked. Persists the
-      // lot changes to tn_savings_lots.
-      function consumeSavings(amt, now){
-        var left = amt;
-        var lots = state.savingsLots.slice().sort(function(a, b){ return a.time - b.time; });
-        var ops = [];
-        for (var i = 0; i < lots.length && left > 0; i++){
-          var l = lots[i];
-          if (now < l.unlockAt || l.remaining <= 0) continue;
-          var take = Math.min(l.remaining, left);
-          l.remaining -= take; left -= take;
-          (function(lot, rem){
-            if (rem <= 0.004) ops.push(sb.from("tn_savings_lots").delete().eq("id", lot.id));
-            else ops.push(sb.from("tn_savings_lots").update({ amount: rem }).eq("id", lot.id));
-          })(l, l.remaining);
+      /* ================= Mining actions ================= */
+      function minerError(msg){ var e = $("minerErr"); e.textContent = msg; e.className = "sheet-err show"; }
+      var selectedPack = -1; // index into MINER_PACKS chosen in the buy sheet
+      function packRangeText(p){
+        return p.max == null ? fmtUSD(p.min) + "+" : fmtUSD(p.min) + " – " + fmtUSD(p.max);
+      }
+      function packLockText(p){
+        return p.lockDays === 0 ? "Cashout any day" : "Cashout after " + p.lockDays + " days";
+      }
+      function renderMinerTiers(){
+        $("minerTiers").innerHTML = MINER_PACKS.map(function(p, i){
+          var owned = state.miner && state.miner.tier === p.name;
+          var sel = i === selectedPack;
+          return '<div class="tier-row' + (owned ? " owned" : "") + (sel ? " selected" : "") + '"><div class="tier-main">' +
+            '<div class="tier-name">' + p.name + (owned ? '<span class="owned-tag">Your rig</span>' : "") + "</div>" +
+            '<div class="tier-sub"><b style="color:var(--green);">' + (p.rate * 100).toFixed(0) + '%</b> daily profit · ' + packLockText(p) + '</div></div>' +
+            '<div class="tier-price num">' + packRangeText(p) + "</div>" +
+            '<button class="buy-btn" type="button" data-tier="' + i + '"' + (minerBusy ? " disabled" : "") + ">" + (sel ? "Selected" : (owned ? "Replace" : "Select")) + "</button></div>";
+        }).join("");
+      }
+      function updatePackPreview(){
+        var p = MINER_PACKS[selectedPack];
+        if (!p) return;
+        $("packAvail").textContent = "Available in Main Balance: " + fmtUSD(movableMain());
+        var amt = parseFloat($("packAmount").value);
+        $("packProfit").textContent = amt > 0
+          ? "Daily profit: +" + fmtUSD(Math.round(amt * p.rate * 100) / 100) + "/day"
+          : "";
+      }
+      function selectPack(idx){
+        if (minerBusy) return;
+        selectedPack = idx;
+        var p = MINER_PACKS[idx];
+        if (!p) return;
+        $("minerErr").className = "sheet-err";
+        $("packForm").style.display = "";
+        $("minerConfirm").style.display = "";
+        $("packAmountLabel").textContent = p.name + " amount (" + packRangeText(p) + ")";
+        $("packAmount").value = p.min;
+        renderMinerTiers();
+        updatePackPreview();
+      }
+      function openMinerSheet(){
+        $("minerErr").className = "sheet-err";
+        selectedPack = -1;
+        $("packForm").style.display = "none";
+        $("minerConfirm").style.display = "none";
+        renderMinerTiers();
+        $("minerOverlay").className = "overlay show";
+      }
+      function closeMinerSheet(){ $("minerOverlay").className = "overlay"; }
+      // Buying deducts the entered amount from Main Balance (through the
+      // wallet write path) and upserts the tn_miners row with the pack
+      // name as tier and profit_24h = amount × rate. Replacing a rig keeps
+      // the mining balance; the pack's cashout lock restarts at purchase.
+      function buyMiner(){
+        if (minerBusy) return;
+        var p = MINER_PACKS[selectedPack];
+        if (!p) return;
+        if (!sb || !currentUser){ toast("Not signed in", "Log in again to buy a miner."); return; }
+        var amt = parseFloat($("packAmount").value);
+        if (!(amt > 0)){ minerError("Enter a purchase amount for the " + p.name + "."); return; }
+        amt = Math.floor(amt * 100) / 100;
+        if (amt < p.min){ minerError("The " + p.name + " starts at " + fmtUSD(p.min) + " — enter at least that much."); return; }
+        if (p.max != null && amt > p.max){ minerError("The " + p.name + " tops out at " + fmtUSD(p.max) + " — pick a bigger pack to put in more."); return; }
+        if (amt > movableMain()){
+          minerError("That's more than you have available — your Main Balance has " + fmtUSD(movableMain()) + " you can put in.");
+          return;
         }
-        if (left > 0){ state.interestPool = Math.max(0, state.interestPool - left); }
-        state.savingsLots = state.savingsLots.filter(function(x){ return x.remaining > 0.004; });
-        syncSavingsTotal();
-        return Promise.all(ops);
+        var profit = Math.round(amt * p.rate * 100) / 100;
+        minerBusy = true;
+        renderMinerTiers();
+        var prevMain = state.main, prevMiner = state.miner;
+        var replacing = !!prevMiner;
+        state.main -= amt;
+        state.miner = {
+          tier: p.name, price: amt, profit: profit,
+          balance: prevMiner ? prevMiner.balance : 0,
+          purchasedAt: Date.now(), startedAt: null, status: "idle"
+        };
+        persistMiner().then(function(ok){
+          if (!ok){
+            state.main = prevMain; state.miner = prevMiner;
+            minerBusy = false;
+            renderMinerTiers(); renderWallets();
+            return;
+          }
+          return persistWallet().then(function(){
+            minerBusy = false;
+            renderWallets();
+            closeMinerSheet();
+            toast(replacing ? "Miner replaced" : "Miner purchased",
+              "You put " + fmtUSD(amt) + " into the " + p.name + " — it earns " + fmtUSD(profit) + " per 24h cycle. Tap Start Mining on the Mining card to run it." +
+              (replacing ? " Your mining balance carried over." : "") +
+              (p.lockDays === 0 ? " Cashout is open any day." : " Cashout unlocks " + p.lockDays + " days from this purchase."));
+          });
+        });
+      }
+      function startMining(){
+        var m = state.miner;
+        if (!m || m.status === "running" || minerBusy) return;
+        m.status = "running";
+        m.startedAt = Date.now();
+        renderWallets();
+        persistMiner().then(function(ok){
+          if (!ok){ refreshFromServer(true); return; }
+          toast("Mining started", "Your " + m.tier + " is running — it stops on its own in 24 hours and credits " + fmtUSD(m.profit) + " to your Mining balance.");
+          renderWallets();
+        });
+      }
+      function cashoutMiner(){
+        var m = state.miner;
+        if (!m || minerBusy) return;
+        if (Date.now() < m.purchasedAt + lockMsForTier(m.tier)) return; // still locked; button is disabled too
+        var amt = Math.round(m.balance * 100) / 100;
+        if (!(amt > 0)) return;
+        minerBusy = true;
+        renderWallets();
+        m.balance = 0;
+        state.main += amt;
+        persistMiner().then(function(ok){
+          if (!ok){ minerBusy = false; refreshFromServer(true); return; }
+          return persistWallet().then(function(){
+            minerBusy = false;
+            state.txs.unshift({ id: uid(), type: "cashout", amount: amt, note: "Mining balance cashed out to Main Balance", time: Date.now() });
+            if (state.txs.length > 120) state.txs.length = 120;
+            renderWallets(); renderHistory();
+            toast("Cashout complete", fmtUSD(amt) + " moved from your Mining balance into Main Balance.");
+          });
+        });
       }
       function confirmSheet(){
         var amt = parseFloat($("sheetAmount").value);
@@ -1850,7 +2003,7 @@
         } else if (sheetMode === "withdraw"){
           if (amt > withdrawableMain()){
             done();
-            sheetError("You can withdraw up to " + fmtUSD(withdrawableMain()) + " from your Main Balance right now. Savings can't be withdrawn directly — transfer out to Main first.");
+            sheetError("You can withdraw up to " + fmtUSD(withdrawableMain()) + " from your Main Balance right now.");
             return;
           }
           createFundRequest("withdraw", amt).then(function(ok){
@@ -1859,45 +2012,6 @@
             toast("Withdrawal requested", fmtUSD(amt) + " from your Main Balance is pending approval.");
             renderWallets(); closeSheet();
           });
-        } else if (sheetMode === "transferIn"){
-          if (amt > movableMain()){
-            done();
-            sheetError("You can move up to " + fmtUSD(movableMain()) + " from your Main Balance right now.");
-            return;
-          }
-          var unlockAt = new Date(now + LOCK_MS);
-          sb.from("tn_savings_lots").insert({ user_id: currentUser.id, amount: amt, unlock_at: unlockAt.toISOString() }).select().single().then(function(res){
-            if (res.error) throw res.error;
-            state.main -= amt;
-            state.savingsLots.push({ id: res.data.id, amount: amt, remaining: amt, time: now, unlockAt: now + LOCK_MS });
-            syncSavingsTotal();
-            state.txs.unshift({ id: uid(), type: "transfer_in", amount: amt, note: "Main Balance → Savings · locked until " + fmtTime(now + LOCK_MS), time: now });
-            return persistWallet();
-          }).then(function(){
-            done();
-            if (state.txs.length > 120) state.txs.length = 120;
-            renderWallets(); renderHistory(); closeSheet();
-            toast("Transferred to Savings", fmtUSD(amt) + " moved from Main Balance. It earns 15% APY and unlocks on " + fmtTime(now + LOCK_MS) + ".");
-          }).catch(function(){ done(); netErrorToast("Transferring to Savings"); refreshFromServer(true); });
-        } else { // transferOut
-          var availOut = unlockedSavings(now);
-          if (amt > availOut){
-            done();
-            sheetError(amt <= state.savings
-              ? "Only " + fmtUSD(availOut) + " of your Savings is unlocked — the rest is still inside its 7-day lock. Check the lots under your Savings balance for unlock dates."
-              : "That exceeds your Savings balance of " + fmtUSD(state.savings) + ".");
-            return;
-          }
-          consumeSavings(amt, now).then(function(){
-            state.main += amt;
-            state.txs.unshift({ id: uid(), type: "transfer_out", amount: amt, note: "Savings → Main Balance · oldest unlocked lots used first", time: now });
-            return persistWallet();
-          }).then(function(){
-            done();
-            if (state.txs.length > 120) state.txs.length = 120;
-            renderWallets(); renderHistory(); closeSheet();
-            toast("Transferred to Main Balance", fmtUSD(amt) + " moved from Savings and is available to trade.");
-          }).catch(function(){ done(); netErrorToast("Transferring out of Savings"); refreshFromServer(true); });
         }
       }
 
@@ -2046,22 +2160,20 @@
       // ---- Transaction History page ----
       var txFilter = "all";
       var TX_ICONS = {
-        transfer_in: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13M13 3l4 4-4 4M20 17H7M11 13l-4 4 4 4"/></svg>',
-        transfer_out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H7M11 3L7 7l4 4M4 17h13M13 13l4 4-4 4"/></svg>',
         deposit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>',
         withdraw: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>',
-        interest: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>',
         referral: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
         rejected: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+        cashout: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16V8M8.5 11.5L12 8l3.5 3.5"/></svg>',
         trade: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-6 4 3 7-9"/><path d="M14 5h6v6"/></svg>'
       };
-      var TX_TITLES = { deposit: "Deposit to Main Balance", withdraw: "Withdrawal from Main Balance", transfer_in: "Transfer to Savings", transfer_out: "Transfer to Main Balance", interest: "Savings interest", referral: "Referral bonus", rejected: "Request rejected" };
+      var TX_TITLES = { deposit: "Deposit to Main Balance", withdraw: "Withdrawal from Main Balance", cashout: "Mining cashout", referral: "Referral bonus", rejected: "Request rejected" };
       function txCategory(tx){
-        return { deposit: "deposits", withdraw: "withdrawals", transfer_in: "transfers", transfer_out: "transfers", interest: "interest", referral: "referrals", rejected: "rejected" }[tx.type] || "transfers";
+        return { deposit: "deposits", withdraw: "withdrawals", cashout: "transfers", referral: "referrals", rejected: "rejected" }[tx.type] || "transfers";
       }
       function txSignedAmount(tx){
         if (tx.amount === null || tx.amount === undefined) return null;
-        return (tx.type === "withdraw" || tx.type === "transfer_in") ? -tx.amount : tx.amount;
+        return tx.type === "withdraw" ? -tx.amount : tx.amount;
       }
       function renderTxHistory(){
         var listEl = $("txFullList");
@@ -2094,7 +2206,7 @@
         if (tradePnl === 0) tp.textContent = "$0.00";
         tp.style.color = tradePnl > 0 ? "var(--green)" : tradePnl < 0 ? "var(--red)" : "";
         if (!entries.length){
-          listEl.innerHTML = '<div class="empty">Nothing matches this filter yet. Deposits, withdrawals, transfers, interest, bonuses, and closed trades will all appear here.</div>';
+          listEl.innerHTML = '<div class="empty">Nothing matches this filter yet. Deposits, withdrawals, transfers, bonuses, and closed trades will all appear here.</div>';
           return;
         }
         listEl.innerHTML = entries.map(function(e){
@@ -2111,7 +2223,7 @@
           var tx = e.tx, s = txSignedAmount(tx);
           var amtHtml = s === null ? "" : '<div class="hi-amt num ' + (s > 0 ? "pos" : s < 0 ? "neg" : "neu") + '">' + (s > 0 ? "+" : "") + fmtUSD(s).replace("$-", "-$") + "</div>";
           if (s === 0) amtHtml = '<div class="hi-amt num neu">$0.00</div>';
-          return '<div class="hist-item"><div class="tx-ico">' + (TX_ICONS[tx.type] || TX_ICONS.interest) + '</div>' +
+          return '<div class="hist-item"><div class="tx-ico">' + (TX_ICONS[tx.type] || TX_ICONS.cashout) + '</div>' +
             '<div class="hi-main"><div class="hi-title">' + (TX_TITLES[tx.type] || "Transaction") + '</div>' +
             '<div class="hi-sub">' + esc(tx.note || "") + "<br>" + fmtTime(tx.time) + '</div></div>' + amtHtml + "</div>";
         }).join("");
@@ -2198,8 +2310,17 @@
       });
       $("btnDeposit").addEventListener("click", function(){ openSheet("deposit"); });
       $("btnWithdraw").addEventListener("click", function(){ openSheet("withdraw"); });
-      $("btnTransferIn").addEventListener("click", function(){ openSheet("transferIn"); });
-      $("btnTransferOut").addEventListener("click", function(){ openSheet("transferOut"); });
+      $("btnBuyMiner").addEventListener("click", openMinerSheet);
+      $("btnStartMining").addEventListener("click", startMining);
+      $("btnCashout").addEventListener("click", cashoutMiner);
+      $("minerClose").addEventListener("click", closeMinerSheet);
+      $("minerOverlay").addEventListener("click", function(e){ if (e.target === $("minerOverlay")) closeMinerSheet(); });
+      $("minerTiers").addEventListener("click", function(e){
+        var b = e.target.closest ? e.target.closest("[data-tier]") : null;
+        if (b) selectPack(parseInt(b.getAttribute("data-tier"), 10));
+      });
+      $("packAmount").addEventListener("input", updatePackPreview);
+      $("minerConfirm").addEventListener("click", buyMiner);
       function bindInfoToggle(btnId){
         var btn = $(btnId);
         btn.addEventListener("click", function(){
@@ -2209,14 +2330,11 @@
         });
       }
       bindInfoToggle("mainInfoBtn");
-      bindInfoToggle("savingsInfoBtn");
+      bindInfoToggle("miningInfoBtn");
       $("sheetCancel").addEventListener("click", closeSheet);
       $("sheetOverlay").addEventListener("click", function(e){ if (e.target === $("sheetOverlay")) closeSheet(); });
       $("sheetMax").addEventListener("click", function(){
-        var v = sheetMode === "withdraw" ? withdrawableMain()
-              : sheetMode === "transferIn" ? movableMain()
-              : sheetMode === "transferOut" ? unlockedSavings()
-              : 0;
+        var v = sheetMode === "withdraw" ? withdrawableMain() : 0;
         $("sheetAmount").value = v.toFixed(2);
       });
       $("sheetConfirm").addEventListener("click", confirmSheet);
@@ -2276,7 +2394,7 @@
       $("drawerBackdrop").addEventListener("click", closeDrawer);
       document.addEventListener("keydown", function(e){
         if (e.key !== "Escape") return;
-        closeDrawer(); closeScreen("profileOverlay"); closeScreen("paymentOverlay"); closeScreen("helpOverlay");
+        closeDrawer(); closeScreen("profileOverlay"); closeScreen("paymentOverlay"); closeScreen("helpOverlay"); closeMinerSheet();
       });
       $("menuHistory").addEventListener("click", function(){
         closeDrawer();
@@ -2452,7 +2570,7 @@
                   return loadUserData(user.id).then(function(){
                     submitBtn.disabled = false; submitBtn.textContent = "Create account";
                     enterApp();
-                    toast("Welcome to TrybNetwork, " + name.split(" ")[0], "Your account is ready — your Main Balance, Savings, and the Binary Arena are all set up, on every device.");
+                    toast("Welcome to TrybNetwork, " + name.split(" ")[0], "Your account is ready — your Main Balance, Mining, and the Binary Arena are all set up, on every device.");
                   });
                 };
                 if (referredBy){
@@ -2507,7 +2625,7 @@
       // Reset demo: with synced accounts there is nothing local to wipe —
       // explain instead of erasing the account.
       $("resetBtn").addEventListener("click", function(){
-        toast("Accounts are synced now", "Your balance, savings, and history live in your account and follow you across devices — there's no local demo data to reset. Use Log Out in the menu to switch accounts.");
+        toast("Accounts are synced now", "Your balance, mining, and history live in your account and follow you across devices — there's no local demo data to reset. Use Log Out in the menu to switch accounts.");
       });
 
       /* ================= Live sync ================= */
@@ -2515,20 +2633,14 @@
       document.addEventListener("visibilitychange", function(){ if (!document.hidden) refreshFromServer(true); });
 
       /* ================= Main loop =================
-         1s: accrue interest client-side and refresh balances/countdowns.
-         60s: persist the accrued interest to tn_wallets. */
-      var lastSave = 0, lastInterestPersist = Date.now();
+         1s: refresh balances and the mining countdown, and settle any
+         mining cycle whose 24h have elapsed. */
       function loop(){
         var now = Date.now();
-        var dt = Math.max(0, (now - state.lastTick) / 1000);
         state.lastTick = now;
-        if (dt > 0 && currentUser) accrueInterest(now);
-        if (currentUser) renderWallets();
-        if (currentUser && now - lastInterestPersist > 60000){
-          lastInterestPersist = now;
-          if (state.savings > 0) persistWallet();
-        }
-        lastSave = now;
+        if (!currentUser) return;
+        checkMinerCycle(now);
+        renderWallets();
       }
       renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); loadTvChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
       setInterval(loop, TICK_MS);
