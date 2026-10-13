@@ -1,0 +1,2359 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>TrybNetwork Trade &amp; Save</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#0B1132;
+        --bg-deep:#070C26;
+        --card:#121A45;
+        --card-2:#0F173C;
+        --line:rgba(201,162,75,.20);
+        --line-soft:rgba(154,163,199,.16);
+        --gold:#C9A24B;
+        --gold-bright:#E7CB7E;
+        --gold-deep:#9A7B2D;
+        --text:#F1EEE1;
+        --muted:#9AA3C7;
+        --muted-2:#6E77A0;
+        --green:#34C98E;
+        --green-dark:#0E3B2A;
+        --red:#E5534B;
+        --red-dark:#3d1524;
+        --radius:18px;
+      }
+      *{box-sizing:border-box;}
+      html{-webkit-text-size-adjust:100%;}
+      body{
+        margin:0;
+        background:
+          radial-gradient(900px 480px at 85% -120px, rgba(201,162,75,.10), transparent 60%),
+          radial-gradient(700px 500px at -10% 30%, rgba(38,54,140,.35), transparent 60%),
+          var(--bg);
+        color:var(--text);
+        font-family:"Manrope", system-ui, -apple-system, sans-serif;
+        min-height:100vh;
+      }
+      .num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;}
+      .wrap{max-width:1060px; margin:0 auto; padding:0 16px 56px;}
+
+      /* ---------- Header ---------- */
+      header.topbar{
+        display:flex; align-items:center; gap:12px;
+        padding:16px 2px 14px;
+        border-bottom:1px solid var(--line-soft);
+      }
+      .logo{width:48px; height:48px; flex:0 0 auto;}
+      .brand h1{
+        font-family:"Sora", sans-serif; font-size:19px; font-weight:800;
+        margin:0; letter-spacing:.2px; line-height:1.1;
+      }
+      .brand h1 .gold{color:var(--gold-bright);}
+      .brand p{margin:2px 0 0; font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase;}
+      .sim-badge{
+        margin-left:auto; flex:0 0 auto;
+        display:inline-flex; align-items:center; gap:7px;
+        border:1px solid var(--line); color:var(--gold-bright);
+        background:rgba(201,162,75,.08);
+        font-size:11px; font-weight:800; letter-spacing:.6px; text-transform:uppercase;
+        padding:7px 11px; border-radius:999px; white-space:nowrap;
+      }
+      .sim-badge .dot{width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 3px rgba(201,162,75,.18);}
+      .menu-btn{
+        flex:0 0 auto; cursor:pointer; width:44px; height:44px;
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(201,162,75,.08); border:1px solid var(--line); border-radius:12px; color:var(--gold-bright);
+      }
+      .menu-btn:active{transform:translateY(1px);}
+      @media (max-width:560px){
+        header.topbar{flex-wrap:wrap;}
+        .sim-badge{margin-left:0; order:3;}
+        .menu-btn{margin-left:auto; order:2;}
+      }
+
+      @keyframes pop{from{opacity:0; transform:translateY(-6px) scale(.99);} to{opacity:1; transform:none;}}
+
+      /* ---------- Wallets ---------- */
+      .wallets{display:grid; grid-template-columns:1fr; gap:14px; margin-top:18px;}
+      @media (min-width:640px){ .wallets{grid-template-columns:1fr 1fr;} }
+      .wallet{
+        background:linear-gradient(160deg, var(--card) 0%, var(--card-2) 100%);
+        border:1px solid var(--line-soft); border-radius:var(--radius);
+        padding:18px;
+      }
+      .wallet.savings{border-color:var(--line);}
+      .wallet .w-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+      .wallet .w-label{font-size:11.5px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--muted);}
+      .wallet .w-chip{
+        font-size:11px; font-weight:800; color:var(--gold-bright);
+        border:1px solid var(--line); border-radius:999px; padding:4px 9px; background:rgba(201,162,75,.07);
+      }
+      .wallet .w-chip.plain{color:var(--muted); border-color:var(--line-soft); background:transparent;}
+      .wallet .w-balance{
+        font-family:"Sora",sans-serif; font-weight:800; font-size:36px; line-height:1.05;
+        margin:10px 0 2px; letter-spacing:-.5px;
+      }
+      .wallet .w-sub{font-size:12.5px; color:var(--muted); min-height:17px;}
+      .wallet .w-sub .earned{color:var(--green); font-weight:700;}
+      .wallet .w-actions{display:flex; gap:10px; margin-top:14px;}
+      .btn{
+        flex:1; cursor:pointer; border-radius:12px; padding:12px 10px;
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:14px;
+        border:1px solid var(--line); background:rgba(201,162,75,.10); color:var(--gold-bright);
+      }
+      .btn:active{transform:translateY(1px);}
+      .btn.ghost{background:transparent; color:var(--text); border-color:var(--line-soft);}
+      .btn:disabled{opacity:.45; cursor:not-allowed;}
+      .lock-note{margin-top:12px; font-size:12px; color:var(--muted-2); display:flex; gap:6px; align-items:flex-start; line-height:1.45;}
+      .lock-note svg{flex:0 0 auto; margin-top:1px;}
+      .pending-note{margin-top:10px; font-size:12px; color:var(--gold-bright); font-weight:700; line-height:1.5;}
+
+      /* ---------- Savings lots ---------- */
+      .lots{margin-top:14px; border-top:1px solid var(--line-soft); padding-top:12px;}
+      .lots h4{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:0 0 6px; font-weight:800;}
+      .lot-row{display:flex; gap:12px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--line-soft);}
+      .lot-row:last-child{border-bottom:0;}
+      .lot-amt{font-family:"Sora",sans-serif; font-weight:800; font-size:14.5px; white-space:nowrap; padding-top:1px;}
+      .lot-meta{font-size:12px; color:var(--muted); line-height:1.55;}
+      .lot-open{color:var(--green); font-weight:700;}
+      .lot-count{color:var(--gold-bright); font-weight:800;}
+
+      /* ---------- Layout ---------- */
+      .grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:14px; align-items:start;}
+      @media (min-width:920px){ .grid{grid-template-columns:1.25fr 1fr;} }
+      .panel{
+        background:linear-gradient(165deg, var(--card) 0%, var(--card-2) 100%);
+        border:1px solid var(--line-soft); border-radius:var(--radius); padding:18px;
+      }
+      .panel h2.sec{
+        font-family:"Sora",sans-serif; font-size:16px; font-weight:700; margin:0 0 4px;
+        display:flex; align-items:center; gap:8px;
+      }
+      .panel .sec-sub{font-size:12.5px; color:var(--muted); margin:0 0 14px;}
+
+      /* ---------- Arena ---------- */
+      .assets{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+      .asset-btn{
+        cursor:pointer; border:1px solid var(--line-soft); background:rgba(255,255,255,.02);
+        color:var(--muted); font-family:"Manrope",sans-serif; font-weight:800; font-size:13px;
+        padding:9px 13px; border-radius:999px;
+      }
+      .asset-btn.active{color:#181203; background:var(--gold); border-color:var(--gold);}
+      .price-row{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+      .price-now{font-family:"Sora",sans-serif; font-size:30px; font-weight:800; letter-spacing:-.5px;}
+      .price-name{font-size:13px; color:var(--muted); font-weight:700;}
+      .price-chg{font-size:13px; font-weight:800;}
+      .price-chg.up{color:var(--green);} .price-chg.down{color:var(--red);}
+      .feed-note{margin-left:auto; font-size:11px; color:var(--muted-2); font-weight:700; letter-spacing:.5px; text-transform:uppercase; display:flex; align-items:center; gap:6px;}
+      .feed-note .pulse{width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 1.6s infinite;}
+      @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,201,142,.4);} 70%{box-shadow:0 0 0 7px rgba(52,201,142,0);} 100%{box-shadow:0 0 0 0 rgba(52,201,142,0);}}
+      .chart-box{margin-top:10px; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:14px; overflow:hidden;}
+      canvas#chart{display:block; width:100%; height:220px;}
+      .controls{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+      .field label{display:block; font-size:11.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:7px;}
+      .stake-wrap{display:flex; align-items:center; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:0 12px;}
+      .stake-wrap span{color:var(--gold-bright); font-weight:800; font-size:16px;}
+      .stake-wrap input{
+        width:100%; background:transparent; border:0; outline:0; color:var(--text);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:16px; padding:12px 6px;
+      }
+      .seg{display:flex; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:3px; gap:3px;}
+      .seg button{
+        flex:1; cursor:pointer; border:0; border-radius:9px; background:transparent; color:var(--muted);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:13.5px; padding:9px 0;
+      }
+      .seg button.active{background:var(--gold); color:#181203;}
+      .payout-line{grid-column:1 / -1; font-size:12.5px; color:var(--muted); display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;}
+      .payout-line b{color:var(--text);}
+      .payout-line .win-amt{color:var(--green); font-weight:800;}
+      .trade-btns{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;}
+      .trade-btn{
+        cursor:pointer; border:0; border-radius:14px; padding:16px 10px;
+        font-family:"Sora",sans-serif; font-weight:800; font-size:16px; color:#fff;
+        display:flex; align-items:center; justify-content:center; gap:8px;
+      }
+      .trade-btn:active{transform:translateY(1px);}
+      .trade-btn.higher{background:linear-gradient(160deg, #1E9E6A, #14714B);}
+      .trade-btn.lower{background:linear-gradient(160deg, #C7433B, #96281F);}
+      .trade-btn:disabled{opacity:.5; cursor:not-allowed;}
+
+      /* Martingale */
+      .martingale{margin-top:16px; border:1px dashed rgba(201,162,75,.45); border-radius:14px; padding:14px; background:rgba(201,162,75,.05);}
+      .mg-head{display:flex; align-items:center; gap:10px;}
+      .mg-head .mg-title{font-family:"Sora",sans-serif; font-weight:700; font-size:14.5px;}
+      .switch{margin-left:auto; position:relative; width:48px; height:27px; flex:0 0 auto; cursor:pointer; border:0; padding:0; background:#232B5C; border:1px solid var(--line-soft); border-radius:999px; transition:.2s;}
+      .switch::after{content:""; position:absolute; top:2px; left:2px; width:21px; height:21px; border-radius:50%; background:#8B94BC; transition:.2s;}
+      .switch[aria-checked="true"]{background:var(--gold-deep); border-color:var(--gold);}
+      .switch[aria-checked="true"]::after{left:23px; background:var(--gold-bright);}
+      .mg-status{margin-top:10px; font-size:13px; color:var(--muted); display:none; line-height:1.55;}
+      .mg-status.show{display:block;}
+      .mg-status b{color:var(--gold-bright);}
+      .mg-risk{margin-top:8px; font-size:12px; color:#D8A09A; line-height:1.5;}
+
+      /* Open trades */
+      .open-trades{margin-top:16px;}
+      .open-trades h3{font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:0 0 10px; font-weight:800;}
+      .open-trade{
+        display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+        background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:11px 12px; margin-bottom:8px;
+      }
+      .dir-tag{font-size:11px; font-weight:800; letter-spacing:.5px; padding:4px 8px; border-radius:6px; text-transform:uppercase;}
+      .dir-tag.higher{background:var(--green-dark); color:var(--green);}
+      .dir-tag.lower{background:var(--red-dark); color:#F0857E;}
+      .open-trade .ot-main{font-weight:800; font-size:14px;}
+      .open-trade .ot-sub{font-size:12px; color:var(--muted); width:100%;}
+      .ot-timer{margin-left:auto; text-align:right;}
+      .ot-timer .t{font-family:"Sora",sans-serif; font-weight:800; font-size:16px; color:var(--gold-bright);}
+      .ot-timer .bar{width:86px; height:5px; background:#232B5C; border-radius:99px; margin-top:4px; overflow:hidden;}
+      .ot-timer .bar i{display:block; height:100%; background:var(--gold); border-radius:99px;}
+      .empty{font-size:13px; color:var(--muted-2); padding:10px 2px;}
+
+      /* ---------- History ---------- */
+      .tabs{display:flex; gap:6px; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:4px; margin-bottom:14px;}
+      .tabs button{
+        flex:1; cursor:pointer; border:0; background:transparent; color:var(--muted);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:13.5px; padding:9px 0; border-radius:9px;
+      }
+      .tabs button.active{background:var(--gold); color:#181203;}
+      .stats{display:flex; gap:8px; margin-bottom:12px;}
+      .stat{flex:1; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:10px 8px; text-align:center;}
+      .stat .v{font-family:"Sora",sans-serif; font-weight:800; font-size:16px;}
+      .stat .k{font-size:10.5px; color:var(--muted); font-weight:700; letter-spacing:.6px; text-transform:uppercase; margin-top:2px;}
+      .hist-list{max-height:430px; overflow-y:auto; padding-right:2px;}
+      .hist-item{
+        display:flex; gap:10px; align-items:flex-start;
+        padding:11px 2px; border-bottom:1px solid var(--line-soft);
+      }
+      .hist-item:last-child{border-bottom:0;}
+      .hist-item .hi-main{flex:1; min-width:0;}
+      .hist-item .hi-title{font-weight:800; font-size:13.5px; display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
+      .hist-item .hi-sub{font-size:12px; color:var(--muted); margin-top:2px; line-height:1.45;}
+      .hist-item .hi-amt{font-family:"Sora",sans-serif; font-weight:800; font-size:14.5px; white-space:nowrap;}
+      .pos{color:var(--green);} .neg{color:var(--red);} .neu{color:var(--muted);}
+      .res-tag{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:3px 7px; border-radius:6px; text-transform:uppercase;}
+      .res-tag.won{background:var(--green-dark); color:var(--green);}
+      .res-tag.lost{background:var(--red-dark); color:#F0857E;}
+      .res-tag.tie{background:#232B5C; color:var(--muted);}
+      .tx-ico{
+        width:34px; height:34px; border-radius:10px; flex:0 0 auto;
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(201,162,75,.10); border:1px solid var(--line-soft); color:var(--gold-bright);
+      }
+
+      /* ---------- Footer ---------- */
+      footer{margin-top:22px; text-align:center;}
+      footer p{font-size:12px; color:var(--muted-2); line-height:1.6; max-width:60ch; margin:0 auto 14px;}
+      .reset-btn{
+        cursor:pointer; background:transparent; border:1px solid var(--line-soft); color:var(--muted);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:13px; padding:10px 18px; border-radius:10px;
+      }
+      .reset-btn.armed{border-color:var(--red); color:#F0857E;}
+
+      /* ---------- Move funds sheet ---------- */
+      .overlay{
+        position:fixed; inset:0; background:rgba(4,6,18,.72); backdrop-filter:blur(3px);
+        display:none; align-items:flex-end; justify-content:center; z-index:50;
+      }
+      .overlay.show{display:flex;}
+      .sheet{
+        background:var(--card); border:1px solid var(--line); border-bottom:0;
+        border-radius:20px 20px 0 0; width:100%; max-width:520px; padding:22px 20px 28px;
+        animation:up .25s ease both;
+      }
+      @media (min-width:640px){ .overlay{align-items:center;} .sheet{border-radius:20px; border-bottom:1px solid var(--line);} }
+      @keyframes up{from{transform:translateY(16px); opacity:0;} to{transform:none; opacity:1;}}
+      .sheet h3{font-family:"Sora",sans-serif; margin:0 0 4px; font-size:18px; font-weight:800;}
+      .sheet .sheet-sub{font-size:13px; color:var(--muted); margin:0 0 16px; line-height:1.5;}
+      .sheet .amt-wrap{display:flex; align-items:center; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:0 14px;}
+      .sheet .amt-wrap span{color:var(--gold-bright); font-weight:800; font-size:20px;}
+      .sheet .amt-wrap input{width:100%; background:transparent; border:0; outline:0; color:var(--text); font-family:"Sora",sans-serif; font-weight:800; font-size:22px; padding:14px 8px;}
+      .sheet .max-row{display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:12.5px; color:var(--muted);}
+      .sheet .max-btn{cursor:pointer; background:none; border:1px solid var(--line); color:var(--gold-bright); font-weight:800; font-size:12px; padding:5px 11px; border-radius:8px; font-family:"Manrope",sans-serif;}
+      .sheet .sheet-err{display:none; margin-top:12px; font-size:13px; color:#F0857E; font-weight:700;}
+      .sheet .sheet-err.show{display:block;}
+      .sheet .sheet-btns{display:flex; gap:10px; margin-top:18px;}
+      .sheet .sheet-btns .btn{padding:13px 10px;}
+
+      /* ---------- Referral ---------- */
+      .ref-panel{margin-top:14px;}
+      .ref-code-row{display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;}
+      .ref-code{
+        flex:1; min-width:200px; display:flex; align-items:center; gap:10px;
+        background:var(--bg-deep); border:1px dashed rgba(201,162,75,.5); border-radius:12px; padding:11px 14px;
+      }
+      .ref-code .rc-label{font-size:10.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted);}
+      .ref-code .rc-value{font-family:"Sora",sans-serif; font-weight:800; font-size:17px; color:var(--gold-bright); letter-spacing:1px;}
+      .ref-code .rc-link{font-size:11.5px; color:var(--muted-2); width:100%;}
+      .ref-actions{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+      .ref-actions .btn{flex:1; min-width:170px;}
+      .ref-list{margin-top:6px;}
+      .ref-item{display:flex; gap:10px; align-items:center; padding:11px 2px; border-bottom:1px solid var(--line-soft); flex-wrap:wrap;}
+      .ref-item:last-child{border-bottom:0;}
+      .ref-item .ri-main{flex:1; min-width:140px;}
+      .ref-item .ri-name{font-weight:800; font-size:13.5px;}
+      .ref-item .ri-sub{font-size:12px; color:var(--muted); margin-top:2px;}
+      .ref-status{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:4px 8px; border-radius:6px; text-transform:uppercase; background:#232B5C; color:var(--muted);}
+      .ref-status.done{background:var(--green-dark); color:var(--green);}
+      .ref-item .mini-btn{
+        cursor:pointer; border:1px solid var(--line); background:rgba(201,162,75,.10); color:var(--gold-bright);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:12px; padding:8px 12px; border-radius:9px;
+      }
+      .ref-item .mini-btn:active{transform:translateY(1px);}
+
+      /* ---------- Request rows (My Requests panel) ---------- */
+      .req-item{padding:12px 2px; border-bottom:1px solid var(--line-soft);}
+      .req-item:last-child{border-bottom:0;}
+      .req-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+      .req-user{font-weight:800; font-size:14px;}
+      .req-type{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:3px 8px; border-radius:6px; text-transform:uppercase;}
+      .req-type.deposit{background:var(--green-dark); color:var(--green);}
+      .req-type.withdraw{background:#3A2A10; color:var(--gold-bright);}
+      .req-status{margin-left:auto; font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:3px 8px; border-radius:6px; text-transform:uppercase; background:#232B5C; color:var(--muted);}
+      .req-status.approved{background:var(--green-dark); color:var(--green);}
+      .req-status.rejected{background:var(--red-dark); color:#F0857E;}
+      .req-meta{font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.5;}
+      .req-meta b{color:var(--text);}
+
+      /* ---------- Hamburger drawer ---------- */
+      .drawer-backdrop{
+        position:fixed; inset:0; background:rgba(4,6,18,.72); backdrop-filter:blur(3px);
+        opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:60;
+      }
+      .drawer-backdrop.show{opacity:1; pointer-events:auto;}
+      .drawer{
+        position:fixed; top:0; right:0; bottom:0; width:min(86vw, 320px); z-index:61;
+        background:linear-gradient(170deg, var(--card) 0%, var(--card-2) 100%);
+        border-left:1px solid var(--line);
+        transform:translateX(105%); transition:transform .28s ease;
+        display:flex; flex-direction:column; padding:20px 18px 24px; overflow-y:auto;
+      }
+      .drawer.show{transform:none;}
+      .drawer-head{display:flex; align-items:flex-start; gap:10px;}
+      .drawer-close{
+        margin-left:auto; flex:0 0 auto; cursor:pointer; width:36px; height:36px;
+        display:flex; align-items:center; justify-content:center;
+        background:transparent; border:1px solid var(--line-soft); border-radius:10px; color:var(--muted);
+      }
+      .drawer-profile{display:flex; align-items:center; gap:12px; min-width:0;}
+      .avatar{
+        width:46px; height:46px; border-radius:50%; flex:0 0 auto;
+        display:flex; align-items:center; justify-content:center;
+        font-family:"Sora",sans-serif; font-weight:800; font-size:16px; color:#181203;
+        background:var(--gold); border:2px solid rgba(231,203,126,.5);
+      }
+      .avatar.av-1{background:#34C98E;} .avatar.av-2{background:#7EA6E0;} .avatar.av-3{background:#E0857E;}
+      .avatar.av-4{background:#B79AE0;} .avatar.av-5{background:#E0B36A;}
+      .drawer-profile .dp-name{font-family:"Sora",sans-serif; font-weight:800; font-size:15.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .drawer-profile .dp-email{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+      .drawer-nav{margin-top:22px; display:flex; flex-direction:column; gap:6px;}
+      .drawer-item{
+        cursor:pointer; display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+        background:transparent; border:1px solid transparent; border-radius:12px; padding:13px 12px;
+        color:var(--text); font-family:"Manrope",sans-serif; font-weight:800; font-size:14.5px;
+      }
+      .drawer-item:hover, .drawer-item:active{background:rgba(201,162,75,.08); border-color:var(--line-soft);}
+      .drawer-item .di-ico{
+        width:36px; height:36px; border-radius:10px; flex:0 0 auto;
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(201,162,75,.10); border:1px solid var(--line-soft); color:var(--gold-bright);
+      }
+      .drawer-item .di-sub{display:block; font-size:11.5px; color:var(--muted); font-weight:600; margin-top:1px;}
+      .drawer-item .di-arrow{margin-left:auto; color:var(--muted-2); flex:0 0 auto;}
+      .drawer-foot{margin-top:auto; padding-top:18px; font-size:11.5px; color:var(--muted-2); line-height:1.5;}
+
+      /* ---------- Menu screens (profile / payment / help) ---------- */
+      .page-sheet{max-width:560px; max-height:88vh; overflow-y:auto;}
+      .form-field{margin-bottom:14px;}
+      .form-field label{display:block; font-size:11.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:7px;}
+      .text-input{
+        width:100%; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px;
+        color:var(--text); font-family:"Manrope",sans-serif; font-weight:700; font-size:15px; padding:12px 14px; outline:0;
+      }
+      .text-input:focus{border-color:var(--gold);}
+      select.text-input{appearance:none; -webkit-appearance:none;}
+      .avatar-row{display:flex; gap:10px; flex-wrap:wrap;}
+      .avatar-pick{
+        cursor:pointer; width:46px; height:46px; border-radius:50%; border:2px solid transparent; padding:0;
+        display:flex; align-items:center; justify-content:center;
+        font-family:"Sora",sans-serif; font-weight:800; font-size:15px; color:#181203; background:var(--gold);
+      }
+      .avatar-pick.av-1{background:#34C98E;} .avatar-pick.av-2{background:#7EA6E0;} .avatar-pick.av-3{background:#E0857E;}
+      .avatar-pick.av-4{background:#B79AE0;} .avatar-pick.av-5{background:#E0B36A;}
+      .avatar-pick.active{border-color:var(--text); box-shadow:0 0 0 2px var(--bg-deep), 0 0 0 4px var(--gold);}
+      .profile-head{display:flex; align-items:center; gap:14px; margin-bottom:18px;}
+      .profile-head .avatar{width:58px; height:58px; font-size:20px;}
+      .profile-head .ph-name{font-family:"Sora",sans-serif; font-weight:800; font-size:17px;}
+      .profile-head .ph-email{font-size:12.5px; color:var(--muted); margin-top:2px;}
+      .pay-item{
+        display:flex; gap:11px; align-items:flex-start;
+        background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:12px; margin-bottom:10px;
+      }
+      .pay-item .pi-main{flex:1; min-width:0;}
+      .pay-item .pi-title{font-weight:800; font-size:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+      .pay-item .pi-sub{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5; word-break:break-all;}
+      .default-tag{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:3px 7px; border-radius:6px; text-transform:uppercase; background:var(--green-dark); color:var(--green);}
+      .pay-item .pi-btns{display:flex; flex-direction:column; gap:6px; flex:0 0 auto;}
+      .pay-item .pi-btns button{
+        cursor:pointer; background:transparent; border:1px solid var(--line-soft); color:var(--muted);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:11.5px; padding:6px 10px; border-radius:8px;
+      }
+      .pay-item .pi-btns button.danger{color:#F0857E; border-color:rgba(229,83,75,.4);}
+      .pay-form{border-top:1px solid var(--line-soft); margin-top:16px; padding-top:16px;}
+      .pay-form h4{font-family:"Sora",sans-serif; font-size:14.5px; margin:0 0 12px;}
+      .faq-item{border-bottom:1px solid var(--line-soft);}
+      .faq-item:last-child{border-bottom:0;}
+      .faq-q{
+        cursor:pointer; width:100%; display:flex; align-items:center; gap:10px; text-align:left;
+        background:transparent; border:0; padding:14px 2px; color:var(--text);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:14.5px;
+      }
+      .faq-q .fq-arrow{margin-left:auto; color:var(--gold-bright); transition:transform .2s; flex:0 0 auto;}
+      .faq-item.open .faq-q .fq-arrow{transform:rotate(180deg);}
+      .faq-a{display:none; font-size:13.5px; color:var(--muted); line-height:1.65; padding:0 2px 14px;}
+      .faq-item.open .faq-a{display:block;}
+      .faq-a b{color:var(--text);}
+      @keyframes flashPanel{0%{box-shadow:0 0 0 0 rgba(201,162,75,0);} 25%{box-shadow:0 0 0 2px var(--gold);} 100%{box-shadow:0 0 0 0 rgba(201,162,75,0);}}
+      .panel.flash{animation:flashPanel 1.2s ease 2;}
+
+      /* ---------- Header profile chip ---------- */
+      .header-profile{
+        flex:0 0 auto; cursor:pointer; display:flex; align-items:center; gap:9px;
+        background:rgba(255,255,255,.02); border:1px solid var(--line-soft); border-radius:999px;
+        padding:4px 13px 4px 4px; color:var(--text); font-family:"Manrope",sans-serif; text-align:left;
+      }
+      .header-profile:active{transform:translateY(1px);}
+      .header-profile .avatar{width:36px; height:36px; font-size:13px; border-width:1px;}
+      .avatar.has-photo{background-size:cover; background-position:center; color:transparent;}
+      .header-profile .hp-name{font-weight:800; font-size:13px; line-height:1.15; white-space:nowrap;}
+      .header-profile .hp-sub{font-size:11px; color:var(--muted); line-height:1.15; white-space:nowrap;}
+      @media (max-width:560px){
+        .header-profile{order:2; margin-left:auto; padding:4px;}
+        .header-profile .hp-text{display:none;}
+        .menu-btn{margin-left:0;}
+      }
+
+      /* ---------- Transaction History page ---------- */
+      .txh-head{display:flex; align-items:flex-start; gap:14px; margin-top:18px;}
+      .txh-head h2{font-family:"Sora",sans-serif; font-size:21px; font-weight:800; margin:0;}
+      .txh-head p{font-size:12.5px; color:var(--muted); margin:3px 0 0; line-height:1.5;}
+      .txh-back{flex:0 0 auto; padding:10px 16px;}
+      .txh-filters{display:flex; gap:8px; flex-wrap:wrap; margin:16px 0 12px; align-items:center;}
+      .filter-chip{
+        cursor:pointer; border:1px solid var(--line-soft); background:rgba(255,255,255,.02);
+        color:var(--muted); font-family:"Manrope",sans-serif; font-weight:800; font-size:12.5px;
+        padding:8px 13px; border-radius:999px;
+      }
+      .filter-chip.active{color:#181203; background:var(--gold); border-color:var(--gold);}
+      .txh-period{margin-left:auto; width:auto; padding:9px 12px; font-size:13px;}
+      @media (max-width:560px){ .txh-period{margin-left:0;} }
+      .txh-list .hist-item:first-child{padding-top:2px;}
+
+      /* ---------- Profile photo upload ---------- */
+      .photo-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+      .upload-btn{
+        cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+        border:1px solid var(--line); background:rgba(201,162,75,.10); color:var(--gold-bright);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:13px; padding:10px 14px; border-radius:10px;
+      }
+      .photo-remove{
+        cursor:pointer; background:transparent; border:1px solid rgba(229,83,75,.4); color:#F0857E;
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:12.5px; padding:9px 13px; border-radius:10px;
+      }
+      .photo-note{font-size:11.5px; color:var(--muted-2); line-height:1.45;}
+      .user-wrap{display:flex; align-items:center; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:0 14px;}
+      .user-wrap span{color:var(--gold-bright); font-weight:800; font-size:15px;}
+      .user-wrap input{flex:1; min-width:0; background:transparent; border:0; outline:0; color:var(--text); font-family:"Manrope",sans-serif; font-weight:700; font-size:15px; padding:12px 6px;}
+      .user-wrap:focus-within{border-color:var(--gold);}
+      input[type="date"].text-input{color-scheme:dark;}
+
+      /* ---------- Auth gate ---------- */
+      .auth-gate{
+        position:fixed; inset:0; z-index:200; display:none; overflow-y:auto; padding:26px 16px 40px;
+        background:
+          radial-gradient(900px 480px at 85% -120px, rgba(201,162,75,.10), transparent 60%),
+          radial-gradient(700px 500px at -10% 30%, rgba(38,54,140,.35), transparent 60%),
+          var(--bg);
+      }
+      .auth-gate.show{display:flex; align-items:flex-start; justify-content:center;}
+      .auth-card{
+        width:100%; max-width:430px; margin:auto 0;
+        background:linear-gradient(165deg, var(--card) 0%, var(--card-2) 100%);
+        border:1px solid var(--line); border-radius:20px; padding:26px 22px 20px;
+        animation:pop .3s ease both;
+      }
+      .auth-brand{display:flex; align-items:center; gap:12px;}
+      .auth-brand .logo{width:52px; height:52px; flex:0 0 auto;}
+      .auth-brand h2{font-family:"Sora",sans-serif; font-size:20px; font-weight:800; margin:0; line-height:1.1;}
+      .auth-brand h2 .gold{color:var(--gold-bright);}
+      .auth-brand p{margin:3px 0 0; font-size:11.5px; color:var(--muted); font-weight:700; letter-spacing:.5px; text-transform:uppercase;}
+      .auth-intro{font-size:13.5px; color:var(--muted); line-height:1.55; margin:14px 0 16px;}
+      .auth-tabs{margin-bottom:16px;}
+      .auth-card .sheet-err{margin:0 0 12px;}
+      .auth-card form .btn{width:100%; padding:13px 10px; margin-top:2px;}
+      .auth-note{margin:16px 0 0; text-align:center; font-size:11.5px; color:var(--muted-2); line-height:1.5;}
+
+      /* ---------- Toasts ---------- */
+      .toasts{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:80; width:min(92vw, 420px); display:flex; flex-direction:column; gap:8px;}
+      .toast{
+        background:#171F52; border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+        font-size:13.5px; font-weight:700; box-shadow:0 12px 30px rgba(0,0,0,.45);
+        animation:pop .3s ease both; line-height:1.45;
+      }
+      .toast.win{border-color:var(--green);} .toast.lose{border-color:var(--red);}
+      .toast .t-sub{display:block; font-weight:600; color:var(--muted); font-size:12.5px; margin-top:2px;}
+      @media (prefers-reduced-motion: reduce){
+        *{animation-duration:.001s !important; transition-duration:.001s !important;}
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Auth gate: shown whenever there is no signed-in session -->
+    <div class="auth-gate" id="authGate">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <svg class="logo" viewBox="0 0 1200 1200" role="img" aria-label="TrybNetwork logo">
+            <defs>
+              <path id="arcBottomAuth" d="M 260,600 A 340,340 0 0 0 940,600" fill="none"/>
+            </defs>
+            <text font-family="Georgia, 'Times New Roman', serif" font-size="82" letter-spacing="22" fill="#C9A24B" font-weight="600">
+              <textPath href="#arcBottomAuth" startOffset="50%" text-anchor="middle">TRYBNETWORK</textPath>
+            </text>
+            <g fill="#C9A24B">
+              <rect x="252" y="592" width="16" height="16" transform="rotate(45 260 600)"/>
+              <rect x="932" y="592" width="16" height="16" transform="rotate(45 940 600)"/>
+            </g>
+            <circle cx="600" cy="600" r="268" fill="#0B1132"/>
+            <circle cx="600" cy="600" r="252" fill="#111845"/>
+            <circle cx="600" cy="600" r="252" fill="none" stroke="#C9A24B" stroke-width="13"/>
+            <g fill="#DBB669">
+              <rect x="487" y="595" width="7" height="140"/>
+              <rect x="466" y="625" width="48" height="80"/>
+              <rect x="567" y="545" width="7" height="170"/>
+              <rect x="546" y="575" width="48" height="110"/>
+              <rect x="647" y="495" width="7" height="190"/>
+              <rect x="626" y="525" width="48" height="130"/>
+              <rect x="727" y="430" width="7" height="210"/>
+              <rect x="706" y="470" width="48" height="140"/>
+              <polygon points="706,470 754,470 730,418"/>
+            </g>
+          </svg>
+          <div>
+            <h2>Tryb<span class="gold">Network</span></h2>
+            <p>Trade &amp; Save</p>
+          </div>
+        </div>
+        <p class="auth-intro">Create your account to start trading and saving, or log in to pick up right where you left off.</p>
+        <div class="seg auth-tabs" role="tablist" aria-label="Sign up or log in">
+          <button type="button" id="authTabSignup" class="active">Sign Up</button>
+          <button type="button" id="authTabLogin">Log In</button>
+        </div>
+
+        <form id="signupForm" novalidate>
+          <div class="form-field">
+            <label for="suName">Full name</label>
+            <input class="text-input" id="suName" type="text" maxlength="40" placeholder="Your full name" autocomplete="name" />
+          </div>
+          <div class="form-field">
+            <label for="suUsername">Username</label>
+            <div class="user-wrap"><span>@</span><input id="suUsername" type="text" maxlength="20" placeholder="your_username" autocomplete="username" /></div>
+          </div>
+          <div class="form-field">
+            <label for="suEmail">Email</label>
+            <input class="text-input" id="suEmail" type="email" maxlength="80" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="form-field">
+            <label for="suPass">Password</label>
+            <input class="text-input" id="suPass" type="password" maxlength="64" placeholder="At least 6 characters" autocomplete="new-password" />
+          </div>
+          <div class="form-field">
+            <label for="suRef">Referral code <span style="text-transform:none; letter-spacing:0; color:var(--muted-2);">(optional)</span></label>
+            <input class="text-input" id="suRef" type="text" maxlength="16" placeholder="e.g. TRYB-XXXXX" autocomplete="off" />
+          </div>
+          <div class="sheet-err" id="suErr"></div>
+          <button class="btn" type="submit">Create account</button>
+        </form>
+
+        <form id="loginForm" novalidate style="display:none;">
+          <div class="form-field">
+            <label for="liId">Username or email</label>
+            <input class="text-input" id="liId" type="text" maxlength="80" placeholder="Username or email" autocomplete="username" />
+          </div>
+          <div class="form-field">
+            <label for="liPass">Password</label>
+            <input class="text-input" id="liPass" type="password" maxlength="64" placeholder="Your password" autocomplete="current-password" />
+          </div>
+          <div class="sheet-err" id="liErr"></div>
+          <button class="btn" type="submit">Log In</button>
+        </form>
+
+        <p class="auth-note">Demo only — accounts live in this browser.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <header class="topbar">
+        <svg class="logo" viewBox="0 0 1200 1200" role="img" aria-label="TrybNetwork logo">
+          <defs>
+            <path id="arcBottom" d="M 260,600 A 340,340 0 0 0 940,600" fill="none"/>
+          </defs>
+          <text font-family="Georgia, 'Times New Roman', serif" font-size="82" letter-spacing="22" fill="#C9A24B" font-weight="600">
+            <textPath href="#arcBottom" startOffset="50%" text-anchor="middle">TRYBNETWORK</textPath>
+          </text>
+          <g fill="#C9A24B">
+            <rect x="252" y="592" width="16" height="16" transform="rotate(45 260 600)"/>
+            <rect x="932" y="592" width="16" height="16" transform="rotate(45 940 600)"/>
+          </g>
+          <circle cx="600" cy="600" r="268" fill="#0B1132"/>
+          <circle cx="600" cy="600" r="252" fill="#111845"/>
+          <circle cx="600" cy="600" r="252" fill="none" stroke="#C9A24B" stroke-width="13"/>
+          <g fill="#DBB669">
+            <rect x="487" y="595" width="7" height="140"/>
+            <rect x="466" y="625" width="48" height="80"/>
+            <rect x="567" y="545" width="7" height="170"/>
+            <rect x="546" y="575" width="48" height="110"/>
+            <rect x="647" y="495" width="7" height="190"/>
+            <rect x="626" y="525" width="48" height="130"/>
+            <rect x="727" y="430" width="7" height="210"/>
+            <rect x="706" y="470" width="48" height="140"/>
+            <polygon points="706,470 754,470 730,418"/>
+          </g>
+        </svg>
+        <div class="brand">
+          <h1>Tryb<span class="gold">Network</span></h1>
+          <p>Trade &amp; Save</p>
+        </div>
+        <span class="sim-badge"><span class="dot"></span>Simulation · Virtual funds</span>
+        <button class="header-profile" id="headerProfile" type="button" aria-label="Edit profile">
+          <span class="avatar" id="headerAvatar">DT</span>
+          <span class="hp-text">
+            <span class="hp-name" id="headerName">Demo Trader</span><br>
+            <span class="hp-sub" id="headerSub">No username set</span>
+          </span>
+        </button>
+        <button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-haspopup="true" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </header>
+
+      <div id="appView">
+      <!-- Wallets -->
+      <section class="wallets">
+        <div class="wallet">
+          <div class="w-head">
+            <span class="w-label">Main Balance</span>
+            <span class="w-chip plain">Trading wallet</span>
+          </div>
+          <div class="w-balance num" id="mainBalance">$0.00</div>
+          <div class="w-sub">Deposits and withdrawals apply to this balance only — and it's the only balance you can trade with.</div>
+          <div class="w-actions">
+            <button class="btn" id="btnDeposit" type="button">Deposit</button>
+            <button class="btn ghost" id="btnWithdraw" type="button">Withdraw</button>
+          </div>
+          <div class="pending-note" id="mainPending" style="display:none;"></div>
+        </div>
+        <div class="wallet savings">
+          <div class="w-head">
+            <span class="w-label">Savings</span>
+            <span class="w-chip">15% APY</span>
+          </div>
+          <div class="w-balance num" id="savingsBalance">$0.00</div>
+          <div class="w-sub">Interest earned so far: <span class="earned num" id="interestEarned">$0.00</span> · accrues every second</div>
+          <div class="w-sub num" id="savingsAvail" style="margin-top:3px;"></div>
+          <div class="w-actions">
+            <button class="btn" id="btnTransferIn" type="button">Transfer In</button>
+            <button class="btn ghost" id="btnTransferOut" type="button">Transfer Out</button>
+          </div>
+          <div id="savingsLots"></div>
+          <div class="lock-note">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E77A0" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <span>Every transfer into Savings is locked for 7 days before it can move back to Main. Savings has no deposit or withdrawal of its own — money enters and leaves only through Main Balance — and savings funds can never be staked on a trade.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- My requests: live status of this account's deposit/withdrawal requests -->
+      <section class="panel" id="myRequestsPanel" aria-label="My deposit and withdrawal requests" style="margin-top:14px; display:none;">
+        <h2 class="sec">My Requests</h2>
+        <p class="sec-sub">Your deposit and withdrawal requests with their live status. When a request is approved or rejected, the status below — and your Main Balance — update here automatically, no reload needed.</p>
+        <div id="myReqList"></div>
+      </section>
+
+      <div class="grid">
+        <!-- Arena -->
+        <section class="panel" aria-label="Binary options arena">
+          <h2 class="sec">Binary Arena</h2>
+          <p class="sec-sub">Pick an asset, set your stake, and call the price Higher or Lower. Wins pay your stake back plus 85% profit.</p>
+
+          <div class="assets" id="assetTabs"></div>
+
+          <div class="price-row">
+            <div>
+              <div class="price-now num" id="priceNow">—</div>
+              <div class="price-name" id="priceName">—</div>
+            </div>
+            <span class="price-chg num" id="priceChg"></span>
+            <span class="feed-note"><span class="pulse"></span>Simulated feed</span>
+          </div>
+
+          <div class="chart-box"><canvas id="chart"></canvas></div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="stakeInput">Stake (from Main Balance)</label>
+              <div class="stake-wrap"><span>$</span><input id="stakeInput" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <div class="field">
+              <label>Duration</label>
+              <div class="seg" id="durationSeg">
+                <button type="button" data-dur="30">30s</button>
+                <button type="button" data-dur="60" class="active">1m</button>
+                <button type="button" data-dur="300">5m</button>
+              </div>
+            </div>
+            <div class="payout-line">
+              <span>Potential return on a win: <b class="num" id="payoutInfo">—</b></span>
+              <span class="win-amt num" id="profitInfo"></span>
+            </div>
+          </div>
+
+          <div class="trade-btns">
+            <button class="trade-btn higher" id="btnHigher" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              Higher
+            </button>
+            <button class="trade-btn lower" id="btnLower" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+              Lower
+            </button>
+          </div>
+
+          <div class="martingale">
+            <div class="mg-head">
+              <span class="mg-title">Martingale Mode</span>
+              <button class="switch" id="mgToggle" type="button" role="switch" aria-checked="false" aria-label="Martingale Mode"></button>
+            </div>
+            <div class="mg-status" id="mgStatus"></div>
+            <p class="mg-risk">Martingale doubles stakes after losses — a losing streak can wipe the balance.</p>
+          </div>
+
+          <div class="open-trades">
+            <h3>Open trades</h3>
+            <div id="openTradesList"><div class="empty">No open trades. Place one above to see its countdown here.</div></div>
+          </div>
+        </section>
+
+        <!-- History -->
+        <section class="panel" id="historyPanel" aria-label="History">
+          <h2 class="sec">History</h2>
+          <p class="sec-sub">Every trade and wallet movement in this simulation, saved on this device.</p>
+          <div class="tabs" role="tablist">
+            <button type="button" id="tabTrades" class="active">Trades</button>
+            <button type="button" id="tabWallet">Wallet</button>
+          </div>
+          <div id="tradesPane">
+            <div class="stats">
+              <div class="stat"><div class="v num" id="statTrades">0</div><div class="k">Trades</div></div>
+              <div class="stat"><div class="v num" id="statWinRate">—</div><div class="k">Win rate</div></div>
+              <div class="stat"><div class="v num" id="statPnl">$0.00</div><div class="k">Net P/L</div></div>
+            </div>
+            <div class="hist-list" id="tradeHistory"></div>
+          </div>
+          <div id="walletPane" style="display:none;">
+            <div class="hist-list" id="walletHistory"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Referrals -->
+      <section class="panel ref-panel" aria-label="Referral program">
+        <h2 class="sec">Refer &amp; Earn</h2>
+        <p class="sec-sub">Earn a <b style="color:var(--gold-bright);">3 USDT</b> bonus for every referral whose first deposit is <b style="color:var(--gold-bright);">12 USDT</b>. Rewards land in your Main Balance. Referrals are simulated here so you can test the flow.</p>
+        <div class="ref-code-row">
+          <div class="ref-code">
+            <div>
+              <div class="rc-label">Your referral code</div>
+              <div class="rc-value num" id="refCode">—</div>
+              <div class="rc-link" id="refLink">—</div>
+            </div>
+          </div>
+          <button class="btn" id="copyRefBtn" type="button" style="flex:0 1 170px;">Copy code</button>
+        </div>
+        <div class="stats" style="margin-top:14px;">
+          <div class="stat"><div class="v num" id="statReferrals">0</div><div class="k">Referrals</div></div>
+          <div class="stat"><div class="v num" id="statRefQualified">0</div><div class="k">Qualified</div></div>
+          <div class="stat"><div class="v num" id="statRefEarned">$0.00</div><div class="k">Bonus earned</div></div>
+        </div>
+        <div class="ref-actions">
+          <button class="btn ghost" id="simRefBtn" type="button">Simulate a referral signup</button>
+        </div>
+        <div class="ref-list" id="refList"></div>
+      </section>
+      </div><!-- /appView -->
+
+      <!-- Transaction History view (dedicated page) -->
+      <div id="txHistoryView" style="display:none;">
+        <div class="txh-head">
+          <button class="btn ghost txh-back" id="txBackBtn" type="button">← Back</button>
+          <div>
+            <h2>Transaction History</h2>
+            <p>Every wallet transaction and closed trade on this account, newest first. Use the filters to narrow the list.</p>
+          </div>
+        </div>
+        <div class="stats" style="margin-top:16px;">
+          <div class="stat"><div class="v num" id="txhCount">0</div><div class="k">Entries shown</div></div>
+          <div class="stat"><div class="v num" id="txhWalletNet">$0.00</div><div class="k">Wallet net</div></div>
+          <div class="stat"><div class="v num" id="txhTradePnl">$0.00</div><div class="k">Trade P/L</div></div>
+        </div>
+        <div class="txh-filters">
+          <div id="txFilters" style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="filter-chip active" data-txf="all">All</button>
+            <button type="button" class="filter-chip" data-txf="trades">Trades</button>
+            <button type="button" class="filter-chip" data-txf="deposits">Deposits</button>
+            <button type="button" class="filter-chip" data-txf="withdrawals">Withdrawals</button>
+            <button type="button" class="filter-chip" data-txf="transfers">Transfers</button>
+            <button type="button" class="filter-chip" data-txf="interest">Interest</button>
+            <button type="button" class="filter-chip" data-txf="referrals">Referral bonuses</button>
+            <button type="button" class="filter-chip" data-txf="rejected">Rejected</button>
+          </div>
+          <select class="text-input txh-period" id="txPeriod" aria-label="Time period">
+            <option value="all">All time</option>
+            <option value="today">Today</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+          </select>
+        </div>
+        <section class="panel" aria-label="All transactions">
+          <div class="txh-list" id="txFullList"></div>
+        </section>
+      </div>
+
+      <footer>
+        <p>TrybNetwork Trade &amp; Save is a simulation. All balances are virtual, all prices are simulated, and nothing here involves real money or financial advice. Savings interest and trade payouts are illustrative only.</p>
+        <button class="reset-btn" id="resetBtn" type="button">Reset demo</button>
+      </footer>
+    </div>
+
+    <!-- Move funds sheet -->
+    <div class="overlay" id="sheetOverlay">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+        <h3 id="sheetTitle">Move funds</h3>
+        <p class="sheet-sub" id="sheetSub"></p>
+        <div class="amt-wrap"><span>$</span><input id="sheetAmount" class="num" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></div>
+        <div class="max-row"><span id="sheetAvail"></span><button class="max-btn" id="sheetMax" type="button">Use max</button></div>
+        <div class="sheet-err" id="sheetErr"></div>
+        <div class="sheet-btns">
+          <button class="btn ghost" id="sheetCancel" type="button">Cancel</button>
+          <button class="btn" id="sheetConfirm" type="button">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hamburger drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="drawer" id="drawer" aria-label="Menu" aria-hidden="true">
+      <div class="drawer-head">
+        <div class="drawer-profile">
+          <span class="avatar" id="drawerAvatar">DT</span>
+          <div style="min-width:0;">
+            <div class="dp-name" id="drawerName">Demo Trader</div>
+            <div class="dp-email" id="drawerEmail">No email set</div>
+          </div>
+        </div>
+        <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <nav class="drawer-nav" aria-label="Menu items">
+        <button class="drawer-item" id="menuHistory" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg></span>
+          <span>Transaction History<span class="di-sub">Trades &amp; wallet movements</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuProfile" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg></span>
+          <span>Edit Profile<span class="di-sub">Full name, username, DOB &amp; photo</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuPayment" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg></span>
+          <span>Payment Method<span class="di-sub">Withdrawal bank &amp; crypto address</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuHelp" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3A2.6 2.6 0 1 1 12 12.4V14"/><path d="M12 17.2h.01"/></svg></span>
+          <span>Help<span class="di-sub">Wallets, savings lock, bonuses &amp; the arena</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuLogout" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>
+          <span>Log Out<span class="di-sub" id="logoutSub">Sign out of this account</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </nav>
+      <div class="drawer-foot">TrybNetwork Trade &amp; Save — a simulation with virtual funds. Nothing here involves real money.</div>
+    </aside>
+
+    <!-- Edit Profile screen -->
+    <div class="overlay" id="profileOverlay">
+      <div class="sheet page-sheet" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+        <h3 id="profileTitle">Edit Profile</h3>
+        <p class="sheet-sub">Saved on this device and shown in the header and menu.</p>
+        <div class="profile-head">
+          <span class="avatar" id="profileAvatarPreview">DT</span>
+          <div>
+            <div class="ph-name" id="profileNamePreview">Demo Trader</div>
+            <div class="ph-email" id="profileEmailPreview">No username set</div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Profile picture</label>
+          <div class="photo-row">
+            <label class="upload-btn" for="profilePhoto">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
+              Upload photo
+            </label>
+            <input id="profilePhoto" type="file" accept="image/*" style="display:none;" />
+            <button class="photo-remove" id="photoRemove" type="button" style="display:none;">Remove photo</button>
+          </div>
+          <p class="photo-note" style="margin:8px 0 0;">Pick an image from your device — it's resized and stored only in this browser. Without a photo, your initials avatar is used.</p>
+        </div>
+        <div class="form-field">
+          <label for="profileName">Full name</label>
+          <input class="text-input" id="profileName" type="text" maxlength="40" placeholder="Your full name" autocomplete="name" />
+        </div>
+        <div class="form-field">
+          <label for="profileUsername">Username</label>
+          <div class="user-wrap"><span>@</span><input id="profileUsername" type="text" maxlength="20" placeholder="your_username" autocomplete="username" /></div>
+        </div>
+        <div class="form-field">
+          <label for="profileDob">Date of birth</label>
+          <input class="text-input" id="profileDob" type="date" />
+        </div>
+        <div class="form-field">
+          <label for="profileEmail">Email</label>
+          <input class="text-input" id="profileEmail" type="email" maxlength="80" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label>Avatar colour (when no photo)</label>
+          <div class="avatar-row" id="avatarRow"></div>
+        </div>
+        <div class="sheet-err" id="profileErr"></div>
+        <div class="sheet-btns">
+          <button class="btn ghost" id="profileCancel" type="button">Cancel</button>
+          <button class="btn" id="profileSave" type="button">Save profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Method screen -->
+    <div class="overlay" id="paymentOverlay">
+      <div class="sheet page-sheet" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+        <h3 id="paymentTitle">Payment Method</h3>
+        <p class="sheet-sub">Add the withdrawal destinations for this account — a crypto wallet address and/or your bank account details. Saved on this device. Demo only — withdrawals are simulated and no real payouts are sent to these details.</p>
+        <div id="payList"></div>
+        <div class="pay-form">
+          <h4>Add a withdrawal method</h4>
+          <div class="form-field">
+            <label for="payType">Method type</label>
+            <select class="text-input" id="payType">
+              <option value="bank">Bank account</option>
+              <option value="crypto">Crypto wallet address</option>
+            </select>
+          </div>
+          <div id="payBankFields">
+            <div class="form-field">
+              <label for="payBankName">Bank name</label>
+              <input class="text-input" id="payBankName" type="text" maxlength="60" placeholder="e.g. GTBank" />
+            </div>
+            <div class="form-field">
+              <label for="payAcctNum">Account number</label>
+              <input class="text-input" id="payAcctNum" type="text" inputmode="numeric" maxlength="24" placeholder="Account number" />
+            </div>
+            <div class="form-field">
+              <label for="payAcctName">Account name</label>
+              <input class="text-input" id="payAcctName" type="text" maxlength="60" placeholder="Name on the account" />
+            </div>
+          </div>
+          <div id="payCryptoFields" style="display:none;">
+            <div class="form-field">
+              <label for="payAddress">Withdrawal crypto address</label>
+              <input class="text-input" id="payAddress" type="text" maxlength="120" placeholder="Paste your wallet address" />
+            </div>
+            <div class="form-field">
+              <label for="payCoin">Coin / network (optional)</label>
+              <input class="text-input" id="payCoin" type="text" maxlength="30" placeholder="e.g. USDT (TRC20)" />
+            </div>
+          </div>
+          <div class="sheet-err" id="payErr"></div>
+          <div class="sheet-btns">
+            <button class="btn ghost" id="paymentClose" type="button">Done</button>
+            <button class="btn" id="payAdd" type="button">Add method</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help screen -->
+    <div class="overlay" id="helpOverlay">
+      <div class="sheet page-sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <h3 id="helpTitle">Help &amp; FAQ</h3>
+        <p class="sheet-sub">How TrybNetwork Trade &amp; Save works in this simulation.</p>
+        <div id="faqList">
+          <div class="faq-item open">
+            <button class="faq-q" type="button">What are the two wallets?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">You have a <b>Main Balance</b> and a <b>Savings</b> wallet, and they never mix. Deposits and withdrawals apply to Main Balance only, and Main is the only balance you can trade with. Savings has no deposit or withdrawal of its own — money enters and leaves Savings only by transferring to or from Main Balance, and savings funds can never be staked on a trade.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">How does Savings earn, and what is the 7-day lock?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Savings earns <b>15% APY</b>, accruing every second on whatever is saved. Every transfer into Savings becomes a separate lot that is <b>locked for 7 days</b> before it can move back to Main — each lot shows its own unlock countdown under your Savings balance. Interest you earn is never locked, and when you transfer out, your oldest unlocked lots are used first.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">How do deposits and withdrawals work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Deposit and Withdraw on the Main Balance card create a <b>request</b> — the funds move only once the request is approved. Rejected requests leave your balance unchanged and are noted in your wallet history.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">What bonuses are there?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals and transfers out until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every referral whose first deposit is <b>12 USDT</b> — track it in the Refer &amp; Earn panel and share your referral code from there.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">How does the Binary Arena work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Pick an asset (BTC, ETH, EURUSD, or gold), set a stake from your Main Balance, choose a duration (30s, 1m, or 5m), and call the price <b>Higher</b> or <b>Lower</b>. If you are right at expiry you get your stake back plus <b>85% profit</b>; if you are wrong you lose the stake, and an exact tie refunds it. Prices come from a simulated feed, so results are for practice only.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">What is Martingale Mode?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">With Martingale Mode on, your stake <b>doubles after every loss</b> and resets to your base stake after a win. It can recover small losses quickly, but a losing streak grows stakes exponentially and can wipe the balance — the arena shows a warning for a reason. Try it with virtual funds here before ever risking real money.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" type="button">Where do I set where payouts go?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Open the menu at the top right and choose <b>Payment Method</b> to add a bank account or crypto wallet as a payout destination and mark one as default. This is a demo, so no real payouts are ever sent.</div>
+          </div>
+        </div>
+        <div class="sheet-btns">
+          <button class="btn" id="helpClose" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+
+    <script>
+      "use strict";
+      /* ================= Config ================= */
+      var LS_KEY = "trybnetwork-trade-save-v2";
+      var APY = 0.15;                    // 15% per year
+      var YEAR_SECS = 365 * 24 * 3600;
+      var LOCK_MS = 7 * 24 * 3600 * 1000; // each Savings transfer-in is locked for 7 days
+      var PAYOUT_RATE = 0.85;            // 85% profit on a win
+      var START_MAIN = 0;                // no starting grant — new users open at $0 plus the welcome bonus
+      var WELCOME_BONUS = 3;             // 3 USDT, treated 1:1 with USD
+      var BONUS_UNLOCK_VOLUME = 10;      // trade 10 USDT total to unlock the bonus
+      var REFERRAL_REWARD = 3;           // 3 USDT per qualifying referral
+      var REFERRAL_DEPOSIT = 12;         // referral's first deposit that triggers the reward
+      var INTEREST_LOG_AT = 0.10;        // log an interest entry once $0.10 unlogged accrues
+
+      var ASSETS = {
+        BTCUSD: { name: "Bitcoin / USD",  start: 67432.50, vol: 0.00055, dec: 2 },
+        ETHUSD: { name: "Ethereum / USD", start: 3521.40,  vol: 0.00072, dec: 2 },
+        EURUSD: { name: "Euro / USD",     start: 1.0852,   vol: 0.00007, dec: 4 },
+        XAUUSD: { name: "Gold / USD",     start: 2387.60,  vol: 0.00022, dec: 2 }
+      };
+      var CANDLE_MS = 2000, MAX_CANDLES = 46, TICK_MS = 200;
+
+      /* ================= Helpers ================= */
+      function $(id){ return document.getElementById(id); }
+      function fmtUSD(n){
+        var sign = n < 0 ? "-$" : "$";
+        return sign + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      function fmtPrice(asset, v){ return v.toLocaleString("en-US", { minimumFractionDigits: ASSETS[asset].dec, maximumFractionDigits: ASSETS[asset].dec }); }
+      function fmtTime(ts){
+        var d = new Date(ts);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + ", " +
+               d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+      }
+      function fmtCountdown(ms){
+        var s = Math.max(0, Math.ceil(ms / 1000));
+        var m = Math.floor(s / 60), r = s % 60;
+        return m > 0 ? m + ":" + (r < 10 ? "0" : "") + r : r + "s";
+      }
+      function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+      function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+      function toast(title, sub, kind){
+        var box = $("toasts");
+        var el = document.createElement("div");
+        el.className = "toast" + (kind ? " " + kind : "");
+        el.innerHTML = esc(title) + (sub ? '<span class="t-sub">' + esc(sub) + "</span>" : "");
+        box.appendChild(el);
+        setTimeout(function(){ el.style.opacity = "0"; el.style.transition = "opacity .4s"; setTimeout(function(){ el.remove(); }, 420); }, 4600);
+      }
+
+      /* ================= State ================= */
+      function makeRefCode(){
+        var chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", out = "";
+        for (var i = 0; i < 5; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
+        return "TRYB-" + out;
+      }
+      function freshState(){
+        return {
+          main: START_MAIN + WELCOME_BONUS,   // $0 start + the silent 3 USDT welcome bonus = $3.00
+          startGrantRemoved: true,            // this state never carried the old $10,000 starting grant
+          savings: 0,
+          savingsLots: [],                    // each transfer-in: { id, amount, remaining, time, unlockAt }
+          interestPool: 0,                    // accrued interest inside Savings — never locked
+          totalInterest: 0,
+          interestUnlogged: 0,
+          trades: [],
+          txs: [],   // the welcome bonus is credited silently — no history entry
+          openTrades: [],
+          mgOn: false, mgStep: 0,
+          bonusLocked: true, bonusTraded: 0,
+          refCode: makeRefCode(),
+          referrals: [], referralEarned: 0,
+          adminRequests: [],
+          profile: { name: "Demo Trader", email: "", avatar: 0, username: "", dob: "", photo: "" },
+          paymentMethods: [],
+          lastTick: Date.now()
+        };
+      }
+      /* ================= Demo accounts & session =================
+         Accounts and sessions live in localStorage (demo only). Each
+         account's app state is stored under its own key so balances,
+         history, and referrals stay separate per user. */
+      var ACCOUNTS_KEY = "trybnetwork-accounts-v1";
+      var SESSION_KEY = "trybnetwork-session-v1";
+      function stateKey(username){ return LS_KEY + "::" + username; }
+      function loadAccounts(){
+        try { var a = JSON.parse(localStorage.getItem(ACCOUNTS_KEY)); return Array.isArray(a) ? a : []; }
+        catch(e){ return []; }
+      }
+      function saveAccounts(list){ try { localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list)); } catch(e){} }
+      function findAccount(id){
+        var key = String(id || "").trim().toLowerCase();
+        if (!key) return null;
+        var list = loadAccounts();
+        for (var i = 0; i < list.length; i++){
+          if (list[i].username.toLowerCase() === key || list[i].email.toLowerCase() === key) return list[i];
+        }
+        return null;
+      }
+      function findAccountByRefCode(code){
+        var key = String(code || "").trim().toUpperCase();
+        if (!key) return null;
+        var list = loadAccounts();
+        for (var i = 0; i < list.length; i++){
+          if ((list[i].refCode || "").toUpperCase() === key) return list[i];
+        }
+        return null;
+      }
+      function updateAccount(username, patch){
+        var list = loadAccounts();
+        for (var i = 0; i < list.length; i++){
+          if (list[i].username === username){ for (var k in patch) list[i][k] = patch[k]; saveAccounts(list); return list[i]; }
+        }
+        return null;
+      }
+      var currentUser = null;   // the signed-in account record, or null
+      (function bootSession(){
+        var un = null;
+        try { un = localStorage.getItem(SESSION_KEY); } catch(e){}
+        if (un){ var acct = findAccount(un); if (acct) currentUser = acct; }
+      })();
+
+      var state;
+      function save(){
+        if (!currentUser) return;   // nothing persists while signed out
+        try { localStorage.setItem(stateKey(currentUser.username), JSON.stringify(state)); } catch(e){}
+      }
+      function loadForUser(username){
+        try {
+          var raw = localStorage.getItem(stateKey(username));
+          if (!raw){
+            // Adopt a state saved before accounts existed (single legacy
+            // key) so earlier demo progress carries into the first account.
+            var legacy = localStorage.getItem(LS_KEY);
+            if (legacy){
+              raw = legacy;
+              localStorage.setItem(stateKey(username), legacy);
+              localStorage.removeItem(LS_KEY);
+            }
+          }
+          if (!raw) return null;
+          var s = JSON.parse(raw);
+          if (typeof s.main !== "number" || !Array.isArray(s.txs)) return null;
+          return s;
+        } catch(e){ return null; }
+      }
+      state = (currentUser ? loadForUser(currentUser.username) : null) || freshState();
+      function normalizeState(){
+      // Fill any fields introduced after a state was first saved.
+      if (state.bonusLocked === undefined){ state.bonusLocked = true; state.bonusTraded = 0; }
+      if (typeof state.bonusTraded !== "number") state.bonusTraded = 0;
+      if (!state.refCode) state.refCode = makeRefCode();
+      if (!Array.isArray(state.referrals)){ state.referrals = []; state.referralEarned = 0; }
+      if (typeof state.referralEarned !== "number") state.referralEarned = 0;
+      if (!Array.isArray(state.adminRequests)) state.adminRequests = [];
+      if (!state.profile || typeof state.profile !== "object") state.profile = { name: "Demo Trader", email: "", avatar: 0, username: "", dob: "", photo: "" };
+      if (typeof state.profile.name !== "string" || !state.profile.name) state.profile.name = "Demo Trader";
+      if (typeof state.profile.email !== "string") state.profile.email = "";
+      if (typeof state.profile.avatar !== "number") state.profile.avatar = 0;
+      if (typeof state.profile.username !== "string") state.profile.username = "";
+      if (typeof state.profile.dob !== "string") state.profile.dob = "";
+      if (typeof state.profile.photo !== "string") state.profile.photo = "";
+      if (!Array.isArray(state.paymentMethods)) state.paymentMethods = [];
+      if (typeof state.interestPool !== "number") state.interestPool = 0;
+      // One-time correction: states saved before the starting grant was
+      // removed still carry the old $10,000 in their balances. Take it back
+      // out — from Main first, then from Savings (interest first, then the
+      // newest lots) — so existing users land on the same footing as new
+      // ones: $0 start plus the 3 USDT welcome bonus and whatever they
+      // genuinely earned, deposited, or won since.
+      if (!state.startGrantRemoved){
+        state.startGrantRemoved = true;
+        var grantLeft = 10000;
+        var fromMain = Math.min(Math.max(0, state.main), grantLeft);
+        state.main -= fromMain; grantLeft -= fromMain;
+        if (grantLeft > 0 && state.savings > 0){
+          var fromPool = Math.min(state.interestPool, grantLeft);
+          state.interestPool -= fromPool; state.savings -= fromPool; grantLeft -= fromPool;
+          if (!Array.isArray(state.savingsLots)) state.savingsLots = [];
+          for (var gi = state.savingsLots.length - 1; gi >= 0 && grantLeft > 0; gi--){
+            var gtake = Math.min(state.savingsLots[gi].remaining, grantLeft);
+            state.savingsLots[gi].remaining -= gtake; state.savings -= gtake; grantLeft -= gtake;
+          }
+          state.savingsLots = state.savingsLots.filter(function(l){ return l.remaining > 0.004; });
+          if (state.savings < 0) state.savings = 0;
+        }
+      }
+      // The welcome bonus is silent: drop any bonus announcement entries an
+      // older saved state may still carry in its wallet history.
+      state.txs = state.txs.filter(function(tx){ return tx.type !== "bonus" && tx.type !== "unlock"; });
+      delete state.showWelcome;
+      if (!Array.isArray(state.savingsLots)){
+        state.savingsLots = [];
+        // Savings held from before the 7-day lot lock become one already-unlocked lot.
+        if (state.savings > 0){
+          state.savingsLots.push({ id: uid(), amount: state.savings, remaining: state.savings, time: Date.now() - LOCK_MS, unlockAt: Date.now() });
+        }
+      }
+      }
+      normalizeState();
+
+      // Accrue savings interest for time elapsed while the page was closed.
+      (function accrueOffline(){
+        var now = Date.now();
+        var dt = Math.max(0, (now - (state.lastTick || now)) / 1000);
+        if (dt > 1 && state.savings > 0) addInterest(state.savings * APY * dt / YEAR_SECS);
+        state.lastTick = now;
+      })();
+
+      function addInterest(gain){
+        if (!(gain > 0)) return;
+        state.savings += gain;
+        state.interestPool += gain;   // interest is earned, not transferred in — it never locks
+        state.totalInterest += gain;
+        state.interestUnlogged += gain;
+        if (state.interestUnlogged >= INTEREST_LOG_AT){
+          state.txs.unshift({ id: uid(), type: "interest", amount: state.interestUnlogged, note: "Savings interest · 15% APY", time: Date.now() });
+          state.interestUnlogged = 0;
+          if (state.txs.length > 120) state.txs.length = 120;
+        }
+      }
+
+      /* ================= Simulated market ================= */
+      var market = {};
+      function seedMarket(){
+        Object.keys(ASSETS).forEach(function(sym){
+          var a = ASSETS[sym];
+          var price = a.start * (1 + (Math.random() - 0.5) * 0.004);
+          var candles = [];
+          var t = Date.now() - MAX_CANDLES * CANDLE_MS;
+          for (var i = 0; i < MAX_CANDLES; i++){
+            var o = price;
+            var steps = 6, c = o, h = o, l = o;
+            for (var j = 0; j < steps; j++){
+              c = c * (1 + a.vol * (Math.random() * 2 - 1) * 1.6);
+              if (c > h) h = c; if (c < l) l = c;
+            }
+            candles.push({ o: o, h: h, l: l, c: c });
+            price = c; t += CANDLE_MS;
+          }
+          market[sym] = { price: price, open: candles[0].o, candles: candles, candleStart: Date.now() };
+        });
+      }
+      seedMarket();
+
+      function tickMarket(){
+        Object.keys(market).forEach(function(sym){
+          var m = market[sym], a = ASSETS[sym];
+          m.price = m.price * (1 + a.vol * (Math.random() * 2 - 1));
+          var cur = m.candles[m.candles.length - 1];
+          cur.c = m.price;
+          if (m.price > cur.h) cur.h = m.price;
+          if (m.price < cur.l) cur.l = m.price;
+          if (Date.now() - m.candleStart >= CANDLE_MS){
+            m.candles.push({ o: m.price, h: m.price, l: m.price, c: m.price });
+            if (m.candles.length > MAX_CANDLES) m.candles.shift();
+            m.candleStart = Date.now();
+          }
+        });
+      }
+
+      /* ================= Chart ================= */
+      var curAsset = "BTCUSD";
+      var chartCtx = $("chart").getContext("2d");
+      function drawChart(){
+        var canvas = $("chart");
+        var dpr = window.devicePixelRatio || 1;
+        var w = canvas.clientWidth, h = canvas.clientHeight;
+        if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)){
+          canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+        }
+        var ctx = chartCtx;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        var m = market[curAsset];
+        var candles = m.candles;
+        var hi = -Infinity, lo = Infinity, i, c;
+        for (i = 0; i < candles.length; i++){ c = candles[i]; if (c.h > hi) hi = c.h; if (c.l < lo) lo = c.l; }
+        state.openTrades.forEach(function(t){ if (t.asset === curAsset){ if (t.entry > hi) hi = t.entry; if (t.entry < lo) lo = t.entry; } });
+        var pad = (hi - lo) * 0.12 || hi * 0.001 || 1; hi += pad; lo -= pad;
+        var top = 10, bottom = h - 18, plotH = bottom - top;
+        function Y(v){ return top + (hi - v) / (hi - lo) * plotH; }
+        // gridlines + price labels
+        ctx.font = "10px Manrope, sans-serif"; ctx.fillStyle = "#6E77A0";
+        ctx.strokeStyle = "rgba(154,163,199,.10)"; ctx.lineWidth = 1;
+        for (i = 0; i <= 4; i++){
+          var v = lo + (hi - lo) * i / 4, y = Math.round(Y(v)) + 0.5;
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+          ctx.fillText(fmtPrice(curAsset, v), 6, y - 3);
+        }
+        // candles
+        var slot = w / MAX_CANDLES, bw = Math.max(3, slot * 0.58);
+        for (i = 0; i < candles.length; i++){
+          c = candles[i];
+          var x = i * slot + slot / 2;
+          var up = c.c >= c.o;
+          ctx.strokeStyle = up ? "#34C98E" : "#E5534B"; ctx.fillStyle = up ? "#34C98E" : "#E5534B";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x, Y(c.h)); ctx.lineTo(x, Y(c.l)); ctx.stroke();
+          var yO = Y(c.o), yC = Y(c.c);
+          ctx.fillRect(x - bw / 2, Math.min(yO, yC), bw, Math.max(1.5, Math.abs(yC - yO)));
+        }
+        // last price line
+        var yP = Y(m.price);
+        ctx.strokeStyle = "rgba(201,162,75,.55)"; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(0, yP); ctx.lineTo(w, yP); ctx.stroke(); ctx.setLineDash([]);
+        // entry lines for open trades on this asset
+        ctx.font = "bold 10px Manrope, sans-serif";
+        state.openTrades.forEach(function(t){
+          if (t.asset !== curAsset) return;
+          var y = Y(t.entry);
+          ctx.strokeStyle = "rgba(231,203,126,.9)"; ctx.setLineDash([2, 3]);
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle = "#E7CB7E";
+          ctx.fillText((t.dir === "higher" ? "▲ " : "▼ ") + fmtPrice(curAsset, t.entry), w - 118, y - 4);
+        });
+      }
+
+      /* ================= Rendering ================= */
+      // Part of Main Balance is silently held back from withdrawals and
+      // transfers out until BONUS_UNLOCK_VOLUME has been traded in total.
+      // There is no card, banner, or notice for this — it is only ever
+      // reflected in the amounts available to move.
+      function lockedBonusAmount(){
+        return state.bonusLocked ? Math.min(WELCOME_BONUS, state.main) : 0;
+      }
+      function movableMain(){ return Math.max(0, state.main - lockedBonusAmount()); }
+      // Savings availability: unlocked lots (past their 7-day lock) plus
+      // accrued interest, which is never locked.
+      function unlockedSavings(now){
+        now = now || Date.now();
+        var sum = state.interestPool;
+        state.savingsLots.forEach(function(l){ if (now >= l.unlockAt) sum += l.remaining; });
+        return Math.min(sum, state.savings);
+      }
+      function pendingSelfWithdrawals(){
+        return state.adminRequests.filter(function(r){ return r.self && r.status === "pending" && r.type === "withdraw"; })
+          .reduce(function(a, r){ return a + r.amount; }, 0);
+      }
+      function withdrawableMain(){ return Math.max(0, movableMain() - pendingSelfWithdrawals()); }
+      function fmtDuration(ms){
+        var mins = Math.max(0, Math.ceil(ms / 60000));
+        var d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60;
+        if (d > 0) return d + "d " + h + "h";
+        if (h > 0) return h + "h " + m + "m";
+        return m + "m";
+      }
+      function renderSavingsLots(){
+        var box = $("savingsLots");
+        var now = Date.now();
+        var lots = state.savingsLots.filter(function(l){ return l.remaining > 0.004; });
+        if (!lots.length && state.interestPool <= 0.004){ box.innerHTML = ""; return; }
+        var html = '<div class="lots"><h4>Savings lots · each locked 7 days</h4>';
+        lots.forEach(function(l){
+          var unlocked = now >= l.unlockAt;
+          html += '<div class="lot-row"><span class="lot-amt num">' + fmtUSD(l.remaining) + "</span>" +
+            '<span class="lot-meta">Transferred in ' + fmtTime(l.time) + "<br>" +
+            (unlocked
+              ? '<span class="lot-open">Unlocked · available to transfer out</span>'
+              : "Unlocks " + fmtTime(l.unlockAt) + ' · <span class="lot-count num">in ' + fmtDuration(l.unlockAt - now) + "</span>") +
+            "</span></div>";
+        });
+        if (state.interestPool > 0.004){
+          html += '<div class="lot-row"><span class="lot-amt num">' + fmtUSD(state.interestPool) + "</span>" +
+            '<span class="lot-meta">Interest earned<br><span class="lot-open">Unlocked · available to transfer out</span></span></div>';
+        }
+        html += "</div>";
+        box.innerHTML = html;
+      }
+      function renderWallets(){
+        $("mainBalance").textContent = fmtUSD(state.main);
+        $("savingsBalance").textContent = fmtUSD(state.savings);
+        $("interestEarned").textContent = fmtUSD(state.totalInterest);
+        var now = Date.now();
+        var avail = unlockedSavings(now), lockedAmt = Math.max(0, state.savings - avail);
+        $("savingsAvail").innerHTML = state.savings > 0
+          ? 'Available to transfer out: <b style="color:var(--green);">' + fmtUSD(avail) + "</b>" +
+            (lockedAmt > 0.004 ? ' · <span style="color:var(--gold-bright); font-weight:700;">' + fmtUSD(lockedAmt) + " still locked</span>" : "")
+          : "Nothing saved yet — transfer in from Main Balance to start earning.";
+        var pend = state.adminRequests.filter(function(r){ return r.self && r.status === "pending"; });
+        var pn = $("mainPending");
+        if (pend.length){
+          pn.style.display = "";
+          pn.textContent = pend.map(function(r){
+            return (r.type === "deposit" ? "Deposit" : "Withdrawal") + " of " + fmtUSD(r.amount) + " pending approval";
+          }).join(" · ");
+        } else { pn.style.display = "none"; pn.textContent = ""; }
+        renderSavingsLots();
+        renderMyRequests();
+      }
+      // The signed-in user's own deposit/withdrawal requests with live
+      // status chips. Rebuilt only when the set or a status actually
+      // changes, so the 200ms render loop stays cheap.
+      var myReqSig = null;
+      function renderMyRequests(){
+        var box = $("myReqList");
+        if (!box) return;
+        var mine = state.adminRequests.filter(function(r){ return r.self; });
+        var sig = mine.map(function(r){ return r.id + ":" + r.status + ":" + r.amount; }).join("|");
+        if (sig === myReqSig) return;
+        myReqSig = sig;
+        var panel = $("myRequestsPanel");
+        if (!mine.length){ panel.style.display = "none"; box.innerHTML = ""; return; }
+        panel.style.display = "";
+        box.innerHTML = mine.slice(0, 10).map(function(r){
+          var isDep = r.type === "deposit";
+          var statusTag = r.status === "pending" ? '<span class="req-status">Pending</span>'
+            : '<span class="req-status ' + r.status + '">' + (r.status === "approved" ? "Approved" : "Rejected") + "</span>";
+          var detail = r.status === "pending"
+            ? "Waiting for approval · your Main Balance updates the moment it's approved"
+            : r.status === "approved"
+              ? (isDep ? "Credited to Main Balance" : "Paid out of Main Balance") +
+                (typeof r.balanceAfter === "number" ? ' · Balance after: <b>' + fmtUSD(r.balanceAfter) + "</b>" : "")
+              : "Rejected · Main Balance unchanged";
+          return '<div class="req-item"><div class="req-top">' +
+            '<span class="req-type ' + r.type + '">' + (isDep ? "Deposit" : "Withdrawal") + "</span>" +
+            '<span class="req-user num">' + fmtUSD(r.amount) + "</span>" + statusTag + "</div>" +
+            '<div class="req-meta">Requested ' + fmtTime(r.time) + " · " + detail + "</div></div>";
+        }).join("");
+      }
+      function renderPrice(){
+        var m = market[curAsset];
+        $("priceNow").textContent = fmtPrice(curAsset, m.price);
+        $("priceName").textContent = curAsset + " · " + ASSETS[curAsset].name;
+        var chg = (m.price / m.open - 1) * 100;
+        var el = $("priceChg");
+        el.textContent = (chg >= 0 ? "+" : "") + chg.toFixed(2) + "% this session";
+        el.className = "price-chg num " + (chg >= 0 ? "up" : "down");
+      }
+      function baseStake(){
+        var v = parseFloat($("stakeInput").value);
+        return isFinite(v) && v > 0 ? Math.floor(v * 100) / 100 : 0;
+      }
+      function effectiveStake(){
+        var b = baseStake();
+        return state.mgOn ? b * Math.pow(2, state.mgStep) : b;
+      }
+      function renderPayout(){
+        var s = effectiveStake();
+        if (s > 0){
+          $("payoutInfo").textContent = fmtUSD(s * (1 + PAYOUT_RATE)) + " total";
+          $("profitInfo").textContent = "+" + fmtUSD(s * PAYOUT_RATE) + " profit";
+        } else { $("payoutInfo").textContent = "—"; $("profitInfo").textContent = ""; }
+        renderMgStatus();
+      }
+      function renderMgStatus(){
+        var box = $("mgStatus");
+        if (!state.mgOn){ box.className = "mg-status"; box.innerHTML = ""; return; }
+        var b = baseStake();
+        box.className = "mg-status show";
+        box.innerHTML = "Martingale active · Step <b>" + state.mgStep + "</b> of the sequence" +
+          "<br>Base stake <b>" + fmtUSD(b) + "</b> → next stake <b>" + fmtUSD(effectiveStake()) + "</b> (" + Math.pow(2, state.mgStep) + "× base)" +
+          "<br>A win resets to the base stake. A loss doubles the next stake.";
+      }
+      function renderOpenTrades(){
+        var list = $("openTradesList");
+        if (!state.openTrades.length){
+          list.innerHTML = '<div class="empty">No open trades. Place one above to see its countdown here.</div>';
+          return;
+        }
+        list.innerHTML = state.openTrades.map(function(t){
+          var remain = Math.max(0, t.expiresAt - Date.now());
+          var pct = Math.max(0, Math.min(100, remain / (t.duration * 1000) * 100));
+          var m = market[t.asset];
+          var winning = (t.dir === "higher" && m.price > t.entry) || (t.dir === "lower" && m.price < t.entry);
+          return '<div class="open-trade">' +
+            '<span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" +
+            '<span class="ot-main num">' + t.asset + " · " + fmtUSD(t.stake) + "</span>" +
+            '<span class="ot-timer"><span class="t num">' + fmtCountdown(remain) + '</span><span class="bar"><i style="width:' + pct + '%"></i></span></span>' +
+            '<span class="ot-sub num">Entry ' + fmtPrice(t.asset, t.entry) + " · Now " + fmtPrice(t.asset, m.price) +
+            " · " + (winning ? '<span class="pos">In profit zone</span>' : '<span class="neg">In loss zone</span>') + "</span>" +
+            "</div>";
+        }).join("");
+      }
+      function renderHistory(){
+        // trades
+        var closed = state.trades;
+        $("statTrades").textContent = closed.length;
+        var wins = closed.filter(function(t){ return t.result === "won"; }).length;
+        var decisive = closed.filter(function(t){ return t.result !== "tie"; }).length;
+        $("statWinRate").textContent = decisive ? Math.round(wins / decisive * 100) + "%" : "—";
+        var pnl = closed.reduce(function(a, t){ return a + t.pnl; }, 0);
+        var pnlEl = $("statPnl");
+        pnlEl.textContent = (pnl > 0 ? "+" : "") + fmtUSD(pnl).replace("$-", "-$");
+        if (pnl === 0) pnlEl.textContent = "$0.00";
+        pnlEl.style.color = pnl > 0 ? "var(--green)" : pnl < 0 ? "var(--red)" : "";
+        if (!closed.length){
+          $("tradeHistory").innerHTML = '<div class="empty">No trades yet. Your closed trades will appear here.</div>';
+        } else {
+          $("tradeHistory").innerHTML = closed.map(function(t){
+            var resTag = t.result === "won" ? '<span class="res-tag won">Won</span>' :
+                         t.result === "lost" ? '<span class="res-tag lost">Lost</span>' : '<span class="res-tag tie">Tie · refunded</span>';
+            var pnlTxt = t.pnl > 0 ? "+" + fmtUSD(t.pnl) : t.pnl < 0 ? fmtUSD(t.pnl) : "$0.00";
+            return '<div class="hist-item"><div class="hi-main">' +
+              '<div class="hi-title">' + t.asset + ' <span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" + resTag + "</div>" +
+              '<div class="hi-sub num">Stake ' + fmtUSD(t.stake) + " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit) + "<br>" + fmtTime(t.closedAt) + "</div>" +
+              '</div><div class="hi-amt num ' + (t.pnl > 0 ? "pos" : t.pnl < 0 ? "neg" : "neu") + '">' + pnlTxt + "</div></div>";
+          }).join("");
+        }
+        // wallet
+        if (!state.txs.length){
+          $("walletHistory").innerHTML = '<div class="empty">No wallet activity yet.</div>';
+        } else {
+          var icons = {
+            transfer_in: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13M13 3l4 4-4 4M20 17H7M11 13l-4 4 4 4"/></svg>',
+            transfer_out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H7M11 3L7 7l4 4M4 17h13M13 13l4 4-4 4"/></svg>',
+            deposit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>',
+            withdraw: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>',
+            interest: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>',
+            referral: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+            rejected: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>'
+          };
+          var titles = { deposit: "Deposit to Main Balance", withdraw: "Withdrawal from Main Balance", transfer_in: "Transfer to Savings", transfer_out: "Transfer to Main Balance", interest: "Savings interest", referral: "Referral bonus", rejected: "Request rejected" };
+          $("walletHistory").innerHTML = state.txs.map(function(tx){
+            var amt = (tx.amount === null || tx.amount === undefined) ? "" : '<div class="hi-amt num pos">+' + fmtUSD(tx.amount) + "</div>";
+            return '<div class="hist-item"><div class="tx-ico">' + (icons[tx.type] || icons.interest) + '</div>' +
+              '<div class="hi-main"><div class="hi-title">' + (titles[tx.type] || "Transaction") + '</div>' +
+              '<div class="hi-sub">' + esc(tx.note || "") + "<br>" + fmtTime(tx.time) + '</div></div>' + amt + "</div>";
+          }).join("");
+        }
+        renderTxHistory();
+      }
+
+      /* ================= Trading ================= */
+      var durationSecs = 60;
+      function placeTrade(dir){
+        var stake = effectiveStake();
+        if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a trade."); return; }
+        // Trades draw ONLY from Main Balance — savings can never be staked.
+        if (stake > state.main){
+          toast("Insufficient Main Balance", state.mgOn && state.mgStep > 0
+            ? "Martingale stake " + fmtUSD(stake) + " exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked."
+            : "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked.");
+          return;
+        }
+        state.main -= stake;
+        var m = market[curAsset];
+        var trade = {
+          id: uid(), asset: curAsset, dir: dir, stake: stake,
+          entry: m.price, openedAt: Date.now(),
+          duration: durationSecs, expiresAt: Date.now() + durationSecs * 1000
+        };
+        state.openTrades.push(trade);
+        save(); renderWallets(); renderOpenTrades();
+        toast("Trade opened · " + curAsset + " " + (dir === "higher" ? "Higher" : "Lower"),
+              "Stake " + fmtUSD(stake) + " at " + fmtPrice(curAsset, trade.entry) + " · expires in " + fmtCountdown(durationSecs * 1000));
+      }
+      function resolveTrades(){
+        var now = Date.now(), changed = false;
+        for (var i = state.openTrades.length - 1; i >= 0; i--){
+          var t = state.openTrades[i];
+          if (now < t.expiresAt) continue;
+          state.openTrades.splice(i, 1);
+          var exit = market[t.asset].price;
+          var result, pnl;
+          if (exit === t.entry){ result = "tie"; pnl = 0; state.main += t.stake; }
+          else {
+            var won = (t.dir === "higher" && exit > t.entry) || (t.dir === "lower" && exit < t.entry);
+            if (won){ result = "won"; pnl = t.stake * PAYOUT_RATE; state.main += t.stake * (1 + PAYOUT_RATE); }
+            else { result = "lost"; pnl = -t.stake; }
+          }
+          state.trades.unshift({ id: t.id, asset: t.asset, dir: t.dir, stake: t.stake, entry: t.entry, exit: exit, result: result, pnl: pnl, openedAt: t.openedAt, closedAt: now });
+          if (state.trades.length > 100) state.trades.length = 100;
+          // Silent holdback progress: every closed trade's stake counts
+          // toward the traded-volume threshold; nothing is announced.
+          if (state.bonusLocked){
+            state.bonusTraded += t.stake;
+            if (state.bonusTraded >= BONUS_UNLOCK_VOLUME) state.bonusLocked = false;
+          }
+          // Martingale progression
+          if (state.mgOn){
+            if (result === "lost"){ state.mgStep++; }
+            else if (result === "won"){ state.mgStep = 0; }
+          }
+          if (result === "won") toast("You won · " + t.asset, "Paid " + fmtUSD(t.stake * (1 + PAYOUT_RATE)) + " (" + fmtUSD(pnl) + " profit) to Main Balance.", "win");
+          else if (result === "lost") toast("Trade lost · " + t.asset, "Stake of " + fmtUSD(t.stake) + " forfeited." + (state.mgOn ? " Next martingale stake: " + fmtUSD(effectiveStake()) + "." : ""), "lose");
+          else toast("Tie · " + t.asset, "Exit matched entry — stake refunded to Main Balance.");
+          changed = true;
+        }
+        if (changed){ save(); renderWallets(); renderHistory(); renderPayout(); }
+      }
+
+      /* ================= Fund sheet ================= */
+      // deposit / withdraw: external <-> Main Balance only, routed through
+      // an approval step. transferIn / transferOut: Main <-> Savings, instant;
+      // every transfer in becomes a lot locked for 7 days.
+      var sheetMode = "deposit";
+      function openSheet(mode){
+        sheetMode = mode;
+        var now = Date.now();
+        var cfg = {
+          deposit: {
+            title: "Deposit to Main Balance",
+            sub: "Request virtual funds into your Main Balance. The deposit lands once the request is approved — deposits never go to Savings.",
+            avail: "", max: null, btn: "Request deposit"
+          },
+          withdraw: {
+            title: "Withdraw from Main Balance",
+            sub: "Request a withdrawal from your Main Balance. It is paid out once the request is approved — withdrawals never come out of Savings.",
+            avail: "Available to withdraw: " + fmtUSD(withdrawableMain()), max: withdrawableMain(), btn: "Request withdrawal"
+          },
+          transferIn: {
+            title: "Transfer In to Savings",
+            sub: "Move virtual funds from your Main Balance into Savings, where they earn 15% APY. Each transfer in is locked for 7 days before it can move back to Main.",
+            avail: "Available to move: " + fmtUSD(movableMain()), max: movableMain(), btn: "Transfer in"
+          },
+          transferOut: {
+            title: "Transfer Out to Main Balance",
+            sub: "Move unlocked Savings back to your Main Balance. Amounts still inside their 7-day lock stay in Savings; unlocked lots are used first, oldest first.",
+            avail: "Available to transfer out: " + fmtUSD(unlockedSavings(now)) + " of " + fmtUSD(state.savings) + " saved", max: unlockedSavings(now), btn: "Transfer out"
+          }
+        }[mode];
+        $("sheetTitle").textContent = cfg.title;
+        $("sheetSub").textContent = cfg.sub;
+        $("sheetAvail").textContent = cfg.avail;
+        $("sheetMax").style.display = cfg.max === null ? "none" : "";
+        $("sheetConfirm").textContent = cfg.btn;
+        $("sheetAmount").value = "";
+        $("sheetErr").className = "sheet-err";
+        $("sheetOverlay").className = "overlay show";
+        setTimeout(function(){ $("sheetAmount").focus(); }, 60);
+      }
+      function closeSheet(){ $("sheetOverlay").className = "overlay"; }
+      function sheetError(msg){ var e = $("sheetErr"); e.textContent = msg; e.className = "sheet-err show"; }
+      function createFundRequest(type, amt){
+        state.adminRequests.unshift({
+          id: uid(), user: "You (this account)", self: true, type: type,
+          amount: amt, balance: state.main, status: "pending", time: Date.now()
+        });
+        if (state.adminRequests.length > 60) state.adminRequests.length = 60;
+      }
+      // Draw a transfer-out from unlocked lots first (oldest first, FIFO),
+      // then from accrued interest, which is never locked.
+      function consumeSavings(amt, now){
+        var left = amt;
+        var lots = state.savingsLots.slice().sort(function(a, b){ return a.time - b.time; });
+        for (var i = 0; i < lots.length && left > 0; i++){
+          var l = lots[i];
+          if (now < l.unlockAt || l.remaining <= 0) continue;
+          var take = Math.min(l.remaining, left);
+          l.remaining -= take; left -= take;
+        }
+        if (left > 0){ state.interestPool = Math.max(0, state.interestPool - left); }
+        state.savingsLots = state.savingsLots.filter(function(l){ return l.remaining > 0.004; });
+      }
+      function confirmSheet(){
+        var amt = parseFloat($("sheetAmount").value);
+        if (!(amt > 0)){ sheetError("Enter an amount above $0."); return; }
+        amt = Math.floor(amt * 100) / 100;
+        var now = Date.now();
+        if (sheetMode === "deposit"){
+          createFundRequest("deposit", amt);
+          toast("Deposit requested", fmtUSD(amt) + " to your Main Balance is pending approval — the funds land as soon as it's approved.");
+        } else if (sheetMode === "withdraw"){
+          if (amt > withdrawableMain()){
+            sheetError("You can withdraw up to " + fmtUSD(withdrawableMain()) + " from your Main Balance right now. Savings can't be withdrawn directly — transfer out to Main first.");
+            return;
+          }
+          createFundRequest("withdraw", amt);
+          toast("Withdrawal requested", fmtUSD(amt) + " from your Main Balance is pending approval.");
+        } else if (sheetMode === "transferIn"){
+          if (amt > movableMain()){
+            sheetError("You can move up to " + fmtUSD(movableMain()) + " from your Main Balance right now.");
+            return;
+          }
+          state.main -= amt; state.savings += amt;
+          state.savingsLots.push({ id: uid(), amount: amt, remaining: amt, time: now, unlockAt: now + LOCK_MS });
+          state.txs.unshift({ id: uid(), type: "transfer_in", amount: amt, note: "Main Balance → Savings · locked until " + fmtTime(now + LOCK_MS), time: now });
+          toast("Transferred to Savings", fmtUSD(amt) + " moved from Main Balance. It earns 15% APY and unlocks on " + fmtTime(now + LOCK_MS) + ".");
+        } else { // transferOut
+          var availOut = unlockedSavings(now);
+          if (amt > availOut){
+            sheetError(amt <= state.savings
+              ? "Only " + fmtUSD(availOut) + " of your Savings is unlocked — the rest is still inside its 7-day lock. Check the lots under your Savings balance for unlock dates."
+              : "That exceeds your Savings balance of " + fmtUSD(state.savings) + ".");
+            return;
+          }
+          consumeSavings(amt, now);
+          state.savings -= amt; state.main += amt;
+          state.txs.unshift({ id: uid(), type: "transfer_out", amount: amt, note: "Savings → Main Balance · oldest unlocked lots used first", time: now });
+          toast("Transferred to Main Balance", fmtUSD(amt) + " moved from Savings and is available to trade.");
+        }
+        if (state.txs.length > 120) state.txs.length = 120;
+        save(); renderWallets(); renderHistory(); closeSheet();
+      }
+
+      /* ================= Referrals ================= */
+      var REF_NAMES = ["Adaeze O.", "Funke A.", "Seun B.", "Mariam D.", "Kelvin T.", "Ruth N.", "Peter G.", "Halima Y.", "Chinedu M.", "Sara L."];
+      function renderReferrals(){
+        $("refCode").textContent = state.refCode;
+        $("refLink").textContent = "trybnetwork.demo/join?ref=" + state.refCode;
+        var qualified = state.referrals.filter(function(r){ return r.status === "qualified"; }).length;
+        $("statReferrals").textContent = state.referrals.length;
+        $("statRefQualified").textContent = qualified;
+        $("statRefEarned").textContent = fmtUSD(state.referralEarned);
+        if (!state.referrals.length){
+          $("refList").innerHTML = '<div class="empty">No referrals yet. Simulate a signup to test how the 3 USDT reward works.</div>';
+          return;
+        }
+        $("refList").innerHTML = state.referrals.map(function(r){
+          var done = r.status === "qualified";
+          return '<div class="ref-item"><div class="ri-main">' +
+            '<div class="ri-name">' + esc(r.name) + '</div>' +
+            '<div class="ri-sub">' + (done
+              ? "First deposit of 12 USDT made " + fmtTime(r.depositTime) + " · you earned 3 USDT"
+              : "Joined " + fmtTime(r.time) + " · waiting for a first deposit of 12 USDT") + "</div></div>" +
+            '<span class="ref-status' + (done ? " done" : "") + '">' + (done ? "Reward paid" : "Pending deposit") + "</span>" +
+            (done ? "" : '<button class="mini-btn" type="button" data-ref-deposit="' + r.id + '">Simulate 12 USDT deposit</button>') +
+            "</div>";
+        }).join("");
+      }
+      function simulateReferral(){
+        var name = REF_NAMES[state.referrals.length % REF_NAMES.length];
+        state.referrals.unshift({ id: uid(), name: name, status: "joined", time: Date.now(), depositTime: null });
+        save(); renderReferrals();
+        toast("Referral joined (simulated)", name + " signed up with your code " + state.refCode + ". Simulate their first deposit of 12 USDT to trigger your 3 USDT reward.");
+      }
+      function simulateReferralDeposit(id){
+        var r = null;
+        state.referrals.forEach(function(x){ if (x.id === id) r = x; });
+        if (!r || r.status === "qualified") return;
+        r.status = "qualified"; r.depositTime = Date.now();
+        state.main += REFERRAL_REWARD;
+        state.referralEarned += REFERRAL_REWARD;
+        state.txs.unshift({ id: uid(), type: "referral", amount: REFERRAL_REWARD, note: "Referral reward · " + r.name + " made a first deposit of 12 USDT", time: Date.now() });
+        if (state.txs.length > 120) state.txs.length = 120;
+        save(); renderWallets(); renderHistory(); renderReferrals();
+        toast("Referral bonus +3 USDT", r.name + " deposited 12 USDT — your 3 USDT referral bonus is in your Main Balance.", "win");
+      }
+      /* ================= Menu, profile & payment methods ================= */
+      function avatarInitials(name){
+        var parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return "DT";
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+      }
+      function paintAvatar(el, avatarIdx, name, photo){
+        el.className = "avatar" + (avatarIdx > 0 ? " av-" + avatarIdx : "") + (photo ? " has-photo" : "");
+        if (photo){ el.style.backgroundImage = "url(" + photo + ")"; el.textContent = ""; }
+        else { el.style.backgroundImage = ""; el.textContent = avatarInitials(name); }
+      }
+      function profileSubLine(p){
+        if (p.username) return "@" + p.username;
+        if (p.email) return p.email;
+        return "No username set";
+      }
+      function renderProfileEverywhere(){
+        paintAvatar($("drawerAvatar"), state.profile.avatar, state.profile.name, state.profile.photo);
+        $("drawerName").textContent = state.profile.name;
+        $("drawerEmail").textContent = profileSubLine(state.profile);
+        paintAvatar($("headerAvatar"), state.profile.avatar, state.profile.name, state.profile.photo);
+        $("headerName").textContent = state.profile.name;
+        $("headerSub").textContent = profileSubLine(state.profile);
+        $("logoutSub").textContent = currentUser ? "Signed in as @" + currentUser.username : "Sign out of this account";
+      }
+      // ---- Drawer open/close ----
+      function openDrawer(){
+        $("drawer").classList.add("show");
+        $("drawerBackdrop").classList.add("show");
+        $("drawer").setAttribute("aria-hidden", "false");
+        $("menuBtn").setAttribute("aria-expanded", "true");
+        renderProfileEverywhere();
+      }
+      function closeDrawer(){
+        $("drawer").classList.remove("show");
+        $("drawerBackdrop").classList.remove("show");
+        $("drawer").setAttribute("aria-hidden", "true");
+        $("menuBtn").setAttribute("aria-expanded", "false");
+      }
+      // ---- Generic screen overlays ----
+      function openScreen(id){ $(id).className = "overlay show"; }
+      function closeScreen(id){ $(id).className = "overlay"; }
+      // ---- Profile ----
+      var profileAvatarPick = 0;
+      var profilePhotoPick = "";   // data URL while editing; "" means no photo
+      function profileError(msg){ var e = $("profileErr"); e.textContent = msg; e.className = "sheet-err show"; }
+      function renderAvatarRow(){
+        var row = $("avatarRow");
+        row.innerHTML = "";
+        for (var i = 0; i < 6; i++){
+          (function(idx){
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "avatar-pick" + (idx > 0 ? " av-" + idx : "") + (idx === profileAvatarPick ? " active" : "");
+            b.textContent = avatarInitials($("profileName").value || state.profile.name);
+            b.setAttribute("aria-label", "Avatar colour " + (idx + 1));
+            b.addEventListener("click", function(){
+              profileAvatarPick = idx;
+              renderAvatarRow(); syncProfilePreview();
+            });
+            row.appendChild(b);
+          })(i);
+        }
+      }
+      function syncProfilePreview(){
+        var name = $("profileName").value.trim() || "Demo Trader";
+        var username = $("profileUsername").value.trim().replace(/^@+/, "");
+        var email = $("profileEmail").value.trim();
+        paintAvatar($("profileAvatarPreview"), profileAvatarPick, name, profilePhotoPick);
+        $("profileNamePreview").textContent = name;
+        $("profileEmailPreview").textContent = username ? "@" + username : (email || "No username set");
+        $("photoRemove").style.display = profilePhotoPick ? "" : "none";
+        var picks = $("avatarRow").querySelectorAll(".avatar-pick");
+        picks.forEach(function(p){ p.textContent = avatarInitials(name); });
+      }
+      function openProfile(){
+        profileAvatarPick = state.profile.avatar;
+        profilePhotoPick = state.profile.photo || "";
+        $("profileName").value = state.profile.name;
+        $("profileUsername").value = state.profile.username || "";
+        $("profileDob").value = state.profile.dob || "";
+        $("profileEmail").value = state.profile.email;
+        $("profileErr").className = "sheet-err";
+        renderAvatarRow(); syncProfilePreview();
+        openScreen("profileOverlay");
+      }
+      function saveProfile(){
+        var name = $("profileName").value.trim();
+        var username = $("profileUsername").value.trim().replace(/^@+/, "");
+        var dob = $("profileDob").value;
+        var email = $("profileEmail").value.trim();
+        if (!name){ profileError("Enter your full name."); return; }
+        if (username && !/^[A-Za-z0-9_]{3,20}$/.test(username)){ profileError("Username needs 3–20 characters: letters, numbers, or underscores only."); return; }
+        if (dob){
+          var d = new Date(dob + "T00:00:00");
+          if (isNaN(d.getTime()) || d.getTime() > Date.now()){ profileError("Date of birth can't be in the future."); return; }
+        }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ profileError("That email doesn't look right — check it and try again."); return; }
+        state.profile = { name: name, email: email, avatar: profileAvatarPick, username: username, dob: dob, photo: profilePhotoPick };
+        save(); renderProfileEverywhere();
+        closeScreen("profileOverlay");
+        toast("Profile saved", "Full name, username, date of birth, and picture updated — now shown in the header and menu.");
+      }
+      // ---- Transaction History page ----
+      var txFilter = "all";
+      var TX_ICONS = {
+        transfer_in: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13M13 3l4 4-4 4M20 17H7M11 13l-4 4 4 4"/></svg>',
+        transfer_out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H7M11 3L7 7l4 4M4 17h13M13 13l4 4-4 4"/></svg>',
+        deposit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>',
+        withdraw: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>',
+        interest: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>',
+        referral: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        rejected: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>',
+        trade: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-6 4 3 7-9"/><path d="M14 5h6v6"/></svg>'
+      };
+      var TX_TITLES = { deposit: "Deposit to Main Balance", withdraw: "Withdrawal from Main Balance", transfer_in: "Transfer to Savings", transfer_out: "Transfer to Main Balance", interest: "Savings interest", referral: "Referral bonus", rejected: "Request rejected" };
+      function txCategory(tx){
+        return { deposit: "deposits", withdraw: "withdrawals", transfer_in: "transfers", transfer_out: "transfers", interest: "interest", referral: "referrals", rejected: "rejected" }[tx.type] || "transfers";
+      }
+      function txSignedAmount(tx){
+        if (tx.amount === null || tx.amount === undefined) return null;
+        return (tx.type === "withdraw" || tx.type === "transfer_in") ? -tx.amount : tx.amount;
+      }
+      function renderTxHistory(){
+        var listEl = $("txFullList");
+        if (!listEl) return;
+        var period = $("txPeriod").value;
+        var cutoff = 0, now = Date.now();
+        if (period === "today"){ var d0 = new Date(); d0.setHours(0, 0, 0, 0); cutoff = d0.getTime(); }
+        else if (period === "7d") cutoff = now - 7 * 24 * 3600 * 1000;
+        else if (period === "30d") cutoff = now - 30 * 24 * 3600 * 1000;
+        var entries = [];
+        state.txs.forEach(function(tx){ entries.push({ kind: "tx", time: tx.time, cat: txCategory(tx), tx: tx }); });
+        state.trades.forEach(function(t){ entries.push({ kind: "trade", time: t.closedAt, cat: "trades", trade: t }); });
+        entries.sort(function(a, b){ return b.time - a.time; });
+        entries = entries.filter(function(e){
+          if (e.time < cutoff) return false;
+          return txFilter === "all" || e.cat === txFilter;
+        });
+        // Summary stats describe what's currently shown.
+        var walletNet = 0, tradePnl = 0;
+        entries.forEach(function(e){
+          if (e.kind === "tx"){ var s = txSignedAmount(e.tx); if (s !== null) walletNet += s; }
+          else tradePnl += e.trade.pnl;
+        });
+        $("txhCount").textContent = entries.length;
+        var wn = $("txhWalletNet");
+        wn.textContent = (walletNet > 0 ? "+" : "") + fmtUSD(walletNet).replace("$-", "-$");
+        if (walletNet === 0) wn.textContent = "$0.00";
+        wn.style.color = walletNet > 0 ? "var(--green)" : walletNet < 0 ? "var(--red)" : "";
+        var tp = $("txhTradePnl");
+        tp.textContent = (tradePnl > 0 ? "+" : "") + fmtUSD(tradePnl).replace("$-", "-$");
+        if (tradePnl === 0) tp.textContent = "$0.00";
+        tp.style.color = tradePnl > 0 ? "var(--green)" : tradePnl < 0 ? "var(--red)" : "";
+        if (!entries.length){
+          listEl.innerHTML = '<div class="empty">Nothing matches this filter yet. Deposits, withdrawals, transfers, interest, bonuses, and closed trades will all appear here.</div>';
+          return;
+        }
+        listEl.innerHTML = entries.map(function(e){
+          if (e.kind === "trade"){
+            var t = e.trade;
+            var resTag = t.result === "won" ? '<span class="res-tag won">Won</span>' :
+                         t.result === "lost" ? '<span class="res-tag lost">Lost</span>' : '<span class="res-tag tie">Tie · refunded</span>';
+            var pnlTxt = t.pnl > 0 ? "+" + fmtUSD(t.pnl) : t.pnl < 0 ? fmtUSD(t.pnl) : "$0.00";
+            return '<div class="hist-item"><div class="tx-ico">' + TX_ICONS.trade + '</div><div class="hi-main">' +
+              '<div class="hi-title">' + t.asset + ' <span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" + resTag + "</div>" +
+              '<div class="hi-sub num">Binary trade · Stake ' + fmtUSD(t.stake) + " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit) + "<br>" + fmtTime(t.closedAt) + "</div>" +
+              '</div><div class="hi-amt num ' + (t.pnl > 0 ? "pos" : t.pnl < 0 ? "neg" : "neu") + '">' + pnlTxt + "</div></div>";
+          }
+          var tx = e.tx, s = txSignedAmount(tx);
+          var amtHtml = s === null ? "" : '<div class="hi-amt num ' + (s > 0 ? "pos" : s < 0 ? "neg" : "neu") + '">' + (s > 0 ? "+" : "") + fmtUSD(s).replace("$-", "-$") + "</div>";
+          if (s === 0) amtHtml = '<div class="hi-amt num neu">$0.00</div>';
+          return '<div class="hist-item"><div class="tx-ico">' + (TX_ICONS[tx.type] || TX_ICONS.interest) + '</div>' +
+            '<div class="hi-main"><div class="hi-title">' + (TX_TITLES[tx.type] || "Transaction") + '</div>' +
+            '<div class="hi-sub">' + esc(tx.note || "") + "<br>" + fmtTime(tx.time) + '</div></div>' + amtHtml + "</div>";
+        }).join("");
+      }
+      // ---- Payment methods ----
+      function maskTail(s){
+        s = String(s || "");
+        return s.length > 4 ? "•••• " + s.slice(-4) : s;
+      }
+      function renderPaymentMethods(){
+        var box = $("payList");
+        if (!state.paymentMethods.length){
+          box.innerHTML = '<div class="empty">No withdrawal methods yet. Add a bank account or crypto wallet address below.</div>';
+          return;
+        }
+        box.innerHTML = state.paymentMethods.map(function(pm){
+          var isBank = pm.type === "bank";
+          var title = isBank ? esc(pm.bankName) : esc(pm.coin || "Crypto wallet");
+          var sub = isBank
+            ? esc(pm.acctName) + " · " + esc(maskTail(pm.acctNum))
+            : esc(pm.address);
+          return '<div class="pay-item"><div class="tx-ico">' +
+            (isBank
+              ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M2 11l10-7 10 7z"/></svg>'
+              : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="3"/><path d="M16 12.5h.01M2 10h20"/></svg>') +
+            '</div><div class="pi-main"><div class="pi-title">' + title +
+            (pm.isDefault ? ' <span class="default-tag">Default</span>' : "") + "</div>" +
+            '<div class="pi-sub">' + sub + "</div></div>" +
+            '<div class="pi-btns">' +
+            (pm.isDefault ? "" : '<button type="button" data-pay-default="' + pm.id + '">Set default</button>') +
+            '<button type="button" class="danger" data-pay-remove="' + pm.id + '">Remove</button>' +
+            "</div></div>";
+        }).join("");
+      }
+      function payError(msg){ var e = $("payErr"); e.textContent = msg; e.className = "sheet-err show"; }
+      function addPaymentMethod(){
+        var type = $("payType").value;
+        $("payErr").className = "sheet-err";
+        var pm;
+        if (type === "bank"){
+          var bank = $("payBankName").value.trim(), acctName = $("payAcctName").value.trim(), acctNum = $("payAcctNum").value.trim();
+          if (!bank || !acctName || !acctNum){ payError("Fill in the bank name, account name, and account number."); return; }
+          pm = { id: uid(), type: "bank", bankName: bank, acctName: acctName, acctNum: acctNum, isDefault: state.paymentMethods.length === 0 };
+        } else {
+          var coin = $("payCoin").value.trim(), addr = $("payAddress").value.trim();
+          if (!addr){ payError("Paste your withdrawal crypto address."); return; }
+          pm = { id: uid(), type: "crypto", coin: coin || "Crypto (USDT)", address: addr, isDefault: state.paymentMethods.length === 0 };
+        }
+        state.paymentMethods.push(pm);
+        save(); renderPaymentMethods();
+        $("payBankName").value = ""; $("payAcctName").value = ""; $("payAcctNum").value = "";
+        $("payCoin").value = ""; $("payAddress").value = "";
+        toast("Payout method added", (pm.type === "bank" ? pm.bankName + " · " + maskTail(pm.acctNum) : pm.coin + " · " + maskTail(pm.address)) + " saved. Demo only — no real payouts are sent.");
+      }
+      function syncPayTypeFields(){
+        var isBank = $("payType").value === "bank";
+        $("payBankFields").style.display = isBank ? "" : "none";
+        $("payCryptoFields").style.display = isBank ? "none" : "";
+      }
+
+      /* ================= Wiring ================= */
+      // Asset tabs
+      var tabsBox = $("assetTabs");
+      Object.keys(ASSETS).forEach(function(sym){
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "asset-btn" + (sym === curAsset ? " active" : ""); b.textContent = sym; b.dataset.sym = sym;
+        b.addEventListener("click", function(){
+          curAsset = sym;
+          tabsBox.querySelectorAll(".asset-btn").forEach(function(x){ x.classList.toggle("active", x.dataset.sym === sym); });
+          renderPrice(); drawChart();
+        });
+        tabsBox.appendChild(b);
+      });
+      // Duration
+      $("durationSeg").querySelectorAll("button").forEach(function(b){
+        b.addEventListener("click", function(){
+          durationSecs = parseInt(b.dataset.dur, 10);
+          $("durationSeg").querySelectorAll("button").forEach(function(x){ x.classList.toggle("active", x === b); });
+        });
+      });
+      $("stakeInput").addEventListener("input", renderPayout);
+      $("btnHigher").addEventListener("click", function(){ placeTrade("higher"); });
+      $("btnLower").addEventListener("click", function(){ placeTrade("lower"); });
+      // Martingale
+      $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
+      $("mgToggle").addEventListener("click", function(){
+        state.mgOn = !state.mgOn;
+        $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
+        if (!state.mgOn) state.mgStep = 0;
+        save(); renderPayout();
+        toast(state.mgOn ? "Martingale Mode on" : "Martingale Mode off",
+              state.mgOn ? "Stakes will double after each loss and reset after a win." : "Stakes return to the amount you enter.");
+      });
+      // Wallets / sheet — Deposit & Withdraw live on Main Balance;
+      // Transfer In / Out live on Savings.
+      $("btnDeposit").addEventListener("click", function(){ openSheet("deposit"); });
+      $("btnWithdraw").addEventListener("click", function(){ openSheet("withdraw"); });
+      $("btnTransferIn").addEventListener("click", function(){ openSheet("transferIn"); });
+      $("btnTransferOut").addEventListener("click", function(){ openSheet("transferOut"); });
+      $("sheetCancel").addEventListener("click", closeSheet);
+      $("sheetOverlay").addEventListener("click", function(e){ if (e.target === $("sheetOverlay")) closeSheet(); });
+      $("sheetMax").addEventListener("click", function(){
+        var v = sheetMode === "withdraw" ? withdrawableMain()
+              : sheetMode === "transferIn" ? movableMain()
+              : sheetMode === "transferOut" ? unlockedSavings()
+              : 0;
+        $("sheetAmount").value = v.toFixed(2);
+      });
+      $("sheetConfirm").addEventListener("click", confirmSheet);
+      // History tabs
+      $("tabTrades").addEventListener("click", function(){
+        $("tabTrades").classList.add("active"); $("tabWallet").classList.remove("active");
+        $("tradesPane").style.display = ""; $("walletPane").style.display = "none";
+      });
+      $("tabWallet").addEventListener("click", function(){
+        $("tabWallet").classList.add("active"); $("tabTrades").classList.remove("active");
+        $("walletPane").style.display = ""; $("tradesPane").style.display = "none";
+      });
+      // View switching (Trade & Save app / Transaction History page)
+      function setView(v){
+        $("appView").style.display = v === "app" ? "" : "none";
+        $("txHistoryView").style.display = v === "history" ? "" : "none";
+        if (v === "app" || v === "history") refreshFromStorage();
+        if (v === "history"){ renderTxHistory(); window.scrollTo(0, 0); }
+      }
+      // Referral wiring
+      $("simRefBtn").addEventListener("click", simulateReferral);
+      $("refList").addEventListener("click", function(e){
+        var b = e.target.closest ? e.target.closest("[data-ref-deposit]") : null;
+        if (b) simulateReferralDeposit(b.getAttribute("data-ref-deposit"));
+      });
+      $("copyRefBtn").addEventListener("click", function(){
+        var code = state.refCode;
+        function done(){ toast("Referral code copied", code + " — share it and earn 3 USDT per qualifying referral."); }
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(code).then(done, function(){ toast("Your referral code", code); });
+        } else { toast("Your referral code", code); }
+      });
+      // Hamburger menu & screens
+      $("menuBtn").addEventListener("click", openDrawer);
+      $("drawerClose").addEventListener("click", closeDrawer);
+      $("drawerBackdrop").addEventListener("click", closeDrawer);
+      document.addEventListener("keydown", function(e){
+        if (e.key !== "Escape") return;
+        closeDrawer(); closeScreen("profileOverlay"); closeScreen("paymentOverlay"); closeScreen("helpOverlay");
+      });
+      $("menuHistory").addEventListener("click", function(){
+        closeDrawer();
+        setView("history");
+      });
+      $("txBackBtn").addEventListener("click", function(){ setView("app"); });
+      $("txFilters").addEventListener("click", function(e){
+        var chip = e.target.closest ? e.target.closest("[data-txf]") : null;
+        if (!chip) return;
+        txFilter = chip.getAttribute("data-txf");
+        $("txFilters").querySelectorAll(".filter-chip").forEach(function(c){ c.classList.toggle("active", c === chip); });
+        renderTxHistory();
+      });
+      $("txPeriod").addEventListener("change", renderTxHistory);
+      $("menuProfile").addEventListener("click", function(){ closeDrawer(); openProfile(); });
+      $("menuPayment").addEventListener("click", function(){ closeDrawer(); renderPaymentMethods(); syncPayTypeFields(); openScreen("paymentOverlay"); });
+      $("menuHelp").addEventListener("click", function(){ closeDrawer(); openScreen("helpOverlay"); });
+      // Profile screen
+      $("headerProfile").addEventListener("click", function(){ openProfile(); });
+      $("profileName").addEventListener("input", syncProfilePreview);
+      $("profileUsername").addEventListener("input", syncProfilePreview);
+      $("profileEmail").addEventListener("input", syncProfilePreview);
+      $("photoRemove").addEventListener("click", function(){
+        profilePhotoPick = "";
+        syncProfilePreview();
+      });
+      $("profilePhoto").addEventListener("change", function(){
+        var f = this.files && this.files[0];
+        this.value = "";
+        if (!f) return;
+        if (!/^image\//.test(f.type)){ profileError("Choose an image file for your profile picture."); return; }
+        var reader = new FileReader();
+        reader.onload = function(){
+          var img = new Image();
+          img.onload = function(){
+            var max = 256, scale = Math.min(1, max / Math.max(img.width, img.height));
+            var cv = document.createElement("canvas");
+            cv.width = Math.max(1, Math.round(img.width * scale));
+            cv.height = Math.max(1, Math.round(img.height * scale));
+            cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+            try { profilePhotoPick = cv.toDataURL("image/jpeg", 0.85); }
+            catch(e){ profileError("That image could not be used — try another one."); return; }
+            $("profileErr").className = "sheet-err";
+            syncProfilePreview();
+          };
+          img.onerror = function(){ profileError("That image could not be read — try another one."); };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(f);
+      });
+      $("profileSave").addEventListener("click", saveProfile);
+      $("profileCancel").addEventListener("click", function(){ closeScreen("profileOverlay"); });
+      $("profileOverlay").addEventListener("click", function(e){ if (e.target === $("profileOverlay")) closeScreen("profileOverlay"); });
+      // Payment screen
+      $("payType").addEventListener("change", syncPayTypeFields);
+      $("payAdd").addEventListener("click", addPaymentMethod);
+      $("paymentClose").addEventListener("click", function(){ closeScreen("paymentOverlay"); });
+      $("paymentOverlay").addEventListener("click", function(e){ if (e.target === $("paymentOverlay")) closeScreen("paymentOverlay"); });
+      $("payList").addEventListener("click", function(e){
+        var def = e.target.closest ? e.target.closest("[data-pay-default]") : null;
+        var rem = e.target.closest ? e.target.closest("[data-pay-remove]") : null;
+        if (def){
+          var id = def.getAttribute("data-pay-default");
+          state.paymentMethods.forEach(function(pm){ pm.isDefault = pm.id === id; });
+          save(); renderPaymentMethods();
+          toast("Default payout method updated", "Withdrawals in this demo would go to the method marked Default.");
+        } else if (rem){
+          var rid = rem.getAttribute("data-pay-remove");
+          var wasDefault = false;
+          state.paymentMethods = state.paymentMethods.filter(function(pm){
+            if (pm.id === rid){ wasDefault = !!pm.isDefault; return false; }
+            return true;
+          });
+          if (wasDefault && state.paymentMethods.length) state.paymentMethods[0].isDefault = true;
+          save(); renderPaymentMethods();
+          toast("Payout method removed", "The method was deleted from this device.");
+        }
+      });
+      // Help screen
+      $("helpClose").addEventListener("click", function(){ closeScreen("helpOverlay"); });
+      $("helpOverlay").addEventListener("click", function(e){ if (e.target === $("helpOverlay")) closeScreen("helpOverlay"); });
+      $("faqList").addEventListener("click", function(e){
+        var q = e.target.closest ? e.target.closest(".faq-q") : null;
+        if (q) q.parentElement.classList.toggle("open");
+      });
+      /* ================= Auth gate (sign up / log in / log out) ================= */
+      function authTab(which){
+        var signup = which === "signup";
+        $("signupForm").style.display = signup ? "" : "none";
+        $("loginForm").style.display = signup ? "none" : "";
+        $("authTabSignup").classList.toggle("active", signup);
+        $("authTabLogin").classList.toggle("active", !signup);
+        $("suErr").className = "sheet-err";
+        $("liErr").className = "sheet-err";
+      }
+      $("authTabSignup").addEventListener("click", function(){ authTab("signup"); });
+      $("authTabLogin").addEventListener("click", function(){ authTab("login"); });
+      function authError(id, msg){ var e = $(id); e.textContent = msg; e.className = "sheet-err show"; }
+      // Bring the signed-in account's state on screen: hide the gate
+      // and re-render everything from the freshly loaded state.
+      function enterApp(){
+        $("authGate").classList.remove("show");
+        // Keep the account record's referral code in step with the app
+        // state so codes entered at signup can be matched.
+        if (currentUser) currentUser = updateAccount(currentUser.username, { refCode: state.refCode }) || currentUser;
+        $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
+        setView("app");
+        renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); drawChart();
+        renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
+        save();
+      }
+      function startSession(acct){
+        currentUser = acct;
+        try { localStorage.setItem(SESSION_KEY, acct.username); } catch(e){}
+      }
+      $("signupForm").addEventListener("submit", function(e){
+        e.preventDefault();
+        var name = $("suName").value.trim();
+        var username = $("suUsername").value.trim().replace(/^@+/, "");
+        var email = $("suEmail").value.trim();
+        var pass = $("suPass").value;
+        var ref = $("suRef").value.trim();
+        if (!name){ authError("suErr", "Enter your full name."); return; }
+        if (!/^[A-Za-z0-9_]{3,20}$/.test(username)){ authError("suErr", "Username needs 3–20 characters: letters, numbers, or underscores only."); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ authError("suErr", "That email doesn't look right — check it and try again."); return; }
+        if (pass.length < 6){ authError("suErr", "Password must be at least 6 characters."); return; }
+        var accts = loadAccounts();
+        var unameTaken = accts.some(function(a){ return a.username.toLowerCase() === username.toLowerCase(); });
+        if (unameTaken){ authError("suErr", "That username is already taken — pick another one."); return; }
+        var emailTaken = accts.some(function(a){ return a.email.toLowerCase() === email.toLowerCase(); });
+        if (emailTaken){ authError("suErr", "An account with this email already exists — try logging in instead."); return; }
+        var referrer = null;
+        if (ref){
+          referrer = findAccountByRefCode(ref);
+          if (!referrer){ authError("suErr", "That referral code doesn't match any account. Check it, or leave the field empty."); return; }
+        }
+        var acct = {
+          name: name, username: username, email: email, pass: pass,
+          refCode: "", referredBy: referrer ? referrer.username : null,
+          refRewardDone: false, createdAt: Date.now()
+        };
+        accts.push(acct); saveAccounts(accts);
+        startSession(acct);
+        // A brand-new account starts from a fresh state — which already
+        // carries the silent 3 USDT welcome bonus in Main Balance.
+        state = loadForUser(username) || freshState();
+        normalizeState();
+        state.profile.name = name;
+        state.profile.username = username;
+        state.profile.email = email;
+        acct = updateAccount(username, { refCode: state.refCode }) || acct;
+        currentUser = acct;
+        if (referrer){
+          // Record the referral under the referrer, in their own state.
+          var rs = loadForUser(referrer.username);
+          if (rs){
+            if (!Array.isArray(rs.referrals)) rs.referrals = [];
+            rs.referrals.unshift({ id: uid(), name: name, status: "joined", time: Date.now(), depositTime: null, account: username });
+            try { localStorage.setItem(stateKey(referrer.username), JSON.stringify(rs)); } catch(e){}
+          }
+        }
+        enterApp();
+        toast("Welcome to TrybNetwork, " + name.split(" ")[0], "Your account is ready — your Main Balance, Savings, and the Binary Arena are all set up.");
+      });
+      $("loginForm").addEventListener("submit", function(e){
+        e.preventDefault();
+        var acct = findAccount($("liId").value);
+        if (!acct || acct.pass !== $("liPass").value){
+          authError("liErr", "Wrong username/email or password — check your details and try again.");
+          return;
+        }
+        startSession(acct);
+        state = loadForUser(acct.username) || freshState();
+        normalizeState();
+        if (!loadForUser(acct.username)){
+          // First ever sign-in for this account on this browser: seed the
+          // profile from the account record.
+          state.profile.name = acct.name;
+          state.profile.username = acct.username;
+          state.profile.email = acct.email;
+        }
+        currentUser = acct;
+        enterApp();
+        toast("Welcome back, " + acct.name.split(" ")[0], "Signed in as @" + acct.username + ".");
+      });
+      $("menuLogout").addEventListener("click", function(){
+        closeDrawer();
+        save();
+        currentUser = null;
+        try { localStorage.removeItem(SESSION_KEY); } catch(e){}
+        setView("app");
+        $("liPass").value = "";
+        authTab("login");
+        $("authGate").classList.add("show");
+      });
+      // Reset demo (two-tap confirm — no blocking dialogs)
+      var resetArmed = false, resetTimer = null;
+      $("resetBtn").addEventListener("click", function(){
+        if (!resetArmed){
+          resetArmed = true;
+          $("resetBtn").textContent = "Tap again to erase everything and restart";
+          $("resetBtn").classList.add("armed");
+          resetTimer = setTimeout(function(){
+            resetArmed = false; $("resetBtn").textContent = "Reset demo"; $("resetBtn").classList.remove("armed");
+          }, 4000);
+          return;
+        }
+        clearTimeout(resetTimer);
+        try { localStorage.removeItem(LS_KEY); if (currentUser) localStorage.removeItem(stateKey(currentUser.username)); } catch(e){}
+        state = freshState();
+        seedMarket();
+        $("mgToggle").setAttribute("aria-checked", "false");
+        $("stakeInput").value = "10";
+        save(); renderWallets(); renderHistory(); renderPayout(); renderOpenTrades(); renderPrice(); drawChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
+        toast("Demo reset", "Fresh start: balances, lots, and history have been reset.");
+        resetArmed = false; $("resetBtn").textContent = "Reset demo"; $("resetBtn").classList.remove("armed");
+      });
+      window.addEventListener("resize", drawChart);
+
+      /* ================= Live sync with approval decisions =================
+         Deposit/withdrawal approvals and rejections are written into the
+         account's saved state (possibly from another tab). Whenever this
+         dashboard regains focus, becomes visible again, or the saved state
+         changes in another tab, reload it and re-render — so the balance
+         and the My Requests statuses reflect the decision immediately,
+         with no manual reload. */
+      function refreshFromStorage(){
+        if (!currentUser) return;
+        var fresh = loadForUser(currentUser.username);
+        if (!fresh) return;
+        state = fresh;
+        normalizeState();
+        state.lastTick = Date.now();   // interest keeps accruing from here; no double-count
+        myReqSig = null;               // force the My Requests panel to rebuild
+        $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
+        renderWallets(); renderHistory(); renderReferrals();
+        renderProfileEverywhere(); renderPaymentMethods(); renderOpenTrades(); renderPayout();
+      }
+      window.addEventListener("focus", refreshFromStorage);
+      document.addEventListener("visibilitychange", function(){ if (!document.hidden) refreshFromStorage(); });
+      window.addEventListener("storage", function(e){
+        if (currentUser && e.key === stateKey(currentUser.username)) refreshFromStorage();
+      });
+
+      /* ================= Main loop ================= */
+      var lastSave = 0;
+      function loop(){
+        var now = Date.now();
+        var dt = Math.max(0, (now - state.lastTick) / 1000);
+        state.lastTick = now;
+        if (state.savings > 0 && dt > 0) addInterest(state.savings * APY * dt / YEAR_SECS);
+        tickMarket();
+        resolveTrades();
+        renderWallets(); renderPrice(); renderOpenTrades(); drawChart();
+        if (now - lastSave > 4000){ save(); lastSave = now; }
+      }
+      renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); drawChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
+      save();
+      setInterval(loop, TICK_MS);
+      // No session → the auth gate covers the app until sign up / log in.
+      if (!currentUser) $("authGate").classList.add("show");
+    </script>
+  </body>
+</html>
