@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
       :root{
         --bg:#0B1132;
@@ -160,17 +161,15 @@
         padding:9px 13px; border-radius:999px;
       }
       .asset-btn.active{color:#181203; background:var(--gold); border-color:var(--gold);}
-      .price-row{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
-      .price-now{font-family:"Sora",sans-serif; font-size:30px; font-weight:800; letter-spacing:-.5px;}
-      .price-name{font-size:13px; color:var(--muted); font-weight:700;}
-      .price-chg{font-size:13px; font-weight:800;}
-      .price-chg.up{color:var(--green);} .price-chg.down{color:var(--red);}
+      .price-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+      .price-name{font-family:"Sora",sans-serif; font-size:16px; font-weight:700;}
       .feed-note{margin-left:auto; font-size:11px; color:var(--muted-2); font-weight:700; letter-spacing:.5px; text-transform:uppercase; display:flex; align-items:center; gap:6px;}
       .feed-note .pulse{width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 1.6s infinite;}
       @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,201,142,.4);} 70%{box-shadow:0 0 0 7px rgba(52,201,142,0);} 100%{box-shadow:0 0 0 0 rgba(52,201,142,0);}}
       .chart-box{margin-top:10px; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:14px; overflow:hidden;}
-      canvas#chart{display:block; width:100%; height:220px;}
-      .controls{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;}
+      #tvChart{display:block; width:100%; height:380px; background:var(--bg-deep);}
+      @media (max-width:560px){ #tvChart{height:300px;} }
+      .controls{display:grid; grid-template-columns:1fr; gap:12px; margin-top:16px;}
       .field label{display:block; font-size:11.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:7px;}
       .stake-wrap{display:flex; align-items:center; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:12px; padding:0 12px;}
       .stake-wrap span{color:var(--gold-bright); font-weight:800; font-size:16px;}
@@ -255,6 +254,7 @@
       .res-tag.won{background:var(--green-dark); color:var(--green);}
       .res-tag.lost{background:var(--red-dark); color:#F0857E;}
       .res-tag.tie{background:#232B5C; color:var(--muted);}
+      .res-tag.await{background:#3A2A10; color:var(--gold-bright);}
       .tx-ico{
         width:34px; height:34px; border-radius:10px; flex:0 0 auto;
         display:flex; align-items:center; justify-content:center;
@@ -713,33 +713,21 @@
         <!-- Arena -->
         <section class="panel" aria-label="Binary options arena">
           <h2 class="sec">Binary Arena</h2>
-          <p class="sec-sub">Pick an asset, set your stake, and call the price Higher or Lower. Wins pay your stake back plus 85% profit.</p>
+          <p class="sec-sub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays your stake back plus 85% profit, a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
 
           <div class="assets" id="assetTabs"></div>
 
           <div class="price-row">
-            <div>
-              <div class="price-now num" id="priceNow">—</div>
-              <div class="price-name" id="priceName">—</div>
-            </div>
-            <span class="price-chg num" id="priceChg"></span>
-            <span class="feed-note"><span class="pulse"></span>Simulated feed</span>
+            <div class="price-name" id="priceName">—</div>
+            <span class="feed-note"><span class="pulse"></span>Live chart · TradingView</span>
           </div>
 
-          <div class="chart-box"><canvas id="chart"></canvas></div>
+          <div class="chart-box"><div id="tvChart"></div></div>
 
           <div class="controls">
             <div class="field">
               <label for="stakeInput">Stake (from Main Balance)</label>
               <div class="stake-wrap"><span>$</span><input id="stakeInput" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
-            </div>
-            <div class="field">
-              <label>Duration</label>
-              <div class="seg" id="durationSeg">
-                <button type="button" data-dur="30">30s</button>
-                <button type="button" data-dur="60" class="active">1m</button>
-                <button type="button" data-dur="300">5m</button>
-              </div>
             </div>
             <div class="payout-line">
               <span>Potential return on a win: <b class="num" id="payoutInfo">—</b></span>
@@ -768,8 +756,8 @@
           </div>
 
           <div class="open-trades">
-            <h3>Open trades</h3>
-            <div id="openTradesList"><div class="empty">No open trades. Place one above to see its countdown here.</div></div>
+            <h3>Bids awaiting result</h3>
+            <div id="openTradesList"><div class="empty">No bids waiting. Place a Higher or Lower bid above and it will sit here until the result is in.</div></div>
           </div>
         </section>
 
@@ -859,7 +847,7 @@
       </div>
 
       <footer>
-        <p>TrybNetwork Trade &amp; Save is a simulation. All balances are virtual, all prices are simulated, and nothing here involves real money or financial advice. Savings interest and trade payouts are illustrative only.</p>
+        <p>TrybNetwork Trade &amp; Save is a simulation. All balances are virtual and nothing here involves real money or financial advice. The arena chart streams live market prices for reference only, and bid results are decided by the admin. Savings interest and trade payouts are illustrative only.</p>
         <button class="reset-btn" id="resetBtn" type="button">Reset demo</button>
       </footer>
     </div>
@@ -1048,7 +1036,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does the Binary Arena work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Pick an asset (BTC, ETH, EURUSD, or gold), set a stake from your Main Balance, choose a duration (30s, 1m, or 5m), and call the price <b>Higher</b> or <b>Lower</b>. If you are right at expiry you get your stake back plus <b>85% profit</b>; if you are wrong you lose the stake, and an exact tie refunds it. Prices come from a simulated feed, so results are for practice only.</div>
+            <div class="faq-a">Pick an asset (BTC, ETH, EURUSD, or gold), set a stake from your Main Balance, and bid <b>Higher</b> or <b>Lower</b>. Your stake is <b>locked</b> the moment you bid, and the bid sits at <b>Awaiting result</b> until the admin decides it. A win pays your stake back plus <b>85% profit</b> into your Main Balance; a loss forfeits the locked stake. The chart streams live prices from TradingView for reference — results are decided by the admin, not by the chart.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">What is Martingale Mode?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1083,12 +1071,12 @@
       var INTEREST_LOG_AT = 0.10;        // log an interest entry once $0.10 unlogged accrues
 
       var ASSETS = {
-        BTCUSD: { name: "Bitcoin / USD",  start: 67432.50, vol: 0.00055, dec: 2 },
-        ETHUSD: { name: "Ethereum / USD", start: 3521.40,  vol: 0.00072, dec: 2 },
-        EURUSD: { name: "Euro / USD",     start: 1.0852,   vol: 0.00007, dec: 4 },
-        XAUUSD: { name: "Gold / USD",     start: 2387.60,  vol: 0.00022, dec: 2 }
+        BTCUSD: { name: "Bitcoin / USD",  tv: "COINBASE:BTCUSD", dec: 2 },
+        ETHUSD: { name: "Ethereum / USD", tv: "COINBASE:ETHUSD", dec: 2 },
+        EURUSD: { name: "Euro / USD",     tv: "FX:EURUSD",       dec: 4 },
+        XAUUSD: { name: "Gold / USD",     tv: "OANDA:XAUUSD",    dec: 2 }
       };
-      var CANDLE_MS = 2000, MAX_CANDLES = 46, TICK_MS = 200;
+      var TICK_MS = 1000;
 
       /* ================= Helpers ================= */
       function $(id){ return document.getElementById(id); }
@@ -1101,11 +1089,6 @@
         var d = new Date(ts);
         return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + ", " +
                d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-      }
-      function fmtCountdown(ms){
-        var s = Math.max(0, Math.ceil(ms / 1000));
-        var m = Math.floor(s / 60), r = s % 60;
-        return m > 0 ? m + ":" + (r < 10 ? "0" : "") + r : r + "s";
       }
       function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
       function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
@@ -1136,7 +1119,7 @@
           interestUnlogged: 0,
           trades: [],
           txs: [],   // the welcome bonus is credited silently — no history entry
-          openTrades: [],
+          bids: [],   // High/Low bids: { id, username, name, asset, dir, stake, status: "awaiting"|"won"|"lost", time }
           mgOn: false, mgStep: 0,
           bonusLocked: true, bonusTraded: 0,
           refCode: makeRefCode(),
@@ -1224,6 +1207,15 @@
       if (!Array.isArray(state.referrals)){ state.referrals = []; state.referralEarned = 0; }
       if (typeof state.referralEarned !== "number") state.referralEarned = 0;
       if (!Array.isArray(state.adminRequests)) state.adminRequests = [];
+      if (!Array.isArray(state.bids)) state.bids = [];
+      // Bids placed under the old price-expiry rules carry over as bids
+      // awaiting an admin result — their stakes were already deducted.
+      if (Array.isArray(state.openTrades) && state.openTrades.length){
+        state.openTrades.forEach(function(t){
+          state.bids.push({ id: t.id, username: currentUser ? currentUser.username : "", name: state.profile ? state.profile.name : "", asset: t.asset, dir: t.dir, stake: t.stake, status: "awaiting", time: t.openedAt || Date.now() });
+        });
+      }
+      state.openTrades = [];
       if (!state.profile || typeof state.profile !== "object") state.profile = { name: "Demo Trader", email: "", avatar: 0, username: "", dob: "", photo: "" };
       if (typeof state.profile.name !== "string" || !state.profile.name) state.profile.name = "Demo Trader";
       if (typeof state.profile.email !== "string") state.profile.email = "";
@@ -1269,6 +1261,7 @@
       }
       }
       normalizeState();
+      applyBidResults();   // settle any bids the admin decided while this device was away
 
       // Accrue savings interest for time elapsed while the page was closed.
       (function accrueOffline(){
@@ -1291,99 +1284,35 @@
         }
       }
 
-      /* ================= Simulated market ================= */
-      var market = {};
-      function seedMarket(){
-        Object.keys(ASSETS).forEach(function(sym){
-          var a = ASSETS[sym];
-          var price = a.start * (1 + (Math.random() - 0.5) * 0.004);
-          var candles = [];
-          var t = Date.now() - MAX_CANDLES * CANDLE_MS;
-          for (var i = 0; i < MAX_CANDLES; i++){
-            var o = price;
-            var steps = 6, c = o, h = o, l = o;
-            for (var j = 0; j < steps; j++){
-              c = c * (1 + a.vol * (Math.random() * 2 - 1) * 1.6);
-              if (c > h) h = c; if (c < l) l = c;
-            }
-            candles.push({ o: o, h: h, l: l, c: c });
-            price = c; t += CANDLE_MS;
-          }
-          market[sym] = { price: price, open: candles[0].o, candles: candles, candleStart: Date.now() };
-        });
-      }
-      seedMarket();
-
-      function tickMarket(){
-        Object.keys(market).forEach(function(sym){
-          var m = market[sym], a = ASSETS[sym];
-          m.price = m.price * (1 + a.vol * (Math.random() * 2 - 1));
-          var cur = m.candles[m.candles.length - 1];
-          cur.c = m.price;
-          if (m.price > cur.h) cur.h = m.price;
-          if (m.price < cur.l) cur.l = m.price;
-          if (Date.now() - m.candleStart >= CANDLE_MS){
-            m.candles.push({ o: m.price, h: m.price, l: m.price, c: m.price });
-            if (m.candles.length > MAX_CANDLES) m.candles.shift();
-            m.candleStart = Date.now();
-          }
-        });
-      }
-
-      /* ================= Chart ================= */
+      /* ================= Live chart (TradingView) =================
+         The arena chart is TradingView's Advanced Chart widget streaming
+         real market data, for reference only — bid results are decided
+         by the admin, never by the chart. Switching asset reloads the
+         widget on the matching symbol. */
       var curAsset = "BTCUSD";
-      var chartCtx = $("chart").getContext("2d");
-      function drawChart(){
-        var canvas = $("chart");
-        var dpr = window.devicePixelRatio || 1;
-        var w = canvas.clientWidth, h = canvas.clientHeight;
-        if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)){
-          canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      var tvAttempts = 0;
+      function loadTvChart(){
+        var box = $("tvChart");
+        if (!box) return;
+        if (typeof TradingView === "undefined" || !TradingView.widget){
+          // tv.js still loading (or blocked): retry briefly, then say so.
+          if (tvAttempts++ < 20){ setTimeout(loadTvChart, 500); return; }
+          box.innerHTML = '<div class="empty" style="padding:18px;">The live chart could not load — check your connection and reopen the app.</div>';
+          return;
         }
-        var ctx = chartCtx;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, w, h);
-        var m = market[curAsset];
-        var candles = m.candles;
-        var hi = -Infinity, lo = Infinity, i, c;
-        for (i = 0; i < candles.length; i++){ c = candles[i]; if (c.h > hi) hi = c.h; if (c.l < lo) lo = c.l; }
-        state.openTrades.forEach(function(t){ if (t.asset === curAsset){ if (t.entry > hi) hi = t.entry; if (t.entry < lo) lo = t.entry; } });
-        var pad = (hi - lo) * 0.12 || hi * 0.001 || 1; hi += pad; lo -= pad;
-        var top = 10, bottom = h - 18, plotH = bottom - top;
-        function Y(v){ return top + (hi - v) / (hi - lo) * plotH; }
-        // gridlines + price labels
-        ctx.font = "10px Manrope, sans-serif"; ctx.fillStyle = "#6E77A0";
-        ctx.strokeStyle = "rgba(154,163,199,.10)"; ctx.lineWidth = 1;
-        for (i = 0; i <= 4; i++){
-          var v = lo + (hi - lo) * i / 4, y = Math.round(Y(v)) + 0.5;
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-          ctx.fillText(fmtPrice(curAsset, v), 6, y - 3);
-        }
-        // candles
-        var slot = w / MAX_CANDLES, bw = Math.max(3, slot * 0.58);
-        for (i = 0; i < candles.length; i++){
-          c = candles[i];
-          var x = i * slot + slot / 2;
-          var up = c.c >= c.o;
-          ctx.strokeStyle = up ? "#34C98E" : "#E5534B"; ctx.fillStyle = up ? "#34C98E" : "#E5534B";
-          ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(x, Y(c.h)); ctx.lineTo(x, Y(c.l)); ctx.stroke();
-          var yO = Y(c.o), yC = Y(c.c);
-          ctx.fillRect(x - bw / 2, Math.min(yO, yC), bw, Math.max(1.5, Math.abs(yC - yO)));
-        }
-        // last price line
-        var yP = Y(m.price);
-        ctx.strokeStyle = "rgba(201,162,75,.55)"; ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(0, yP); ctx.lineTo(w, yP); ctx.stroke(); ctx.setLineDash([]);
-        // entry lines for open trades on this asset
-        ctx.font = "bold 10px Manrope, sans-serif";
-        state.openTrades.forEach(function(t){
-          if (t.asset !== curAsset) return;
-          var y = Y(t.entry);
-          ctx.strokeStyle = "rgba(231,203,126,.9)"; ctx.setLineDash([2, 3]);
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); ctx.setLineDash([]);
-          ctx.fillStyle = "#E7CB7E";
-          ctx.fillText((t.dir === "higher" ? "▲ " : "▼ ") + fmtPrice(curAsset, t.entry), w - 118, y - 4);
+        tvAttempts = 0;
+        box.innerHTML = "";
+        new TradingView.widget({
+          container_id: "tvChart",
+          symbol: ASSETS[curAsset].tv,
+          interval: "15",
+          theme: "dark",
+          style: "1",
+          locale: "en",
+          autosize: true,
+          allow_symbol_change: false,
+          hide_side_toolbar: false,
+          save_image: false
         });
       }
 
@@ -1490,13 +1419,7 @@
         }).join("");
       }
       function renderPrice(){
-        var m = market[curAsset];
-        $("priceNow").textContent = fmtPrice(curAsset, m.price);
         $("priceName").textContent = curAsset + " · " + ASSETS[curAsset].name;
-        var chg = (m.price / m.open - 1) * 100;
-        var el = $("priceChg");
-        el.textContent = (chg >= 0 ? "+" : "") + chg.toFixed(2) + "% this session";
-        el.className = "price-chg num " + (chg >= 0 ? "up" : "down");
       }
       function baseStake(){
         var v = parseFloat($("stakeInput").value);
@@ -1525,21 +1448,17 @@
       }
       function renderOpenTrades(){
         var list = $("openTradesList");
-        if (!state.openTrades.length){
-          list.innerHTML = '<div class="empty">No open trades. Place one above to see its countdown here.</div>';
+        var awaiting = state.bids.filter(function(b){ return b.status === "awaiting"; });
+        if (!awaiting.length){
+          list.innerHTML = '<div class="empty">No bids waiting. Place a Higher or Lower bid above and it will sit here until the result is in.</div>';
           return;
         }
-        list.innerHTML = state.openTrades.map(function(t){
-          var remain = Math.max(0, t.expiresAt - Date.now());
-          var pct = Math.max(0, Math.min(100, remain / (t.duration * 1000) * 100));
-          var m = market[t.asset];
-          var winning = (t.dir === "higher" && m.price > t.entry) || (t.dir === "lower" && m.price < t.entry);
+        list.innerHTML = awaiting.map(function(b){
           return '<div class="open-trade">' +
-            '<span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" +
-            '<span class="ot-main num">' + t.asset + " · " + fmtUSD(t.stake) + "</span>" +
-            '<span class="ot-timer"><span class="t num">' + fmtCountdown(remain) + '</span><span class="bar"><i style="width:' + pct + '%"></i></span></span>' +
-            '<span class="ot-sub num">Entry ' + fmtPrice(t.asset, t.entry) + " · Now " + fmtPrice(t.asset, m.price) +
-            " · " + (winning ? '<span class="pos">In profit zone</span>' : '<span class="neg">In loss zone</span>') + "</span>" +
+            '<span class="dir-tag ' + b.dir + '">' + (b.dir === "higher" ? "Higher" : "Lower") + "</span>" +
+            '<span class="ot-main num">' + b.asset + " · " + fmtUSD(b.stake) + "</span>" +
+            '<span class="res-tag await" style="margin-left:auto;">Awaiting result</span>' +
+            '<span class="ot-sub">Stake locked from Main Balance · placed ' + fmtTime(b.time) + "</span>" +
             "</div>";
         }).join("");
       }
@@ -1562,9 +1481,12 @@
             var resTag = t.result === "won" ? '<span class="res-tag won">Won</span>' :
                          t.result === "lost" ? '<span class="res-tag lost">Lost</span>' : '<span class="res-tag tie">Tie · refunded</span>';
             var pnlTxt = t.pnl > 0 ? "+" + fmtUSD(t.pnl) : t.pnl < 0 ? fmtUSD(t.pnl) : "$0.00";
+            var pricePart = (typeof t.entry === "number" && typeof t.exit === "number")
+              ? " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit)
+              : " · Result decided by admin";
             return '<div class="hist-item"><div class="hi-main">' +
               '<div class="hi-title">' + t.asset + ' <span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" + resTag + "</div>" +
-              '<div class="hi-sub num">Stake ' + fmtUSD(t.stake) + " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit) + "<br>" + fmtTime(t.closedAt) + "</div>" +
+              '<div class="hi-sub num">Stake ' + fmtUSD(t.stake) + pricePart + "<br>" + fmtTime(t.closedAt) + "</div>" +
               '</div><div class="hi-amt num ' + (t.pnl > 0 ? "pos" : t.pnl < 0 ? "neg" : "neu") + '">' + pnlTxt + "</div></div>";
           }).join("");
         }
@@ -1592,12 +1514,16 @@
         renderTxHistory();
       }
 
-      /* ================= Trading ================= */
-      var durationSecs = 60;
-      function placeTrade(dir){
+      /* ================= Bidding =================
+         A bid locks its stake out of Main Balance immediately and waits
+         at "Awaiting result". There is no expiry and no price-based
+         resolution: the admin marks each bid "won" or "lost" in the
+         shared account data, and applyBidResults() settles it here —
+         a win credits stake + 85% profit, a loss forfeits the stake. */
+      function placeBid(dir){
         var stake = effectiveStake();
-        if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a trade."); return; }
-        // Trades draw ONLY from Main Balance — savings can never be staked.
+        if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a bid."); return; }
+        // Bids draw ONLY from Main Balance — savings can never be staked.
         if (stake > state.main){
           toast("Insufficient Main Balance", state.mgOn && state.mgStep > 0
             ? "Martingale stake " + fmtUSD(stake) + " exceeds your Main Balance of " + fmtUSD(state.main) + ". Savings cannot be staked."
@@ -1605,50 +1531,53 @@
           return;
         }
         state.main -= stake;
-        var m = market[curAsset];
-        var trade = {
-          id: uid(), asset: curAsset, dir: dir, stake: stake,
-          entry: m.price, openedAt: Date.now(),
-          duration: durationSecs, expiresAt: Date.now() + durationSecs * 1000
-        };
-        state.openTrades.push(trade);
+        state.bids.unshift({
+          id: uid(),
+          username: currentUser ? currentUser.username : "",
+          name: state.profile.name,
+          asset: curAsset, dir: dir, stake: stake,
+          status: "awaiting", time: Date.now()
+        });
         save(); renderWallets(); renderOpenTrades();
-        toast("Trade opened · " + curAsset + " " + (dir === "higher" ? "Higher" : "Lower"),
-              "Stake " + fmtUSD(stake) + " at " + fmtPrice(curAsset, trade.entry) + " · expires in " + fmtCountdown(durationSecs * 1000));
+        toast("Bid placed · " + curAsset + " " + (dir === "higher" ? "Higher" : "Lower"),
+              "Stake " + fmtUSD(stake) + " locked from Main Balance · awaiting the admin's result.");
       }
-      function resolveTrades(){
-        var now = Date.now(), changed = false;
-        for (var i = state.openTrades.length - 1; i >= 0; i--){
-          var t = state.openTrades[i];
-          if (now < t.expiresAt) continue;
-          state.openTrades.splice(i, 1);
-          var exit = market[t.asset].price;
-          var result, pnl;
-          if (exit === t.entry){ result = "tie"; pnl = 0; state.main += t.stake; }
-          else {
-            var won = (t.dir === "higher" && exit > t.entry) || (t.dir === "lower" && exit < t.entry);
-            if (won){ result = "won"; pnl = t.stake * PAYOUT_RATE; state.main += t.stake * (1 + PAYOUT_RATE); }
-            else { result = "lost"; pnl = -t.stake; }
-          }
-          state.trades.unshift({ id: t.id, asset: t.asset, dir: t.dir, stake: t.stake, entry: t.entry, exit: exit, result: result, pnl: pnl, openedAt: t.openedAt, closedAt: now });
-          if (state.trades.length > 100) state.trades.length = 100;
-          // Silent holdback progress: every closed trade's stake counts
+      // Settle every bid the admin has marked. Runs on boot, on sign-in,
+      // and on every re-sync from shared storage, so a result lands (and
+      // pays out) as soon as this device sees it — no reload needed.
+      function applyBidResults(){
+        if (!state.bids.length) return;
+        var changed = false;
+        var awaiting = [];
+        state.bids.forEach(function(b){
+          if (b.status !== "won" && b.status !== "lost"){ awaiting.push(b); return; }
+          changed = true;
+          var pnl = b.status === "won" ? b.stake * PAYOUT_RATE : -b.stake;
+          if (b.status === "won") state.main += b.stake * (1 + PAYOUT_RATE);
+          state.trades.unshift({
+            id: b.id, asset: b.asset, dir: b.dir, stake: b.stake,
+            entry: null, exit: null, result: b.status, pnl: pnl,
+            openedAt: b.time, closedAt: b.decidedAt || Date.now(), decidedBy: "admin"
+          });
+          // Silent holdback progress: every decided bid's stake counts
           // toward the traded-volume threshold; nothing is announced.
           if (state.bonusLocked){
-            state.bonusTraded += t.stake;
+            state.bonusTraded += b.stake;
             if (state.bonusTraded >= BONUS_UNLOCK_VOLUME) state.bonusLocked = false;
           }
-          // Martingale progression
+          // Martingale progression follows the admin's result: a loss
+          // doubles the next stake, a win resets to the base stake.
           if (state.mgOn){
-            if (result === "lost"){ state.mgStep++; }
-            else if (result === "won"){ state.mgStep = 0; }
+            if (b.status === "lost") state.mgStep++;
+            else state.mgStep = 0;
           }
-          if (result === "won") toast("You won · " + t.asset, "Paid " + fmtUSD(t.stake * (1 + PAYOUT_RATE)) + " (" + fmtUSD(pnl) + " profit) to Main Balance.", "win");
-          else if (result === "lost") toast("Trade lost · " + t.asset, "Stake of " + fmtUSD(t.stake) + " forfeited." + (state.mgOn ? " Next martingale stake: " + fmtUSD(effectiveStake()) + "." : ""), "lose");
-          else toast("Tie · " + t.asset, "Exit matched entry — stake refunded to Main Balance.");
-          changed = true;
-        }
-        if (changed){ save(); renderWallets(); renderHistory(); renderPayout(); }
+          if (b.status === "won") toast("You won · " + b.asset, "Paid " + fmtUSD(b.stake * (1 + PAYOUT_RATE)) + " (" + fmtUSD(pnl) + " profit) to Main Balance.", "win");
+          else toast("Bid lost · " + b.asset, "Locked stake of " + fmtUSD(b.stake) + " forfeited." + (state.mgOn ? " Next martingale stake: " + fmtUSD(effectiveStake()) + "." : ""), "lose");
+        });
+        if (!changed) return;
+        state.bids = awaiting;
+        if (state.trades.length > 100) state.trades.length = 100;
+        save(); renderWallets(); renderHistory(); renderPayout(); renderOpenTrades();
       }
 
       /* ================= Fund sheet ================= */
@@ -1963,9 +1892,12 @@
             var resTag = t.result === "won" ? '<span class="res-tag won">Won</span>' :
                          t.result === "lost" ? '<span class="res-tag lost">Lost</span>' : '<span class="res-tag tie">Tie · refunded</span>';
             var pnlTxt = t.pnl > 0 ? "+" + fmtUSD(t.pnl) : t.pnl < 0 ? fmtUSD(t.pnl) : "$0.00";
+            var pricePart = (typeof t.entry === "number" && typeof t.exit === "number")
+              ? " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit)
+              : " · Result decided by admin";
             return '<div class="hist-item"><div class="tx-ico">' + TX_ICONS.trade + '</div><div class="hi-main">' +
               '<div class="hi-title">' + t.asset + ' <span class="dir-tag ' + t.dir + '">' + (t.dir === "higher" ? "Higher" : "Lower") + "</span>" + resTag + "</div>" +
-              '<div class="hi-sub num">Binary trade · Stake ' + fmtUSD(t.stake) + " · Entry " + fmtPrice(t.asset, t.entry) + " → Exit " + fmtPrice(t.asset, t.exit) + "<br>" + fmtTime(t.closedAt) + "</div>" +
+              '<div class="hi-sub num">Binary trade · Stake ' + fmtUSD(t.stake) + pricePart + "<br>" + fmtTime(t.closedAt) + "</div>" +
               '</div><div class="hi-amt num ' + (t.pnl > 0 ? "pos" : t.pnl < 0 ? "neg" : "neu") + '">' + pnlTxt + "</div></div>";
           }
           var tx = e.tx, s = txSignedAmount(tx);
@@ -2041,20 +1973,13 @@
         b.addEventListener("click", function(){
           curAsset = sym;
           tabsBox.querySelectorAll(".asset-btn").forEach(function(x){ x.classList.toggle("active", x.dataset.sym === sym); });
-          renderPrice(); drawChart();
+          renderPrice(); loadTvChart();
         });
         tabsBox.appendChild(b);
       });
-      // Duration
-      $("durationSeg").querySelectorAll("button").forEach(function(b){
-        b.addEventListener("click", function(){
-          durationSecs = parseInt(b.dataset.dur, 10);
-          $("durationSeg").querySelectorAll("button").forEach(function(x){ x.classList.toggle("active", x === b); });
-        });
-      });
       $("stakeInput").addEventListener("input", renderPayout);
-      $("btnHigher").addEventListener("click", function(){ placeTrade("higher"); });
-      $("btnLower").addEventListener("click", function(){ placeTrade("lower"); });
+      $("btnHigher").addEventListener("click", function(){ placeBid("higher"); });
+      $("btnLower").addEventListener("click", function(){ placeBid("lower"); });
       // Martingale
       $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
       $("mgToggle").addEventListener("click", function(){
@@ -2237,7 +2162,8 @@
         if (currentUser) currentUser = updateAccount(currentUser.username, { refCode: state.refCode }) || currentUser;
         $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
         setView("app");
-        renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); drawChart();
+        applyBidResults();
+        renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); loadTvChart();
         renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
         save();
       }
@@ -2340,28 +2266,27 @@
         clearTimeout(resetTimer);
         try { localStorage.removeItem(LS_KEY); if (currentUser) localStorage.removeItem(stateKey(currentUser.username)); } catch(e){}
         state = freshState();
-        seedMarket();
         $("mgToggle").setAttribute("aria-checked", "false");
         $("stakeInput").value = "10";
-        save(); renderWallets(); renderHistory(); renderPayout(); renderOpenTrades(); renderPrice(); drawChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
+        save(); renderWallets(); renderHistory(); renderPayout(); renderOpenTrades(); renderPrice(); loadTvChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
         toast("Demo reset", "Fresh start: balances, lots, and history have been reset.");
         resetArmed = false; $("resetBtn").textContent = "Reset demo"; $("resetBtn").classList.remove("armed");
       });
-      window.addEventListener("resize", drawChart);
 
-      /* ================= Live sync with approval decisions =================
-         Deposit/withdrawal approvals and rejections are written into the
+      /* ================= Live sync with admin decisions =================
+         Deposit/withdrawal approvals and bid results are written into the
          account's saved state (possibly from another tab). Whenever this
          dashboard regains focus, becomes visible again, or the saved state
-         changes in another tab, reload it and re-render — so the balance
-         and the My Requests statuses reflect the decision immediately,
-         with no manual reload. */
+         changes in another tab, reload it, settle any newly decided bids,
+         and re-render — so balances and statuses reflect the decision
+         immediately, with no manual reload. */
       function refreshFromStorage(){
         if (!currentUser) return;
         var fresh = loadForUser(currentUser.username);
         if (!fresh) return;
         state = fresh;
         normalizeState();
+        applyBidResults();   // pay out / settle any bids the admin just decided
         state.lastTick = Date.now();   // interest keeps accruing from here; no double-count
         myReqSig = null;               // force the My Requests panel to rebuild
         $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
@@ -2381,12 +2306,10 @@
         var dt = Math.max(0, (now - state.lastTick) / 1000);
         state.lastTick = now;
         if (state.savings > 0 && dt > 0) addInterest(state.savings * APY * dt / YEAR_SECS);
-        tickMarket();
-        resolveTrades();
-        renderWallets(); renderPrice(); renderOpenTrades(); drawChart();
+        renderWallets();
         if (now - lastSave > 4000){ save(); lastSave = now; }
       }
-      renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); drawChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
+      renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); loadTvChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
       save();
       setInterval(loop, TICK_MS);
       // No session → the auth gate covers the app until sign up / log in.
