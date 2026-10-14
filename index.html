@@ -59,15 +59,6 @@
       }
       .brand h1 .gold{color:var(--gold-bright);}
       .brand p{margin:2px 0 0; font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase;}
-      .sim-badge{
-        margin-left:auto; flex:0 0 auto;
-        display:inline-flex; align-items:center; gap:7px;
-        border:1px solid var(--line); color:var(--gold-bright);
-        background:rgba(201,162,75,.08);
-        font-size:11px; font-weight:800; letter-spacing:.6px; text-transform:uppercase;
-        padding:7px 11px; border-radius:999px; white-space:nowrap;
-      }
-      .sim-badge .dot{width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 3px rgba(201,162,75,.18);}
       .menu-btn{
         flex:0 0 auto; cursor:pointer; width:44px; height:44px;
         display:flex; align-items:center; justify-content:center;
@@ -76,7 +67,6 @@
       .menu-btn:active{transform:translateY(1px);}
       @media (max-width:560px){
         header.topbar{flex-wrap:wrap;}
-        .sim-badge{margin-left:0; order:3;}
         .menu-btn{margin-left:auto; order:2;}
       }
 
@@ -498,7 +488,7 @@
 
       /* ---------- Header profile chip ---------- */
       .header-profile{
-        flex:0 0 auto; cursor:pointer; display:flex; align-items:center; gap:9px;
+        margin-left:auto; flex:0 0 auto; cursor:pointer; display:flex; align-items:center; gap:9px;
         background:rgba(255,255,255,.02); border:1px solid var(--line-soft); border-radius:999px;
         padding:4px 13px 4px 4px; color:var(--text); font-family:"Manrope",sans-serif; text-align:left;
       }
@@ -697,8 +687,6 @@
           <div class="sheet-err" id="liErr"></div>
           <button class="btn" type="submit">Log In</button>
         </form>
-
-        <p class="auth-note">Demo only — virtual funds, synced across your devices.</p>
       </div>
     </div>
 
@@ -732,9 +720,8 @@
         </svg>
         <div class="brand">
           <h1>Tryb<span class="gold">Network</span></h1>
-          <p>Trade &amp; Mine</p>
+          <p>Trade &amp; Save</p>
         </div>
-  
         <button class="header-profile" id="headerProfile" type="button" aria-label="Edit profile">
           <span class="avatar" id="headerAvatar">DT</span>
           <span class="hp-text">
@@ -955,7 +942,6 @@
       </div>
 
       <footer>
-        <p>TrybNetwork Trade &amp; Save is a simulation. All balances are virtual and nothing here involves real money or financial advice. The arena chart streams live market prices for reference only, and bid results are decided by the admin. Mining profits and trade payouts are illustrative only.</p>
         <button class="reset-btn" id="resetBtn" type="button">Reset demo</button>
       </footer>
     </div>
@@ -1073,7 +1059,6 @@
           <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
       </nav>
-      <div class="drawer-foot">TrybNetwork Trade &amp; Save — a simulation with virtual funds. Nothing here involves real money.</div>
     </aside>
 
     <!-- Edit Profile screen -->
