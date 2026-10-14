@@ -360,6 +360,8 @@
       .ref-item .ri-sub{font-size:12px; color:var(--muted); margin-top:2px;}
       .ref-status{font-size:10.5px; font-weight:800; letter-spacing:.5px; padding:4px 8px; border-radius:6px; text-transform:uppercase; background:#232B5C; color:var(--muted);}
       .ref-status.done{background:var(--green-dark); color:var(--green);}
+      .ref-status.vesting{background:#3A2F14; color:var(--gold-bright);}
+      .ref-status.cancelled{background:#3C1F24; color:var(--red);}
       .ref-item .mini-btn{
         cursor:pointer; border:1px solid var(--line); background:rgba(201,162,75,.10); color:var(--gold-bright);
         font-family:"Manrope",sans-serif; font-weight:800; font-size:12px; padding:8px 12px; border-radius:9px;
@@ -619,6 +621,15 @@
       @keyframes dbFly5{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(-6px,-40px) rotate(90deg); opacity:0;}}
       @keyframes dbFly6{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(8px,34px) rotate(-200deg); opacity:0;}}
       .av-ground{position:absolute; left:0; right:0; bottom:0; height:6px; background:repeating-linear-gradient(90deg, var(--gold) 0 14px, transparent 14px 28px); opacity:.45;}
+
+      /* Aviator recent winners feed */
+      .av-winners{margin-top:16px; border-top:1px solid var(--line-soft); padding-top:12px;}
+      .av-win-list{display:grid; gap:6px; margin-top:9px;}
+      .av-win-row{display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:10px; padding:8px 12px; font-size:13px;}
+      .av-win-name{font-weight:800; letter-spacing:.4px;}
+      .av-win-amt{font-weight:800; color:var(--green); white-space:nowrap;}
+      .av-win-row.fresh{animation:winSlide .45s ease both;}
+      @keyframes winSlide{from{opacity:0; transform:translateY(-7px);} to{opacity:1; transform:translateY(0);}}
 
       /* Spin wheel */
       .wheel-wrap{position:relative; width:min(280px, 78vw); margin:8px auto 0;}
@@ -946,7 +957,7 @@
         <div class="stats" style="margin-top:14px;">
           <div class="stat"><div class="v num" id="statReferrals">0</div><div class="k">Referrals</div></div>
           <div class="stat"><div class="v num" id="statRefQualified">0</div><div class="k">Qualified</div></div>
-          <div class="stat"><div class="v num" id="statRefEarned">$0.00</div><div class="k">Bonus earned</div></div>
+          <div class="stat"><div class="v num" id="statRefEarned">$0.00</div><div class="k">Bonus vested</div></div>
         </div>
         <div class="ref-actions">
           <button class="btn ghost" id="simRefBtn" type="button">Simulate a referral signup</button>
@@ -1128,6 +1139,10 @@
             <button class="btn game-btn cashout" id="avCashBtn" type="button" style="display:none;">Cash Out $0.00</button>
           </div>
           <p class="game-note" id="avBidState">Bids close when the countdown ends. No bid? The flight still runs — watch it for free.</p>
+          <div class="av-winners">
+            <span class="recent-label">Recent winners</span>
+            <div class="av-win-list" id="avWinners"></div>
+          </div>
         </section>
       </div>
 
@@ -1556,6 +1571,8 @@
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
       var REFERRAL_REWARD = 3;
+      var REFERRAL_MIN_DEPOSIT = 12; // first approved deposit that qualifies a referral
+      var REFERRAL_VEST_DAYS = 7;    // referral bonuses vest this long after qualifying
       var ASSETS = {
         BTCUSD: { name: "Bitcoin / USD",  tv: "COINBASE:BTCUSD", dec: 2 },
         ETHUSD: { name: "Ethereum / USD", tv: "COINBASE:ETHUSD", dec: 2 },
@@ -1615,6 +1632,7 @@
           mgOn: false, mgStep: 0,
           bonusLocked: true, bonusTraded: 0,
           refCode: "—", referrals: [], referralEarned: 0,
+          wagering: 0, refBonuses: [],
           adminRequests: [],
           profile: { name: "Demo Trader", email: "", avatar: 0, username: "", dob: "", photo: "" },
           paymentMethods: [],
@@ -1654,6 +1672,173 @@
               });
             });
           }).catch(function(){ return false; });
+      }
+
+      /* ================= Wagering volume (anti-abuse) =================
+         Every stake or purchase — binary bids, game stakes (Aviator,
+         Spin Wheel, Whot) and miner purchases — adds to the user's
+         wagering volume, accumulated in tn_profiles.wagering_volume.
+         Withdrawal requests stay locked until the volume covers the
+         user's total approved deposits (a 1x playthrough), so a
+         deposit can't be cycled straight back out. If the column
+         doesn't exist yet, tracking and the gate switch off quietly
+         and nothing else changes. */
+      var wageringColumnKnown = null; // null = untested, true = present, false = absent
+      function addWagering(amount){
+        amount = Math.round((Number(amount) || 0) * 100) / 100;
+        if (!(amount > 0)) return;
+        state.wagering = Math.round(((Number(state.wagering) || 0) + amount) * 100) / 100;
+        if (!sb || !currentUser || wageringColumnKnown === false) return;
+        var val = state.wagering;
+        sb.from("tn_profiles").update({ wagering_volume: val }).eq("id", currentUser.id).then(function(res){
+          wageringColumnKnown = !res.error;
+        }).catch(function(){});
+      }
+      function totalApprovedDeposits(){
+        return state.adminRequests.filter(function(r){ return r.self && r.type === "deposit" && r.status === "approved"; })
+          .reduce(function(a, r){ return a + (Number(r.amount) || 0); }, 0);
+      }
+      // null = withdrawals unlocked; otherwise how much playthrough is left.
+      function wageringGate(){
+        if (wageringColumnKnown === false) return null; // no column — nothing to enforce against
+        var target = Math.round(totalApprovedDeposits() * 100) / 100;
+        var traded = Math.round((Number(state.wagering) || 0) * 100) / 100;
+        if (!(target > 0) || traded >= target) return null;
+        return { remaining: Math.round((target - traded) * 100) / 100, traded: traded, target: target };
+      }
+      function wageringGateText(g){
+        return "Withdrawals unlock after you trade " + fmtUSD(g.remaining) + " more (playthrough " + fmtUSD(g.traded) + " of " + fmtUSD(g.target) + ")";
+      }
+
+      /* ================= Referral bonus vesting (anti-abuse) =================
+         The $3 referral bonus no longer lands the moment a referred
+         user's first deposit is approved. The qualifying event — this
+         user's first approved deposit of $12+ — writes a
+         tn_referral_bonuses row (status 'pending', vests_at 7 days
+         out) instead of crediting the referrer on the spot. On app
+         load, pending rows past their vest date settle lazily: if the
+         referred user's net deposits (approved deposits minus
+         completed withdrawals) are still $12+, the bonus is marked
+         'vested' and $3 is credited — the guarded status flip makes
+         sure it can never credit twice — otherwise it is marked
+         'cancelled'. If the tn_referral_bonuses table doesn't exist
+         yet, the qualifying event falls back to the old immediate
+         credit so nothing breaks. */
+      var referralBonusTableKnown = null; // null = untested, true = present, false = absent
+      var referralBonusBusy = false;
+      var referralProcessing = false;
+      // Credit any user's Main Balance directly — the same wallet-credit
+      // path the referral profit share uses (read balance, write back).
+      function creditUserWallet(userId, amount){
+        return sb.from("tn_wallets").select("main_balance").eq("user_id", userId).maybeSingle().then(function(w){
+          if (w.error || !w.data) return false;
+          var bal = Math.round(((Number(w.data.main_balance) || 0) + amount) * 100) / 100;
+          return sb.from("tn_wallets").update({ main_balance: bal, updated_at: new Date().toISOString() }).eq("user_id", userId)
+            .then(function(u){ return !u.error; });
+        }).catch(function(){ return false; });
+      }
+      function markReferralRewardPaid(referredId){
+        return sb.from("tn_referrals").update({ reward_paid: true }).eq("referred_id", referredId).eq("reward_paid", false)
+          .then(function(){ return true; }).catch(function(){ return false; });
+      }
+      // Qualifying event, seen from the referred user's side: my first
+      // approved deposit reached $12 and my referral row is unpaid.
+      function checkReferralQualification(){
+        if (!sb || !currentUser || referralBonusBusy) return;
+        sb.from("tn_referrals").select("*").eq("referred_id", currentUser.id).eq("reward_paid", false).limit(1)
+          .then(function(res){
+            var ref = (res.data || [])[0];
+            if (!ref || !ref.referrer_id) return;
+            var deps = state.adminRequests.filter(function(r){ return r.self && r.type === "deposit" && r.status === "approved"; })
+              .slice().sort(function(a, b){ return a.time - b.time; });
+            if (!deps.length || !(deps[0].amount >= REFERRAL_MIN_DEPOSIT)) return;
+            queueReferralBonus(ref);
+          }).catch(function(){});
+      }
+      function queueReferralBonus(ref){
+        if (referralBonusBusy) return;
+        referralBonusBusy = true;
+        function finish(){ referralBonusBusy = false; }
+        function immediateCredit(){
+          // Fallback (table missing/unusable): the old behaviour —
+          // credit the referrer's Main Balance right away.
+          return creditUserWallet(ref.referrer_id, REFERRAL_REWARD).then(function(ok){
+            if (ok) return markReferralRewardPaid(currentUser.id);
+            return false;
+          });
+        }
+        sb.from("tn_referral_bonuses").select("id").eq("referred_id", currentUser.id).limit(1).then(function(existing){
+          if (existing.error){ referralBonusTableKnown = false; return immediateCredit(); }
+          referralBonusTableKnown = true;
+          if ((existing.data || []).length) return true; // already queued or settled — never queue twice
+          var vestsAt = new Date(Date.now() + REFERRAL_VEST_DAYS * 24 * 3600 * 1000).toISOString();
+          return sb.from("tn_referral_bonuses").insert({
+            referrer_id: ref.referrer_id, referred_id: currentUser.id,
+            amount: REFERRAL_REWARD, status: "pending", vests_at: vestsAt
+          }).then(function(ins){
+            if (ins.error) return immediateCredit();
+            return true;
+          });
+        }).then(finish, finish).catch(function(){ finish(); });
+      }
+      // Lazy vesting, from the referrer's side: settle my pending rows
+      // whose vest date has passed, one by one.
+      function settleDueReferralBonuses(){
+        if (!sb || !currentUser || referralBonusTableKnown === false) return Promise.resolve();
+        return sb.from("tn_referral_bonuses").select("*").eq("referrer_id", currentUser.id).eq("status", "pending")
+          .lte("vests_at", new Date().toISOString()).then(function(res){
+            if (res.error){ referralBonusTableKnown = false; return; }
+            referralBonusTableKnown = true;
+            var chain = Promise.resolve();
+            (res.data || []).forEach(function(row){
+              chain = chain.then(function(){ return settleOneReferralBonus(row); });
+            });
+            return chain;
+          }).catch(function(){});
+      }
+      function settleOneReferralBonus(row){
+        var amount = Math.round((Number(row.amount) || REFERRAL_REWARD) * 100) / 100;
+        // The referred user's net deposits decide whether the bonus vests.
+        return sb.from("tn_requests").select("type, amount").eq("user_id", row.referred_id).eq("status", "approved")
+          .then(function(res){
+            var net = 0;
+            (res.data || []).forEach(function(r){
+              var amt = Number(r.amount) || 0;
+              if (r.type === "deposit") net += amt;
+              else if (r.type === "withdrawal") net -= amt;
+            });
+            var next = net >= REFERRAL_MIN_DEPOSIT ? "vested" : "cancelled";
+            // Guarded flip: only the settler that moves the row out of
+            // 'pending' may credit — a bonus can never pay twice.
+            return sb.from("tn_referral_bonuses").update({ status: next }).eq("id", row.id).eq("status", "pending").select()
+              .then(function(upd){
+                if (upd.error || !upd.data || !upd.data.length) return false; // settled elsewhere first
+                state.refBonuses.forEach(function(b){ if (b.id === row.id) b.status = next; });
+                if (next === "cancelled"){ renderReferrals(); return true; }
+                state.main = Math.round((state.main + amount) * 100) / 100;
+                state.referralEarned = Math.round((state.referralEarned + amount) * 100) / 100;
+                state.txs.unshift({ id: uid(), type: "referral", amount: amount,
+                  note: "Referral bonus vested · credited to Main Balance", time: Date.now() });
+                if (state.txs.length > 120) state.txs.length = 120;
+                return persistWallet().then(function(){
+                  markReferralRewardPaid(row.referred_id);
+                  renderWallets(); renderHistory(); renderReferrals();
+                  toast("Referral bonus vested", fmtUSD(amount) + " from your referral's deposit is now in your Main Balance.", "win");
+                  return true;
+                });
+              });
+          }).catch(function(){ return false; });
+      }
+      // App-load pass: settle anything due to vest, then check whether
+      // this user's own deposit just qualified their referrer's bonus.
+      function processReferralBonuses(){
+        if (!sb || !currentUser || referralProcessing) return;
+        referralProcessing = true;
+        settleDueReferralBonuses().then(function(){
+          checkReferralQualification();
+          referralProcessing = false;
+          renderReferrals();
+        }).catch(function(){ referralProcessing = false; });
       }
 
       /* ================= Mining =================
@@ -1792,9 +1977,10 @@
           sb.from("tn_miners").select("*").eq("user_id", userId).maybeSingle(),
           sb.from("tn_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
           sb.from("tn_bids").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
-          sb.from("tn_referrals").select("*").eq("referrer_id", userId).order("created_at", { ascending: false })
+          sb.from("tn_referrals").select("*").eq("referrer_id", userId).order("created_at", { ascending: false }),
+          sb.from("tn_referral_bonuses").select("*").eq("referrer_id", userId).order("created_at", { ascending: false })
         ]).then(function(res){
-          var prof = res[0], wal = res[1], min = res[2], reqs = res[3], bids = res[4], refs = res[5];
+          var prof = res[0], wal = res[1], min = res[2], reqs = res[3], bids = res[4], refs = res[5], bons = res[6];
           if (prof.error || wal.error){ if (!opts.silent) netErrorToast("Loading your account"); return false; }
           profileRow = prof.data;
           walletRow = wal.data;
@@ -1826,9 +2012,30 @@
             dob: profileRow.date_of_birth || "",
             photo: profileRow.avatar_url || ""
           };
+          // Wagering volume lives on the profile row; if the column
+          // isn't there yet, tracking and the withdrawal gate stay off.
+          wageringColumnKnown = "wagering_volume" in profileRow;
+          fresh.wagering = wageringColumnKnown ? (Number(profileRow.wagering_volume) || 0) : 0;
+          // Referral bonus rows (tn_referral_bonuses) drive vesting;
+          // a missing table just means no rows and the legacy totals.
+          var bonusRows = (!bons.error && bons.data) ? bons.data : null;
+          if (bonusRows) referralBonusTableKnown = true;
+          else if (bons.error) referralBonusTableKnown = false;
+          fresh.refBonuses = (bonusRows || []).map(function(b){
+            return { id: b.id, referredId: b.referred_id, amount: Number(b.amount) || REFERRAL_REWARD,
+                     status: b.status || "pending",
+                     vestsAt: b.vests_at ? new Date(b.vests_at).getTime() : 0,
+                     createdAt: b.created_at ? new Date(b.created_at).getTime() : Date.now() };
+          });
           // Referral stats come from tn_referrals; names need the referred profiles.
           var refRows = refs.data || [];
-          fresh.referralEarned = refRows.filter(function(r){ return r.reward_paid; }).length * REFERRAL_REWARD;
+          // "Bonus vested" total: vested bonus rows, plus referrals paid
+          // the old immediate way (reward_paid with no bonus row at all).
+          var bonusByReferred = {};
+          fresh.refBonuses.forEach(function(b){ bonusByReferred[b.referredId] = b; });
+          fresh.referralEarned = Math.round((fresh.refBonuses.filter(function(b){ return b.status === "vested"; })
+              .reduce(function(a, b){ return a + b.amount; }, 0)
+            + refRows.filter(function(r){ return r.reward_paid && !bonusByReferred[r.referred_id]; }).length * REFERRAL_REWARD) * 100) / 100;
           state = fresh;
           state.txs = buildWalletTxs(reqs.data).concat(keep.localTxs);
           state.txs.sort(function(a, b){ return b.time - a.time; });
@@ -1841,7 +2048,7 @@
               (pr.data || []).forEach(function(p){ byId[p.id] = p; });
               state.referrals = refRows.map(function(r){
                 var p = byId[r.referred_id];
-                return { id: r.id, name: p ? (p.full_name || ("@" + (p.username || ""))) : "Referral", status: r.reward_paid ? "qualified" : "joined", time: r.created_at ? new Date(r.created_at).getTime() : Date.now(), depositTime: r.reward_paid ? (r.created_at ? new Date(r.created_at).getTime() : Date.now()) : null };
+                return { id: r.id, referredId: r.referred_id, name: p ? (p.full_name || ("@" + (p.username || ""))) : "Referral", status: r.reward_paid ? "qualified" : "joined", time: r.created_at ? new Date(r.created_at).getTime() : Date.now(), depositTime: r.reward_paid ? (r.created_at ? new Date(r.created_at).getTime() : Date.now()) : null };
               });
               return true;
             }).catch(function(){ state.referrals = []; return true; });
@@ -2141,6 +2348,7 @@
             asset: asset, dir: dir, stake: stake, status: "awaiting",
             time: row.created_at ? new Date(row.created_at).getTime() : Date.now()
           });
+          addWagering(stake); // bid stakes count toward the playthrough
           return persistWallet();
         }).then(function(ok){
           bidBusy = false;
@@ -2303,6 +2511,7 @@
           $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
           renderWallets(); renderHistory(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods(); renderOpenTrades(); renderPayout();
           settleUnpaidBids();
+          processReferralBonuses();
           if (typeof loadRecentPlays === "function") loadRecentPlays();
           resumeDepositWatchers();
           checkAutoSettle();
@@ -2331,9 +2540,11 @@
       }
       function updateSheetConfirmState(){
         var btn = $("sheetConfirm");
-        btn.disabled = receiptNeeded() && (receiptUploading || !receiptUrl);
+        var gate = sheetMode === "withdraw" ? wageringGate() : null;
+        btn.disabled = (receiptNeeded() && (receiptUploading || !receiptUrl)) || !!gate;
         btn.textContent = receiptNeeded() && receiptUploading ? "Uploading receipt…"
-          : sheetMode === "deposit" ? "I've sent it" : "Request withdrawal";
+          : sheetMode === "deposit" ? "I've sent it"
+          : gate ? wageringGateText(gate) : "Request withdrawal";
       }
       function setReceiptStatus(msg, cls){
         var s = $("receiptStatus");
@@ -2423,6 +2634,10 @@
         }[mode];
         $("sheetTitle").textContent = cfg.title;
         $("sheetSub").textContent = cfg.sub;
+        if (mode === "withdraw"){
+          var openGate = wageringGate();
+          if (openGate) $("sheetSub").textContent = wageringGateText(openGate) + " Bids, game stakes and miner purchases all count toward your playthrough.";
+        }
         $("sheetAvail").textContent = cfg.avail;
         $("sheetMax").style.display = cfg.max === null ? "none" : "";
         resetReceipt();
@@ -2697,6 +2912,7 @@
           }
           return persistWallet().then(function(){
             minerBusy = false;
+            addWagering(amt); // miner purchases count toward the playthrough
             renderWallets();
             closeMinerSheet();
             toast(replacing ? "Miner replaced" : "Miner purchased",
@@ -2769,6 +2985,8 @@
             renderWallets(); closeSheet();
           });
         } else if (sheetMode === "withdraw"){
+          var confirmGate = wageringGate();
+          if (confirmGate){ done(); sheetError(wageringGateText(confirmGate)); return; }
           if (amt > withdrawableMain()){
             done();
             sheetError("You can withdraw up to " + fmtUSD(withdrawableMain()) + " from your Main Balance right now.");
@@ -2795,14 +3013,29 @@
           $("refList").innerHTML = '<div class="empty">No referrals yet. Share your code — when someone signs up with it, they appear here automatically.</div>';
           return;
         }
+        var bonusByReferred = {};
+        state.refBonuses.forEach(function(b){ bonusByReferred[b.referredId] = b; });
         $("refList").innerHTML = state.referrals.map(function(r){
           var done = r.status === "qualified";
+          var bonus = bonusByReferred[r.referredId];
+          var sub, chip, chipCls;
+          if (bonus && bonus.status === "pending"){
+            sub = "Qualified · " + fmtUSD(bonus.amount) + " bonus vests " + fmtTime(bonus.vestsAt);
+            chip = "Vesting"; chipCls = " vesting";
+          } else if (bonus && bonus.status === "cancelled"){
+            sub = "Bonus cancelled · the referral's net deposits fell below " + fmtUSD(REFERRAL_MIN_DEPOSIT);
+            chip = "Cancelled"; chipCls = " cancelled";
+          } else if (done || (bonus && bonus.status === "vested")){
+            sub = "Qualified · you earned 3 USDT";
+            chip = "Reward paid"; chipCls = " done";
+          } else {
+            sub = "Joined " + fmtTime(r.time) + " · signed up with your referral code";
+            chip = "Signed up"; chipCls = "";
+          }
           return '<div class="ref-item"><div class="ri-main">' +
             '<div class="ri-name">' + esc(r.name) + '</div>' +
-            '<div class="ri-sub">' + (done
-              ? "Qualified · you earned 3 USDT"
-              : "Joined " + fmtTime(r.time) + " · signed up with your referral code") + "</div></div>" +
-            '<span class="ref-status' + (done ? " done" : "") + '">' + (done ? "Reward paid" : "Signed up") + "</span>" +
+            '<div class="ri-sub">' + sub + "</div></div>" +
+            '<span class="ref-status' + chipCls + '">' + chip + "</span>" +
             "</div>";
         }).join("");
       }
@@ -3317,6 +3550,7 @@
         renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
         setupRealtime();
         settleUnpaidBids();
+        processReferralBonuses();
         resumeDepositWatchers();
         checkAutoSettle();
         if (typeof initGames === "function") initGames();
@@ -3595,22 +3829,57 @@
 
       /* ================= Aviator =================
          BETTING (15s) → FLYING → RESOLVED (5s) → BETTING… At takeoff
-         a bid flight draws R ~ Uniform(0,1): if R < 1/99 it is a win
-         flight with crash multiplier C uniform on 5x–10x — the plane
-         flies and the bidder may cash out at any moment before C is
-         reached (never cashing out loses the bid at C). Otherwise
-         (98/99) C = 1.00x exactly: the plane crashes on takeoff, an
-         instant loss with no cashout window. The multiplier grows
-         as 1 + t/10 and there is no forced crash. Flights with no
-         bid on board are display-only teases: 80% fly to a uniform
-         9x–10x, 20% crash instantly at 1.00x. No flight ever flies
-         past 10x. */
+         a bid flight draws its crash multiplier C from a continuous
+         power-law distribution: C = U^(-1/α) with U ~ Uniform(0,1),
+         capped at the 10x ceiling.
+         Base curve: α = ln(99)/ln(5) ≈ 2.8548, so P(C ≥ 5x) is
+         exactly 1/99 — reaching 5x is the rare event — while every
+         flight still looks naturally random: the median crash is
+         ≈ 1.27x, ~23% of flights crash below 1.1x, ~32% reach 1.5x
+         and ~14% reach 2x.
+         New-player hook: a user's first 3 Aviator bids ever are
+         pinned to crash at a uniform random 1.6x–2.5x instead of
+         drawing from the base curve — so any cashout at or below
+         1.5x always wins, while the flights still look naturally
+         varied; from the 4th bid onward the base 5x curve applies.
+         The lifetime bid count comes from tn_plays (game='aviator');
+         a localStorage counter is kept alongside as the fallback
+         for when the table can't be read. The bidder
+         may cash out at any moment before C is reached (never
+         cashing out loses the bid at C). The
+         multiplier grows as 1 + t/10 and there is no forced crash.
+         Flights with no bid on board are display-only teases: 80%
+         fly to a uniform 9x–10x, 20% crash instantly at 1.00x. No
+         flight ever flies past 10x. */
       var AV_BET_MS = 15000, AV_RESOLVED_MS = 5000, AV_POS_T = 100; // AV_POS_T only eases the on-screen flight path
+      var AV_ALPHA = Math.log(99) / Math.log(5); // ≈ 2.8548 — base curve: P(C ≥ 5x) = 1/99
+      var AV_HOOK_BIDS = 3;
+      var AV_HOOK_MIN = 1.6, AV_HOOK_MAX = 2.5; // first-bids crash range (uniform)
       var av = null, avTimer = null, avBidBusy = false;
-      function avDrawBidCrash(){
-        // Flat 1-in-99 win chance; otherwise an instant 1.00x crash.
-        if (Math.random() < 1 / 99) return round2(5 + Math.random() * 5);
-        return 1;
+      var avBidCount = avLocalBidCount(); // lifetime aviator bids placed (hook bookkeeping)
+      function avLocalBidCount(){
+        try { return parseInt(localStorage.getItem("tn_aviator_bids") || "0", 10) || 0; }
+        catch(e){ return 0; }
+      }
+      function avRefreshBidCount(){
+        avBidCount = Math.max(avBidCount, avLocalBidCount());
+        if (!sb || !currentUser) return;
+        sb.from("tn_plays").select("*", { count: "exact", head: true })
+          .eq("user_id", currentUser.id).eq("game", "aviator")
+          .then(function(res){
+            if (res.error || typeof res.count !== "number") return; // keep the local fallback
+            avBidCount = Math.max(res.count, avLocalBidCount());
+          }).catch(function(){ /* keep the local fallback */ });
+      }
+      function avDrawBidCrash(alpha){
+        // Continuous power-law crash point: C = U^(-1/α), capped at 10x.
+        // (Math.random() = 0 would give Infinity, which the cap turns into 10.)
+        return round2(Math.min(10, Math.pow(Math.random(), -1 / alpha)));
+      }
+      function avDrawHookCrash(){
+        // New-player hook flights: crash pinned to a uniform random
+        // 1.6x–2.5x, so any cashout at or below 1.5x always wins.
+        return round2(AV_HOOK_MIN + Math.random() * (AV_HOOK_MAX - AV_HOOK_MIN));
       }
       function avDrawTeaseCrash(){
         // Display-only: 80% soar to a uniform 9x–10x, 20% crash at 1.00x.
@@ -3680,10 +3949,11 @@
         av.phase = "flying";
         av.flightStart = Date.now();
         if (av.bid && av.bid.active){
-          // Bid flight: flat 1-in-99 win chance — a win flight flies
-          // to a uniform 5x–10x crash point; anything else crashes on
-          // takeoff at exactly 1.00x.
-          av.crashMult = avDrawBidCrash();
+          // Bid flight: a bid inside the user's first AV_HOOK_BIDS
+          // lifetime bids is pinned to a uniform 1.6x–2.5x crash;
+          // every later bid draws its crash point from the base
+          // 5x-rarity power-law distribution.
+          av.crashMult = av.bid.hook ? avDrawHookCrash() : avDrawBidCrash(AV_ALPHA);
         } else {
           // No bid on board: a display-only tease flight. 80% of the
           // time it soars to a uniform 9x–10x; 20% it crashes
@@ -3762,7 +4032,15 @@
               toast("Couldn't record the bid", "Your stake was returned to your Main Balance — please try again.", "lose");
               return;
             }
-            av.bid = { playId: playId, stake: stake, active: true, cashed: false, lost: false };
+            // Hook bookkeeping: this bid counts toward the user's
+            // lifetime total the moment it is placed; while the
+            // total is still within the first AV_HOOK_BIDS bids its
+            // flight is pinned to the 1.6x–2.5x hook range.
+            var isHookBid = avBidCount < AV_HOOK_BIDS;
+            avBidCount += 1;
+            try { localStorage.setItem("tn_aviator_bids", String(Math.max(avBidCount, avLocalBidCount()))); } catch(e){}
+            av.bid = { playId: playId, stake: stake, active: true, cashed: false, lost: false, hook: isHookBid };
+            addWagering(stake); // game stakes count toward the playthrough
             renderWallets(); avRender();
             toast("Bid placed · " + fmtUSD(stake), "Locked from Main Balance for the next flight — cash out before the crash.");
           });
@@ -3796,6 +4074,53 @@
           .eq("user_id", currentUser.id).eq("game", "aviator").eq("status", "pending").lt("created_at", cutoff)
           .then(function(){ loadRecentPlays(); }).catch(function(){});
       }
+      /* ================= Aviator recent winners feed =================
+         Purely cosmetic social proof on the Aviator screen: every
+         10–25 seconds a generated entry — a masked username and a
+         plausible win amount — slides in at the top of the feed;
+         the last 10 entries stay visible. Nothing here reads from
+         or writes to the backend. */
+      var AV_WINNER_NAMES = ["Tunde","Adaeze","Chidi","Funke","Emeka","Blessing","Ibrahim","Ngozi","Segun","Aisha","Olumide","Kemi","Yusuf","Chiamaka","Peter","Grace","David","Sarah","Michael","Fatima","John","Mary","Ahmed","Bisi","Rotimi","Halima","Victor","Queen","Samuel","Ruth","Daniel","Esther","Bola","Felix","Amara","Sule","Titilayo","George","Nkiru","Abdul"];
+      var avWinners = [], avWinnersTimer = null;
+      function avMaskName(name){
+        if (name.length <= 2) return name.charAt(0) + "***";
+        return name.charAt(0) + "***" + name.charAt(name.length - 1);
+      }
+      function avWinnerAmount(){
+        // Skewed low: most wins are modest cash-outs, a few are big.
+        var r = Math.random();
+        if (r < 0.7) return round2(3 + Math.random() * 57);
+        if (r < 0.93) return round2(60 + Math.random() * 240);
+        return round2(300 + Math.random() * 900);
+      }
+      function avRenderWinners(){
+        var el = $("avWinners");
+        if (!el) return;
+        el.innerHTML = avWinners.map(function(w, i){
+          return '<div class="av-win-row' + (i === 0 ? " fresh" : "") + '"><span class="av-win-name">' + w.name + '</span><span class="av-win-amt">won ' + fmtUSD(w.amount) + "</span></div>";
+        }).join("");
+      }
+      function avPushWinner(){
+        var name = AV_WINNER_NAMES[Math.floor(Math.random() * AV_WINNER_NAMES.length)];
+        avWinners.unshift({ name: avMaskName(name), amount: avWinnerAmount() });
+        if (avWinners.length > 10) avWinners.length = 10;
+        avRenderWinners();
+      }
+      function avWinnersSchedule(){
+        avWinnersTimer = setTimeout(function(){
+          avPushWinner();
+          avWinnersSchedule();
+        }, 10000 + Math.random() * 15000); // next entry in 10–25s
+      }
+      function avWinnersStart(){
+        if (avWinnersTimer) return;
+        if (!avWinners.length){ for (var i = 0; i < 4; i++) avPushWinner(); }
+        avWinnersSchedule();
+      }
+      function avWinnersStop(){
+        if (avWinnersTimer){ clearTimeout(avWinnersTimer); avWinnersTimer = null; }
+      }
+
       /* ================= Spin Wheel =================
          The wheel is drawn as six EQUAL segments — presentation only.
          The outcome is drawn by the segment weights first, then the
@@ -3856,6 +4181,7 @@
               toast("Couldn't record the spin", "Your stake was returned to your Main Balance — please try again.", "lose");
               return;
             }
+            addWagering(stake); // game stakes count toward the playthrough
             renderWallets();
             var target = ((-seg.center) % 360 + 360) % 360;
             var cur = ((spinState.rotation % 360) + 360) % 360;
@@ -4108,6 +4434,7 @@
               deadPasses: 0, stalemate: null,
               lastAction: "Match started — your move."
             };
+            addWagering(stake); // game stakes count toward the playthrough
             whotPendingWild = -1;
             whot.user = whotDrawCards(6);
             whot.comp = whotDrawCards(6);
@@ -4358,6 +4685,8 @@
         buildWheel();
         loadRecentPlays();
         resolveStaleAviatorPlays();
+        avRefreshBidCount();
+        avWinnersStart();
         refreshWhotWinCount();
         if (!av) avResetCycle();
         if (!avTimer) avTimer = setInterval(avTick, 100);
@@ -4366,6 +4695,7 @@
       }
       function stopGames(){
         if (avTimer){ clearInterval(avTimer); avTimer = null; }
+        avWinnersStop();
         av = null; whot = null; whotPendingWild = -1;
         spinState.spinning = false;
       }
