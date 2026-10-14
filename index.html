@@ -573,6 +573,91 @@
       .pw-toggle.on .ico-eye{display:none;}
       .pw-toggle.on .ico-eye-off{display:block;}
 
+      /* ---------- Games (Aviator / Spin Wheel / Whot) ---------- */
+      .games-grid{display:grid; grid-template-columns:1fr; gap:14px; margin-top:14px; align-items:start;}
+      @media (min-width:920px){
+        .games-grid{grid-template-columns:1fr 1fr;}
+        .games-grid .panel.wide{grid-column:1 / -1;}
+      }
+      .recent-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;}
+      .recent-label{font-size:10.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted-2); flex:0 0 auto;}
+      .recent-strip{display:flex; gap:5px; flex-wrap:wrap;}
+      .recent-none{font-size:12px; color:var(--muted-2);}
+      .game-banner{margin-top:12px; border:1px solid var(--line-soft); background:var(--bg-deep); border-radius:12px; padding:11px 13px; font-size:13.5px; font-weight:700; line-height:1.5;}
+      .game-banner.win{border-color:var(--green); color:#B9F2DA;}
+      .game-banner.lose{border-color:var(--red); color:#F6C1BD;}
+      .game-controls{display:grid; gap:10px; margin-top:12px;}
+      .game-btn{width:100%; padding:13px 10px; flex:none;}
+      .game-btn.cashout{background:linear-gradient(160deg, #1E9E6A, #14714B); border-color:#1E9E6A; color:#fff;}
+      .game-note{font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.55; min-height:18px;}
+
+      /* Aviator */
+      .av-sky{position:relative; height:172px; background:linear-gradient(180deg, #0A1030, #101A48); border:1px solid var(--line-soft); border-radius:14px; overflow:hidden;}
+      .av-mult{position:absolute; top:12px; left:14px; font-family:"Sora",sans-serif; font-weight:800; font-size:31px; color:var(--gold-bright); line-height:1;}
+      .av-status{position:absolute; top:14px; right:14px; font-size:12px; font-weight:800; color:var(--muted); text-align:right; max-width:52%; line-height:1.45;}
+      .av-plane{position:absolute; left:3%; bottom:9%; transition:left .12s linear, bottom .12s linear, transform .3s ease, opacity .3s ease; filter:drop-shadow(0 4px 8px rgba(0,0,0,.45));}
+      .av-plane.crashed{opacity:.3; transform:rotate(42deg);}
+      .av-ground{position:absolute; left:0; right:0; bottom:0; height:6px; background:repeating-linear-gradient(90deg, var(--gold) 0 14px, transparent 14px 28px); opacity:.45;}
+
+      /* Spin wheel */
+      .wheel-wrap{position:relative; width:min(280px, 78vw); margin:8px auto 0;}
+      #spinWheelSvg{display:block; width:100%; height:auto; transform-origin:50% 50%;}
+      .wheel-pointer{position:absolute; top:-5px; left:50%; transform:translateX(-50%); z-index:2; width:0; height:0; border-left:11px solid transparent; border-right:11px solid transparent; border-top:18px solid var(--gold-bright);}
+      .wheel-hub{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:58px; height:58px; border-radius:50%; background:var(--card-2); border:2px solid var(--gold); color:var(--gold-bright); display:flex; align-items:center; justify-content:center; font-family:"Sora",sans-serif; font-weight:800; font-size:12px; letter-spacing:.5px; pointer-events:none;}
+      .spin-legend{display:grid; gap:6px; margin-top:14px;}
+      .spin-legend .sl-row{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted);}
+      .spin-legend .sl-dot{width:11px; height:11px; border-radius:3px; flex:0 0 auto;}
+      .spin-legend .sl-pct{margin-left:auto; font-weight:800; color:var(--text);}
+
+      /* Whot */
+      .whot-top{display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+      .whot-comp-info{flex:1; min-width:160px;}
+      .whot-comp-name{font-family:"Sora",sans-serif; font-weight:800; font-size:14.5px;}
+      .whot-comp-action{font-size:12px; color:var(--muted); margin-top:3px; line-height:1.5; min-height:18px;}
+      .whot-backs{display:flex; align-items:center; padding-left:12px;}
+      .whot-back{width:26px; height:38px; margin-left:-12px; border-radius:5px; border:1px solid var(--line); background:repeating-linear-gradient(45deg, #1B2450 0 5px, #141B40 5px 10px); flex:0 0 auto;}
+      .whot-backs .wb-more{font-size:12px; font-weight:800; color:var(--muted); margin-left:6px;}
+      .whot-mid{display:flex; align-items:flex-start; justify-content:center; gap:30px; margin-top:16px;}
+      .whot-pilebox{text-align:center;}
+      .whot-mini-label{font-size:10.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted-2); margin-bottom:6px;}
+      .whot-required{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; font-size:12.5px; color:var(--muted); font-weight:700;}
+      .whot-card{
+        width:56px; height:78px; border-radius:10px; padding:4px;
+        background:linear-gradient(165deg, #FCF9F0, #EDE6D2); color:#1B2140;
+        border:1px solid rgba(0,0,0,.3);
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+      }
+      .whot-card .wc-num{font-family:"Sora",sans-serif; font-weight:800; font-size:19px; line-height:1;}
+      .whot-card .wc-special{font-size:8px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; color:#5A6285; text-align:center; line-height:1.3;}
+      .whot-card.wild{background:linear-gradient(165deg, #1B2450, #0F173C); color:var(--gold-bright); border-color:var(--gold);}
+      .whot-card .wc-whot{font-family:"Sora",sans-serif; font-weight:800; font-size:14px; letter-spacing:1px;}
+      .whot-card .wc-wild-sub{font-size:8.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; font-weight:800;}
+      button.whot-card{cursor:pointer; font-family:inherit; transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;}
+      button.whot-card:disabled{cursor:default;}
+      .whot-card.dim{opacity:.42;}
+      .whot-card.playable{box-shadow:0 0 0 2px var(--gold); transform:translateY(-4px);}
+      .whot-card.drawn{box-shadow:0 0 0 2px var(--green);}
+      .whot-deck{
+        width:56px; height:78px; border-radius:10px; border:1px solid var(--line);
+        background:repeating-linear-gradient(45deg, #232B5C 0 6px, #171F52 6px 12px);
+        color:var(--gold-bright); cursor:pointer;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+        font-family:"Sora",sans-serif; font-weight:800; padding:4px;
+      }
+      .whot-deck:disabled{opacity:.45; cursor:not-allowed;}
+      .whot-deck .wd-count{font-size:17px; line-height:1;}
+      .whot-deck .wd-label{font-size:8.5px; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); font-family:"Manrope",sans-serif;}
+      .whot-hand{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; justify-content:center;}
+      .whot-empty{font-size:13px; color:var(--muted-2); text-align:center; width:100%; padding:10px 0;}
+      .whot-suits{display:none; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; font-size:13px; font-weight:700;}
+      .whot-suits.show{display:flex;}
+      .whot-suits button{
+        cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+        border:1px solid var(--line); background:rgba(201,162,75,.08); color:var(--text);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:12.5px; padding:8px 11px; border-radius:9px;
+      }
+      .whot-suits button:active{transform:translateY(1px);}
+
       /* ---------- Toasts ---------- */
       .toasts{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:80; width:min(92vw, 420px); display:flex; flex-direction:column; gap:8px;}
       .toast{
@@ -866,6 +951,108 @@
           </div>
           <div id="walletPane" style="display:none;">
             <div class="hist-list" id="walletHistory"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Games -->
+      <div class="games-grid">
+        <!-- Aviator -->
+        <section class="panel" aria-label="Aviator game">
+          <h2 class="sec">Aviator
+            <button class="info-btn" id="avInfoBtn" type="button" aria-expanded="false" aria-controls="avCardSub" aria-label="About Aviator">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="avCardSub">Every 30 seconds a new flight opens for bids — enter at least $1 and tap Place Bid before takeoff. The multiplier starts at 1.00x and climbs 0.10x every second, so 10 seconds of flight is 2.00x. Tap Cash Out while the plane is flying to bank your stake × the multiplier shown. If the plane crashes first, the bid is lost — and if you hold past 1.50x without cashing out, the bid crashes on the spot. Flights last at most 100 seconds (11.00x).</p>
+          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="avRecent"><span class="recent-none">No rounds yet</span></div></div>
+          <div class="av-sky">
+            <div class="av-mult num" id="avMult">—</div>
+            <div class="av-status" id="avStatus">Next flight in 0:30</div>
+            <div class="av-plane" id="avPlane"><svg width="36" height="36" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.7 20.3 21.9 12 2.7 3.7l2.5 6.8L16.8 12l-11.6 1.5z" fill="#E7CB7E" stroke="#9A7B2D" stroke-width=".8" stroke-linejoin="round"/></svg></div>
+            <div class="av-ground"></div>
+          </div>
+          <div class="game-banner" id="avBanner" style="display:none;"></div>
+          <div class="game-controls">
+            <div class="field">
+              <label for="avAmount">Bid amount (min $1)</label>
+              <div class="stake-wrap"><span>$</span><input id="avAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <button class="btn game-btn" id="avBidBtn" type="button">Place Bid</button>
+            <button class="btn game-btn cashout" id="avCashBtn" type="button" style="display:none;">Cash Out $0.00</button>
+          </div>
+          <p class="game-note" id="avBidState">Bids close when the countdown ends. No bid? The flight still runs — watch it for free.</p>
+        </section>
+
+        <!-- Spin Wheel -->
+        <section class="panel" aria-label="Spin Wheel game">
+          <h2 class="sec">Spin Wheel
+            <button class="info-btn" id="spinInfoBtn" type="button" aria-expanded="false" aria-controls="spinCardSub" aria-label="About Spin Wheel">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="spinCardSub">Enter at least $1 and spin. The wheel is weighted: Try again 70% (stake lost), $1 reward 10% (your stake back plus $1), $0.50 reward 10% (your stake back plus $0.50), No result 9% (stake returned), 2x 0.9% (double your stake), 10x 0.1% (ten times your stake). Winnings are credited to your Main Balance.</p>
+          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="spinRecent"><span class="recent-none">No rounds yet</span></div></div>
+          <div class="wheel-wrap">
+            <div class="wheel-pointer"></div>
+            <svg id="spinWheelSvg" viewBox="0 0 260 260" role="img" aria-label="Spin wheel with five weighted segments"></svg>
+            <div class="wheel-hub">SPIN</div>
+          </div>
+          <div class="game-banner" id="spinBanner" style="display:none;"></div>
+          <div class="game-controls">
+            <div class="field">
+              <label for="spinAmount">Bid amount (min $1)</label>
+              <div class="stake-wrap"><span>$</span><input id="spinAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <button class="btn game-btn" id="spinBtn" type="button">Spin</button>
+          </div>
+          <div class="spin-legend">
+            <div class="sl-row"><span class="sl-dot" style="background:#2A2150;"></span>Try again — stake lost<span class="sl-pct num">70%</span></div>
+            <div class="sl-row"><span class="sl-dot" style="background:#14714B;"></span>$1 reward — stake + $1<span class="sl-pct num">10%</span></div>
+            <div class="sl-row"><span class="sl-dot" style="background:#2F9E77;"></span>$0.50 reward — stake + $0.50<span class="sl-pct num">10%</span></div>
+            <div class="sl-row"><span class="sl-dot" style="background:#3D4A7A;"></span>No result — stake returned<span class="sl-pct num">9%</span></div>
+            <div class="sl-row"><span class="sl-dot" style="background:#9A7B2D;"></span>2x — double your stake<span class="sl-pct num">0.9%</span></div>
+            <div class="sl-row"><span class="sl-dot" style="background:#C9A24B;"></span>10x — ten times your stake<span class="sl-pct num">0.1%</span></div>
+          </div>
+        </section>
+
+        <!-- Whot -->
+        <section class="panel wide" aria-label="Whot card game">
+          <h2 class="sec">Whot
+            <button class="info-btn" id="whotInfoBtn" type="button" aria-expanded="false" aria-controls="whotCardSub" aria-label="About Whot">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="whotCardSub">Nigerian Whot against the computer. You both start with 6 cards — play a card that matches the pile's shape or number, or play a Whot wild card and call any shape. Specials: 1 = Hold On (play again), 2 = opponent picks 2 and misses a turn, 5 = opponent picks 3 and misses a turn, 8 = Suspension (opponent misses a turn), 14 = General Market (both players pick 1). If you can't play, pick 1 from the market — if it plays, you may play it, otherwise the turn passes. First to empty their hand wins their stake plus 80% profit.</p>
+          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="whotRecent"><span class="recent-none">No rounds yet</span></div></div>
+          <div class="whot-top">
+            <div class="whot-comp-info">
+              <div class="whot-comp-name">Computer · <span class="num" id="whotCompCount">—</span> cards</div>
+              <div class="whot-comp-action" id="whotCompAction">Waiting for a challenger — start a match below.</div>
+            </div>
+            <div class="whot-backs" id="whotBacks"></div>
+          </div>
+          <div class="whot-mid">
+            <div class="whot-pilebox">
+              <div class="whot-mini-label">Pile</div>
+              <div id="whotPile"><div class="whot-card dim"><span class="wc-num" style="color:#5A6285;">–</span></div></div>
+            </div>
+            <div class="whot-pilebox">
+              <div class="whot-mini-label">Market</div>
+              <button class="whot-deck" id="whotDeckBtn" type="button" disabled><span class="wd-count num" id="whotDeckCount">64</span><span class="wd-label">Pick 1</span></button>
+            </div>
+          </div>
+          <div class="whot-required" id="whotRequired" style="display:none;"></div>
+          <div class="game-banner" id="whotBanner">Enter a bid (min $1) and tap Play — first to empty their hand wins stake + 80%.</div>
+          <div class="whot-suits" id="whotSuitPicker"><span>Call a shape:</span></div>
+          <div class="whot-hand" id="whotHand"><div class="whot-empty">Your cards will appear here.</div></div>
+          <div class="game-controls">
+            <div class="field">
+              <label for="whotAmount">Bid amount (min $1)</label>
+              <div class="stake-wrap"><span>$</span><input id="whotAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <button class="btn game-btn" id="whotPlayBtn" type="button">Play</button>
+            <button class="btn game-btn ghost" id="whotPassBtn" type="button" style="display:none;">Pass turn</button>
           </div>
         </section>
       </div>
@@ -2000,6 +2187,7 @@
           $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
           renderWallets(); renderHistory(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods(); renderOpenTrades(); renderPayout();
           settleUnpaidBids();
+          if (typeof loadRecentPlays === "function") loadRecentPlays();
           resumeDepositWatchers();
           checkAutoSettle();
         }).catch(function(){ refreshBusy = false; });
@@ -2983,10 +3171,12 @@
         settleUnpaidBids();
         resumeDepositWatchers();
         checkAutoSettle();
+        if (typeof initGames === "function") initGames();
       }
       function showGate(){
         teardownRealtime();
         stopAllDepositWatchers();
+        if (typeof stopGames === "function") stopGames();
         bidSettleMode = "manual";
         currentUser = null; profileRow = null; walletRow = null;
         state = blankState();
@@ -3160,6 +3350,818 @@
           }
         });
       }
+    </script>
+    <script>
+      /* ================= Games: Aviator · Spin Wheel · Whot =================
+         Every round is recorded in tn_plays (game, stake, payout, status,
+         detail). Stakes lock out of Main Balance at play time through the
+         wallet write path; winnings credit back to Main Balance the same
+         way. Game wins also pay the standard 1% referral share of the
+         profit, ledgered in tn_referral_earnings under source_type
+         'game_round' with the play's row id as source_id. */
+      var GAME_MIN_STAKE = 1;
+      var playsDetailKnown = null; // null = untested, true = present, false = absent (detail jsonb column)
+      var playsRecent = { aviator: [], spin: [], whot: [] };
+      function round2(n){ return Math.round(n * 100) / 100; }
+
+      function insertPlay(game, stake, detail){
+        if (!sb || !currentUser) return Promise.resolve(null);
+        function attempt(withDetail){
+          var row = { user_id: currentUser.id, game: game, stake: stake, payout: 0, status: "pending" };
+          if (withDetail) row.detail = detail || {};
+          return sb.from("tn_plays").insert(row).select().single();
+        }
+        return attempt(playsDetailKnown !== false).then(function(res){
+          if (!res.error){ playsDetailKnown = true; return res.data ? res.data.id : null; }
+          if (playsDetailKnown !== false){
+            playsDetailKnown = false;
+            return attempt(false).then(function(r2){ return (!r2.error && r2.data) ? r2.data.id : null; });
+          }
+          return null;
+        }).catch(function(){ return null; });
+      }
+      function updatePlay(id, status, payout, detail){
+        if (!sb || !id) return Promise.resolve(false);
+        function attempt(withDetail){
+          var patch = { status: status, payout: payout };
+          if (withDetail && detail) patch.detail = detail;
+          return sb.from("tn_plays").update(patch).eq("id", id);
+        }
+        return attempt(playsDetailKnown !== false).then(function(res){
+          if (!res.error) return true;
+          if (playsDetailKnown !== false){
+            playsDetailKnown = false;
+            return attempt(false).then(function(r2){ return !r2.error; });
+          }
+          return false;
+        }).catch(function(){ return false; });
+      }
+      function renderRecent(game){
+        var el = $(game === "aviator" ? "avRecent" : game === "spin" ? "spinRecent" : "whotRecent");
+        if (!el) return;
+        var rows = playsRecent[game] || [];
+        if (!rows.length){ el.innerHTML = '<span class="recent-none">No rounds yet</span>'; return; }
+        el.innerHTML = rows.map(function(p){
+          var t = fmtTime(p.time);
+          if (p.status === "won"){
+            var pr = round2(p.payout - p.stake);
+            return '<span class="res-tag won" title="' + t + '">' + (pr > 0 ? "+" : "") + fmtUSD(pr) + "</span>";
+          }
+          if (p.status === "lost") return '<span class="res-tag lost" title="' + t + '">' + fmtUSD(-p.stake) + "</span>";
+          if (p.status === "draw") return '<span class="res-tag tie" title="' + t + '">Returned</span>';
+          return '<span class="res-tag await" title="' + t + '">Pending</span>';
+        }).join("");
+      }
+      function pushRecent(game, entry){
+        if (!playsRecent[game]) playsRecent[game] = [];
+        playsRecent[game].unshift(entry);
+        if (playsRecent[game].length > 8) playsRecent[game].length = 8;
+        renderRecent(game);
+      }
+      function loadRecentPlays(){
+        if (!sb || !currentUser) return;
+        sb.from("tn_plays").select("*").eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false }).limit(24).then(function(res){
+            if (res.error) return;
+            var fresh = { aviator: [], spin: [], whot: [] };
+            (res.data || []).forEach(function(r){
+              if (!fresh[r.game] || fresh[r.game].length >= 8) return;
+              fresh[r.game].push({
+                stake: Number(r.stake) || 0, payout: Number(r.payout) || 0, status: r.status,
+                time: r.created_at ? new Date(r.created_at).getTime() : Date.now()
+              });
+            });
+            playsRecent = fresh;
+            renderRecent("aviator"); renderRecent("spin"); renderRecent("whot");
+          }).catch(function(){});
+      }
+      function gameStakeFrom(inputId){
+        var v = parseFloat($(inputId).value);
+        return isFinite(v) ? Math.floor(v * 100) / 100 : 0;
+      }
+      function validateGameStake(stake){
+        if (!(stake >= GAME_MIN_STAKE)){ toast("Minimum stake is $1", "Enter at least $1 to play."); return false; }
+        if (stake > state.main){ toast("Insufficient Main Balance", "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + "."); return false; }
+        return true;
+      }
+
+      /* ================= Aviator =================
+         BETTING (30s) → FLYING → RESOLVED (5s) → BETTING… The crash
+         multiplier is fixed at takeoff: 60% early crash 1.00x–1.30x,
+         40% fly round 2.0x–11.0x. The multiplier grows as 1 + t/10.
+         Greed rule: a bidder who has not cashed out by 1.50x loses the
+         bid on the spot; the plane still flies on to its predetermined
+         crash point for everyone watching. */
+      var AV_BET_MS = 30000, AV_RESOLVED_MS = 5000, AV_GREED_MULT = 1.5, AV_MAX_T = 100;
+      var av = null, avTimer = null, avBidBusy = false;
+      var avFlightNo = 0; // flights taken off in this page session (resets on reload)
+      function avResetCycle(){
+        av = { phase: "betting", endsAt: Date.now() + AV_BET_MS, flightStart: 0, crashMult: 0, bid: null };
+        var pl = $("avPlane"); if (pl) pl.classList.remove("crashed");
+        var bn = $("avBanner"); if (bn) bn.style.display = "none";
+      }
+      function avMultNow(){
+        if (!av || av.phase !== "flying") return 1;
+        var t = (Date.now() - av.flightStart) / 1000;
+        return Math.min(1 + t / 10, 11);
+      }
+      function avRenderFlight(m){
+        $("avMult").textContent = m.toFixed(2) + "x";
+        var t = (Date.now() - av.flightStart) / 1000;
+        var p = Math.sqrt(Math.min(t, AV_MAX_T) / AV_MAX_T);
+        var plane = $("avPlane");
+        plane.style.left = (3 + p * 82) + "%";
+        plane.style.bottom = (9 + p * 64) + "%";
+        if (av.bid && av.bid.active) $("avCashBtn").textContent = "Cash Out " + fmtUSD(round2(av.bid.stake * m));
+      }
+      function avRender(){
+        if (!av) return;
+        var bidBtn = $("avBidBtn"), cashBtn = $("avCashBtn"), amt = $("avAmount"), note = $("avBidState");
+        var b = av.bid;
+        if (av.phase === "betting"){
+          $("avMult").textContent = "—";
+          var plane = $("avPlane");
+          plane.style.left = "3%"; plane.style.bottom = "9%";
+          bidBtn.style.display = ""; cashBtn.style.display = "none";
+          bidBtn.disabled = !!b || avBidBusy;
+          bidBtn.textContent = avBidBusy ? "Placing…" : (b ? "Bid locked · " + fmtUSD(b.stake) : "Place Bid");
+          amt.disabled = !!b || avBidBusy;
+          note.textContent = b
+            ? "Your bid is locked for the next flight — cash out before the crash, and before 1.50x."
+            : "Bids close when the countdown ends. No bid? The flight still runs — watch it for free.";
+        } else if (av.phase === "flying"){
+          bidBtn.style.display = "none";
+          cashBtn.style.display = (b && b.active) ? "" : "none";
+          amt.disabled = true;
+          note.textContent = !b
+            ? "No bid on this flight — sit back and watch."
+            : b.active ? "Cash out before the plane crashes — hold past 1.50x and the bid is gone."
+            : b.cashed ? "Cashed out at " + b.cashMult.toFixed(2) + "x — the flight continues to its crash point."
+            : "Bid lost — the flight continues to its crash point.";
+          avRenderFlight(avMultNow());
+        } else {
+          bidBtn.style.display = "none"; cashBtn.style.display = "none";
+          note.textContent = "Next round opens in a few seconds…";
+        }
+      }
+      function avStartFlight(){
+        av.phase = "flying";
+        av.flightStart = Date.now();
+        avFlightNo++;
+        if (avFlightNo > 6){
+          // From the 7th flight of the session the sky turns hostile:
+          // 90% of rounds crash at 1.01x — effectively no cashout window —
+          // and the other 10% are normal fly rounds (greed rule applies).
+          av.crashMult = Math.random() < 0.9 ? 1.01 : round2(2 + Math.random() * 9);
+        } else {
+          av.crashMult = Math.random() < 0.6
+            ? round2(1 + Math.random() * 0.30)
+            : round2(2 + Math.random() * 9);
+        }
+        $("avBanner").style.display = "none";
+        $("avStatus").textContent = "Flying…";
+        avRender();
+      }
+      function avResolveBidLost(cm, greed){
+        var bid = av.bid;
+        if (!bid || !bid.active) return;
+        bid.active = false; bid.lost = true; bid.greed = !!greed; bid.lostMult = cm;
+        updatePlay(bid.playId, "lost", 0, { crash_mult: cm });
+        pushRecent("aviator", { stake: bid.stake, payout: 0, status: "lost", time: Date.now() });
+        toast("Aviator bid lost",
+          greed ? "You held past 1.50x — the bid crashed at 1.50x. Stake of " + fmtUSD(bid.stake) + " forfeited."
+                : "The plane crashed at " + cm.toFixed(2) + "x before you cashed out. Stake of " + fmtUSD(bid.stake) + " forfeited.",
+          "lose");
+        avRender();
+      }
+      function avCrash(){
+        if (av.bid && av.bid.active) avResolveBidLost(av.crashMult, false);
+        av.phase = "resolved";
+        av.endsAt = Date.now() + AV_RESOLVED_MS;
+        $("avPlane").classList.add("crashed");
+        $("avStatus").textContent = "Crashed at " + av.crashMult.toFixed(2) + "x";
+        var b = $("avBanner"), bid = av.bid;
+        b.style.display = "";
+        if (bid && bid.cashed){
+          b.className = "game-banner win";
+          b.textContent = "Cashed out at " + bid.cashMult.toFixed(2) + "x · won " + fmtUSD(bid.payout) + " — the flight crashed at " + av.crashMult.toFixed(2) + "x.";
+        } else if (bid && bid.lost){
+          b.className = "game-banner lose";
+          b.textContent = bid.greed
+            ? "Bid lost — held past 1.50x. The flight itself crashed at " + av.crashMult.toFixed(2) + "x."
+            : "Crashed at " + av.crashMult.toFixed(2) + "x · bid lost.";
+        } else {
+          b.className = "game-banner";
+          b.textContent = "Flight crashed at " + av.crashMult.toFixed(2) + "x. Next flight opens shortly.";
+        }
+        avRender();
+      }
+      function avTick(){
+        if (!av || !currentUser) return;
+        var now = Date.now();
+        if (av.phase === "betting"){
+          if (now >= av.endsAt){ avStartFlight(); return; }
+          var s = Math.max(0, Math.ceil((av.endsAt - now) / 1000));
+          $("avStatus").textContent = "Next flight in 0:" + (s < 10 ? "0" : "") + s;
+          return;
+        }
+        if (av.phase === "flying"){
+          var m = avMultNow();
+          if (av.bid && av.bid.active && m >= AV_GREED_MULT && av.crashMult > AV_GREED_MULT) avResolveBidLost(AV_GREED_MULT, true);
+          if (m >= av.crashMult){ avCrash(); return; }
+          avRenderFlight(m);
+          return;
+        }
+        if (av.phase === "resolved" && now >= av.endsAt){
+          avResetCycle();
+          avRender();
+        }
+      }
+      function avPlaceBid(){
+        if (avBidBusy || !av || av.phase !== "betting" || av.bid) return;
+        if (!sb || !currentUser){ toast("Not signed in", "Log in again to play."); return; }
+        var stake = gameStakeFrom("avAmount");
+        if (!validateGameStake(stake)) return;
+        avBidBusy = true; avRender();
+        var prevMain = state.main;
+        state.main = round2(state.main - stake);
+        persistWallet().then(function(ok){
+          if (!ok){ state.main = prevMain; avBidBusy = false; renderWallets(); avRender(); return; }
+          return insertPlay("aviator", stake, null).then(function(playId){
+            avBidBusy = false;
+            if (!playId){
+              state.main = prevMain; persistWallet(); renderWallets(); avRender();
+              toast("Couldn't record the bid", "Your stake was returned to your Main Balance — please try again.", "lose");
+              return;
+            }
+            av.bid = { playId: playId, stake: stake, active: true, cashed: false, lost: false };
+            renderWallets(); avRender();
+            toast("Bid placed · " + fmtUSD(stake), "Locked from Main Balance for the next flight — cash out before the crash, and before 1.50x.");
+          });
+        });
+      }
+      function avCashOut(){
+        if (!av || av.phase !== "flying" || !av.bid || !av.bid.active) return;
+        var m = avMultNow();
+        if (m >= av.crashMult) return; // too late — the crash tick settles it
+        var bid = av.bid;
+        bid.active = false; bid.cashed = true;
+        bid.cashMult = round2(m);
+        bid.payout = round2(bid.stake * m);
+        state.main = round2(state.main + bid.payout);
+        persistWallet();
+        updatePlay(bid.playId, "won", bid.payout, { cashout_mult: bid.cashMult });
+        // Referral share: 1% of the profit (payout − stake), if any.
+        var avProfit = round2(bid.payout - bid.stake);
+        if (avProfit > 0) creditReferralShare("game_round", bid.playId, avProfit);
+        pushRecent("aviator", { stake: bid.stake, payout: bid.payout, status: "won", time: Date.now() });
+        renderWallets(); avRender();
+        toast("Cashed out at " + bid.cashMult.toFixed(2) + "x", fmtUSD(bid.payout) + " credited to your Main Balance.", "win");
+      }
+      // A pending aviator play left over from a closed session can never
+      // be cashed out — the flight always ends in a crash. Resolve any
+      // older than 3 minutes as lost on app load.
+      function resolveStaleAviatorPlays(){
+        if (!sb || !currentUser) return;
+        var cutoff = new Date(Date.now() - 3 * 60000).toISOString();
+        sb.from("tn_plays").update({ status: "lost", payout: 0 })
+          .eq("user_id", currentUser.id).eq("game", "aviator").eq("status", "pending").lt("created_at", cutoff)
+          .then(function(){ loadRecentPlays(); }).catch(function(){});
+      }
+      /* ================= Spin Wheel =================
+         Segments are sized by their true weights. The outcome is drawn
+         by weight first, then the wheel is rotated (with a 4s easing
+         spin) so the pointer lands in the middle of that segment. */
+      var SPIN_SEGS = [
+        { key: "again",   label: "Try again", w: 70,  fill: "#2A2150", text: "#9AA3C7" },
+        { key: "reward1", label: "$1 reward", w: 10,  fill: "#14714B", text: "#D9F5E7" },
+        { key: "reward05", label: "$0.50 reward", w: 10, fill: "#2F9E77", text: "#E2F7EC" },
+        { key: "none",    label: "No result", w: 9,   fill: "#3D4A7A", text: "#C7CEE8" },
+        { key: "x2",      label: "2x",        w: 0.9, fill: "#9A7B2D", text: "#FFF3D6" },
+        { key: "x10",     label: "10x",       w: 0.1, fill: "#C9A24B", text: "#181203" }
+      ];
+      var spinState = { spinning: false, rotation: 0 };
+      function spinPick(){
+        var r = Math.random() * 100, acc = 0;
+        for (var i = 0; i < SPIN_SEGS.length; i++){ acc += SPIN_SEGS[i].w; if (r < acc) return i; }
+        return 0;
+      }
+      function buildWheel(){
+        var svg = $("spinWheelSvg");
+        if (!svg || svg.childNodes.length) return;
+        var cx = 130, cy = 130, r = 124, a = 0, parts = "";
+        SPIN_SEGS.forEach(function(seg){
+          var sweep = seg.w / 100 * 360;
+          var a1 = a, a2 = a + sweep; a = a2;
+          seg.center = a1 + sweep / 2;
+          function pt(ang){
+            var rad = ang * Math.PI / 180;
+            return (cx + r * Math.sin(rad)).toFixed(2) + " " + (cy - r * Math.cos(rad)).toFixed(2);
+          }
+          parts += '<path d="M ' + cx + " " + cy + " L " + pt(a1) + " A " + r + " " + r + " 0 " + (sweep > 180 ? 1 : 0) + " 1 " + pt(a2) + ' Z" fill="' + seg.fill + '" stroke="#0B1132" stroke-width="2"/>';
+          if (sweep >= 30){
+            var rad = seg.center * Math.PI / 180, lr = r * 0.64;
+            var lx = cx + lr * Math.sin(rad), ly = cy - lr * Math.cos(rad);
+            parts += '<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" fill="' + seg.text + '" font-size="15" font-weight="800" font-family="Sora, sans-serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(' + seg.center.toFixed(1) + " " + lx.toFixed(1) + " " + ly.toFixed(1) + ')">' + seg.label + "</text>";
+          }
+        });
+        parts += '<circle cx="130" cy="130" r="30" fill="#0F173C" stroke="#C9A24B" stroke-width="2"/>';
+        svg.innerHTML = parts;
+      }
+      function spinGo(){
+        if (spinState.spinning) return;
+        if (!sb || !currentUser){ toast("Not signed in", "Log in again to play."); return; }
+        var stake = gameStakeFrom("spinAmount");
+        if (!validateGameStake(stake)) return;
+        var seg = SPIN_SEGS[spinPick()];
+        spinState.spinning = true;
+        $("spinBtn").disabled = true;
+        $("spinBanner").style.display = "none";
+        var prevMain = state.main;
+        state.main = round2(state.main - stake);
+        persistWallet().then(function(ok){
+          if (!ok){ state.main = prevMain; spinState.spinning = false; $("spinBtn").disabled = false; renderWallets(); return; }
+          return insertPlay("spin", stake, { outcome: seg.key }).then(function(playId){
+            if (!playId){
+              state.main = prevMain; persistWallet(); spinState.spinning = false; $("spinBtn").disabled = false; renderWallets();
+              toast("Couldn't record the spin", "Your stake was returned to your Main Balance — please try again.", "lose");
+              return;
+            }
+            renderWallets();
+            var target = ((-seg.center) % 360 + 360) % 360;
+            var cur = ((spinState.rotation % 360) + 360) % 360;
+            var delta = ((target - cur) % 360 + 360) % 360;
+            spinState.rotation += 360 * 6 + delta;
+            var svg = $("spinWheelSvg");
+            svg.style.transition = "transform 4s cubic-bezier(.12,.75,.08,1)";
+            svg.style.transform = "rotate(" + spinState.rotation + "deg)";
+            setTimeout(function(){ spinSettle(stake, seg, playId); }, 4300);
+          });
+        });
+      }
+      function spinSettle(stake, seg, playId){
+        var payout = 0, status = "lost", profit = 0;
+        if (seg.key === "reward1"){ payout = round2(stake + 1); status = "won"; profit = 1; }
+        else if (seg.key === "reward05"){ payout = round2(stake + 0.5); status = "won"; profit = 0.5; }
+        else if (seg.key === "none"){ payout = stake; status = "draw"; }
+        else if (seg.key === "x2"){ payout = round2(stake * 2); status = "won"; profit = stake; }
+        else if (seg.key === "x10"){ payout = round2(stake * 10); status = "won"; profit = 9 * stake; }
+        if (payout > 0) state.main = round2(state.main + payout);
+        persistWallet();
+        updatePlay(playId, status, payout, { outcome: seg.key });
+        // Referral share: 1% of the profit, ledgered under this play's id.
+        if (status === "won" && profit > 0) creditReferralShare("game_round", playId, profit);
+        pushRecent("spin", { stake: stake, payout: payout, status: status, time: Date.now() });
+        var b = $("spinBanner");
+        b.style.display = "";
+        if (seg.key === "again"){ b.className = "game-banner lose"; b.textContent = "Try again — your " + fmtUSD(stake) + " stake is lost."; }
+        else if (seg.key === "none"){ b.className = "game-banner"; b.textContent = "No result — your " + fmtUSD(stake) + " stake is returned to your Main Balance."; }
+        else { b.className = "game-banner win"; b.textContent = seg.label + "! " + fmtUSD(payout) + " credited to your Main Balance."; }
+        spinState.spinning = false;
+        $("spinBtn").disabled = false;
+        renderWallets();
+      }
+
+      /* ================= Whot =================
+         Nigerian Whot vs the computer. 5 shapes × 12 numbers + 4 wilds.
+         The computer plays honestly — it never looks at the user's
+         hand; it prefers plain cards, then specials, and only spends a
+         Whot wild when nothing else plays. */
+      var WHOT_SUITS = ["circle", "triangle", "cross", "square", "star"];
+      var WHOT_SUIT_NAMES = { circle: "Circle", triangle: "Triangle", cross: "Cross", square: "Square", star: "Star" };
+      var WHOT_SUIT_COLORS = { circle: "#C7433B", triangle: "#9A7B2D", cross: "#14714B", square: "#3D5A9E", star: "#7A4FA3" };
+      var WHOT_NUMS = [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14];
+      var WHOT_SPECIALS = { 1: "Hold On", 2: "Pick 2", 5: "Pick 3", 8: "Suspension", 14: "General Market" };
+      var whot = null, whotBusy = false, whotPendingWild = -1;
+      /* Adaptive difficulty: the bot plays honestly until the user has
+         3 Whot wins on record, then it hardens (see whotCompChooseHard).
+         The win count comes from tn_plays; a localStorage counter is
+         kept alongside as the fallback for when the table can't be read. */
+      var whotWinCount = 0, whotHardMode = false;
+      function whotLocalWins(){
+        try { return parseInt(localStorage.getItem("tn_whot_wins") || "0", 10) || 0; }
+        catch(e){ return 0; }
+      }
+      function refreshWhotWinCount(){
+        whotWinCount = whotLocalWins();
+        whotHardMode = whotWinCount >= 3;
+        if (!sb || !currentUser) return;
+        sb.from("tn_plays").select("*", { count: "exact", head: true })
+          .eq("user_id", currentUser.id).eq("game", "whot").eq("status", "won")
+          .then(function(res){
+            if (res.error || typeof res.count !== "number") return; // keep the local fallback
+            whotWinCount = res.count;
+            whotHardMode = whotWinCount >= 3;
+          }).catch(function(){ /* keep the local fallback */ });
+      }
+      function whotSuitSvg(suit, size){
+        size = size || 22;
+        var c = WHOT_SUIT_COLORS[suit], inner = "";
+        if (suit === "circle") inner = '<circle cx="12" cy="12" r="8" fill="' + c + '"/>';
+        else if (suit === "triangle") inner = '<polygon points="12,4 21,20 3,20" fill="' + c + '"/>';
+        else if (suit === "cross") inner = '<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="' + c + '"/>';
+        else if (suit === "square") inner = '<rect x="4" y="4" width="16" height="16" rx="2" fill="' + c + '"/>';
+        else inner = '<polygon points="12,2.5 14.8,8.7 21.5,9.4 16.5,14 18,20.5 12,17 6,20.5 7.5,14 2.5,9.4 9.2,8.7" fill="' + c + '"/>';
+        return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" aria-hidden="true">' + inner + "</svg>";
+      }
+      function whotCardInner(card){
+        if (card.whot) return '<span class="wc-whot">WHOT</span><span class="wc-wild-sub">Wild card</span>';
+        return '<span class="wc-num num" style="color:' + WHOT_SUIT_COLORS[card.suit] + '">' + card.num + '</span>' +
+               '<span class="wc-shape">' + whotSuitSvg(card.suit, 24) + "</span>" +
+               (WHOT_SPECIALS[card.num] ? '<span class="wc-special">' + WHOT_SPECIALS[card.num] + "</span>" : "");
+      }
+      function whotCardHtml(card){
+        return '<div class="whot-card' + (card.whot ? " wild" : "") + '">' + whotCardInner(card) + "</div>";
+      }
+      function whotCardName(card){
+        return card.whot ? "a Whot wild card" : WHOT_SUIT_NAMES[card.suit] + " " + card.num;
+      }
+      function whotBuildDeck(){
+        var deck = [];
+        WHOT_SUITS.forEach(function(s){ WHOT_NUMS.forEach(function(n){ deck.push({ suit: s, num: n, whot: false }); }); });
+        for (var i = 0; i < 4; i++) deck.push({ whot: true });
+        for (var j = deck.length - 1; j > 0; j--){
+          var k = Math.floor(Math.random() * (j + 1)), tmp = deck[j];
+          deck[j] = deck[k]; deck[k] = tmp;
+        }
+        return deck;
+      }
+      function whotTop(){ return whot.pile[whot.pile.length - 1]; }
+      function whotPlayable(card){
+        if (!whot || !card) return false;
+        if (card.whot) return true;
+        if (card.suit === whot.requiredSuit) return true;
+        var top = whotTop();
+        return !top.whot && card.num === top.num;
+      }
+      function whotDrawCards(n){
+        var out = [];
+        while (out.length < n){
+          if (!whot.deck.length){
+            if (whot.pile.length <= 1) break;
+            var top = whotTop(), rest = whot.pile.slice(0, -1);
+            for (var j = rest.length - 1; j > 0; j--){
+              var k = Math.floor(Math.random() * (j + 1)), tmp = rest[j];
+              rest[j] = rest[k]; rest[k] = tmp;
+            }
+            whot.deck = rest; whot.pile = [top];
+          }
+          out.push(whot.deck.pop());
+        }
+        return out;
+      }
+      function whotDrawInto(who, n){
+        var drawn = whotDrawCards(n);
+        (who === "user" ? whot.user : whot.comp).push.apply(who === "user" ? whot.user : whot.comp, drawn);
+        return drawn.length;
+      }
+      // Apply a played card (either side): move it to the pile, run its
+      // effect, and return who moves next — or null when the match ends.
+      function whotApplyPlay(who, card, calledSuit){
+        var hand = who === "user" ? whot.user : whot.comp;
+        var idx = hand.indexOf(card);
+        if (idx > -1) hand.splice(idx, 1);
+        whot.pile.push(card);
+        whot.rounds++;
+        whot.requiredSuit = card.whot ? (calledSuit || whot.requiredSuit) : card.suit;
+        if (!hand.length){ whotFinish(who); return null; }
+        var other = who === "user" ? "comp" : "user", next = other;
+        if (!card.whot){
+          if (card.num === 1 || card.num === 8) next = who;              // Hold On / Suspension
+          else if (card.num === 2){ whotDrawInto(other, 2); next = who; } // Pick 2 + miss a turn
+          else if (card.num === 5){ whotDrawInto(other, 3); next = who; } // Pick 3 + miss a turn
+          else if (card.num === 14){ whotDrawInto("user", 1); whotDrawInto("comp", 1); } // General Market
+        }
+        return next;
+      }
+      function whotEffectNote(card){
+        if (card.whot) return "";
+        if (card.num === 1) return " Hold On — plays again.";
+        if (card.num === 2) return " Pick 2 — the other side draws 2 and misses a turn.";
+        if (card.num === 5) return " Pick 3 — the other side draws 3 and misses a turn.";
+        if (card.num === 8) return " Suspension — the other side misses a turn.";
+        if (card.num === 14) return " General Market — both players pick 1.";
+        return "";
+      }
+      function whotAfterTurn(next){
+        if (!whot || whot.over){ whotRender(); return; }
+        whot.turn = next;
+        whot.drewThisTurn = false; // a fresh turn may pick from the market again
+        whotRender();
+        if (next === "comp") setTimeout(whotCompTurn, 950);
+      }
+      function whotFinish(winner){
+        whot.over = true; whot.winner = winner; whot.turn = null;
+        whotPendingWild = -1;
+        if (winner === "user"){
+          var payout = round2(whot.stake * 1.8);
+          state.main = round2(state.main + payout);
+          persistWallet();
+          updatePlay(whot.playId, "won", payout, { rounds_played: whot.rounds });
+          // Referral share: 1% of the profit (0.8 × stake).
+          creditReferralShare("game_round", whot.playId, round2(whot.stake * 0.8));
+          // This win counts toward the bot's adaptive difficulty.
+          whotWinCount++;
+          whotHardMode = whotWinCount >= 3;
+          try { localStorage.setItem("tn_whot_wins", String(whotWinCount)); } catch(e){}
+          pushRecent("whot", { stake: whot.stake, payout: payout, status: "won", time: Date.now() });
+          toast("You won the Whot match!", fmtUSD(payout) + " — your stake plus 80% profit — credited to Main Balance.", "win");
+        } else {
+          updatePlay(whot.playId, "lost", 0, { rounds_played: whot.rounds });
+          pushRecent("whot", { stake: whot.stake, payout: 0, status: "lost", time: Date.now() });
+          toast("Computer wins the Whot match", "Your " + fmtUSD(whot.stake) + " stake is forfeited.", "lose");
+        }
+        renderWallets(); whotRender();
+      }
+      function whotStart(){
+        if (whotBusy || (whot && !whot.over)) return;
+        if (!sb || !currentUser){ toast("Not signed in", "Log in again to play."); return; }
+        var stake = gameStakeFrom("whotAmount");
+        if (!validateGameStake(stake)) return;
+        whotBusy = true; whotRender();
+        var prevMain = state.main;
+        state.main = round2(state.main - stake);
+        persistWallet().then(function(ok){
+          if (!ok){ state.main = prevMain; whotBusy = false; renderWallets(); whotRender(); return; }
+          return insertPlay("whot", stake, null).then(function(playId){
+            whotBusy = false;
+            if (!playId){
+              state.main = prevMain; persistWallet(); renderWallets(); whotRender();
+              toast("Couldn't start the match", "Your stake was returned to your Main Balance — please try again.", "lose");
+              return;
+            }
+            whot = {
+              deck: whotBuildDeck(), user: [], comp: [], pile: [],
+              requiredSuit: null, turn: "user", over: false, winner: null,
+              playId: playId, stake: stake, rounds: 0, drawnIdx: -1, drewThisTurn: false,
+              lastAction: "Match started — your move."
+            };
+            whotPendingWild = -1;
+            whot.user = whotDrawCards(6);
+            whot.comp = whotDrawCards(6);
+            // Flip a plain (non-special, non-wild) card to start the pile.
+            var starter = null, skipped = [];
+            while (whot.deck.length){
+              var c = whot.deck.pop();
+              if (!c.whot && !WHOT_SPECIALS[c.num]){ starter = c; break; }
+              skipped.push(c);
+            }
+            whot.deck = skipped.concat(whot.deck);
+            whot.pile = [starter];
+            whot.requiredSuit = starter.suit;
+            renderWallets(); whotRender();
+            toast("Whot match started", fmtUSD(stake) + " locked from Main Balance — first to empty their hand wins " + fmtUSD(round2(stake * 1.8)) + ".");
+          });
+        });
+      }
+      function whotUserPlay(idx){
+        if (!whot || whot.over || whot.turn !== "user" || whotBusy || whotPendingWild > -1) return;
+        var card = whot.user[idx];
+        if (!card || !whotPlayable(card)) return;
+        if (whot.drawnIdx > -1 && idx !== whot.drawnIdx) return; // after picking, only the picked card may be played
+        if (card.whot){ whotPendingWild = idx; whotRender(); return; }
+        whot.drawnIdx = -1;
+        var next = whotApplyPlay("user", card, null);
+        whotAfterTurn(next);
+      }
+      function whotCallSuit(suit){
+        if (whotPendingWild < 0 || !whot) return;
+        var card = whot.user[whotPendingWild];
+        whotPendingWild = -1;
+        whot.drawnIdx = -1;
+        var next = whotApplyPlay("user", card, suit);
+        whotAfterTurn(next);
+      }
+      function whotUserDraw(){
+        if (!whot || whot.over || whot.turn !== "user" || whot.drawnIdx > -1 || whotPendingWild > -1) return;
+        if (whot.drewThisTurn) return; // one pick per turn — the turn is about to pass
+        if (whot.user.some(whotPlayable)){
+          toast("You have a playable card", "Play one of the highlighted cards — picking from the market is only for when you're stuck.");
+          return;
+        }
+        whot.drewThisTurn = true;
+        var drawn = whotDrawCards(1);
+        if (!drawn.length){ whotAfterTurn("comp"); return; }
+        whot.user.push(drawn[0]);
+        if (whotPlayable(drawn[0])){
+          whot.drawnIdx = whot.user.length - 1;
+          whotRender();
+        } else {
+          whotRender();
+          setTimeout(function(){
+            if (whot && !whot.over && whot.turn === "user" && whot.drawnIdx === -1 && whotPendingWild === -1) whotAfterTurn("comp");
+          }, 900);
+        }
+      }
+      function whotUserPass(){
+        if (!whot || whot.drawnIdx === -1) return;
+        whot.drawnIdx = -1;
+        whotAfterTurn("comp");
+      }
+      function whotCompChoose(hand){
+        if (whotHardMode) return whotCompChooseHard(hand);
+        var valid = hand.filter(whotPlayable);
+        if (!valid.length) return null;
+        var plain = valid.filter(function(c){ return !c.whot && !WHOT_SPECIALS[c.num]; });
+        if (plain.length) return plain[0];
+        var specials = valid.filter(function(c){ return !c.whot && WHOT_SPECIALS[c.num]; });
+        if (specials.length) return specials[0];
+        return valid[0]; // only a Whot wild is left
+      }
+      /* Hardened bot (active once the user has 3+ Whot wins): plays with
+         full knowledge of the user's hand. Goes out whenever it can —
+         including a two-card finish through an extra-turn special —
+         fires Pick 3 / Pick 2 / Suspension when the user is down to 2
+         or fewer cards, otherwise plays the card that helps the user
+         least (a shape they hold fewest of, on a number they don't
+         hold), and spends Whot wilds only as a last resort. */
+      function whotCompChooseHard(hand){
+        var valid = hand.filter(whotPlayable);
+        if (!valid.length) return null;
+        if (hand.length === 1) return valid[0]; // go out now
+        var nonWild = valid.filter(function(c){ return !c.whot; });
+        if (hand.length === 2){
+          // Extra-turn special first, if the last card then plays on it.
+          for (var j = 0; j < valid.length; j++){
+            var c0 = valid[j];
+            if (c0.whot || [1, 2, 5, 8].indexOf(c0.num) === -1) continue;
+            var rest = hand[0] === c0 ? hand[1] : hand[0];
+            if (rest.whot || rest.suit === c0.suit || rest.num === c0.num) return c0;
+          }
+        }
+        if (whot.user.length <= 2){
+          // Bury the user before they go out: Pick 3, then Pick 2, then Suspension.
+          var fireOrder = [5, 2, 8];
+          for (var f = 0; f < fireOrder.length; f++){
+            var hit = nonWild.filter(function(c){ return c.num === fireOrder[f]; });
+            if (hit.length) return hit[0];
+          }
+        }
+        var plain = nonWild.filter(function(c){ return !WHOT_SPECIALS[c.num]; });
+        var pool = plain.length ? plain : nonWild;
+        if (pool.length){
+          var suitCount = {}, numHeld = {};
+          whot.user.forEach(function(c){
+            if (!c.whot){ suitCount[c.suit] = (suitCount[c.suit] || 0) + 1; numHeld[c.num] = true; }
+          });
+          var bestC = null, bestScore = Infinity;
+          pool.forEach(function(c){
+            var score = (suitCount[c.suit] || 0) * 2 + (numHeld[c.num] ? 1 : 0);
+            if (score < bestScore){ bestScore = score; bestC = c; }
+          });
+          return bestC;
+        }
+        return valid[0]; // only a Whot wild is playable — spend it defensively
+      }
+      function whotCompPlayCard(card){
+        if (!whot || whot.over) return;
+        var called = null;
+        if (card.whot){
+          if (whotHardMode){
+            // Call the shape the user holds fewest of.
+            var uCounts = {}, uBest = "circle", uMin = Infinity;
+            WHOT_SUITS.forEach(function(s){ uCounts[s] = 0; });
+            whot.user.forEach(function(c){ if (!c.whot) uCounts[c.suit]++; });
+            WHOT_SUITS.forEach(function(s){ if (uCounts[s] < uMin){ uMin = uCounts[s]; uBest = s; } });
+            called = uBest;
+          } else {
+            // Call the shape the computer holds most of.
+            var counts = {}, best = "circle", bestN = -1;
+            whot.comp.forEach(function(c){ if (!c.whot) counts[c.suit] = (counts[c.suit] || 0) + 1; });
+            WHOT_SUITS.forEach(function(s){ if ((counts[s] || 0) > bestN){ bestN = counts[s] || 0; best = s; } });
+            called = best;
+          }
+        }
+        var next = whotApplyPlay("comp", card, called);
+        whot.lastAction = "Computer played " + whotCardName(card) +
+          (card.whot ? " and called " + WHOT_SUIT_NAMES[called] + "." : ".") + whotEffectNote(card);
+        whotAfterTurn(next);
+      }
+      function whotCompTurn(){
+        if (!whot || whot.over || whot.turn !== "comp") return;
+        var card = whotCompChoose(whot.comp);
+        if (card){ whotCompPlayCard(card); return; }
+        // Stuck: pick 1 from the market, and play it if it plays.
+        var drawn = whotDrawCards(1);
+        if (drawn.length){
+          whot.comp.push(drawn[0]);
+          whot.lastAction = "Computer had no matching card and picked 1 from the market.";
+          if (whotPlayable(drawn[0])){
+            whotRender();
+            setTimeout(function(){ whotCompPlayCard(drawn[0]); }, 700);
+            return;
+          }
+        } else {
+          whot.lastAction = "Computer had no matching card and the market is empty — turn passes.";
+        }
+        whotAfterTurn("user");
+      }
+      function whotRender(){
+        var playBtn = $("whotPlayBtn");
+        if (!playBtn) return;
+        var inGame = !!(whot && !whot.over);
+        $("whotAmount").disabled = inGame || whotBusy;
+        playBtn.disabled = inGame || whotBusy;
+        playBtn.textContent = whotBusy ? "Starting…" : (whot && whot.over ? "Play Again" : (inGame ? "Match in progress…" : "Play"));
+        $("whotCompCount").textContent = whot ? whot.comp.length : "—";
+        $("whotCompAction").textContent = whot ? (whot.lastAction || "") : "Waiting for a challenger — start a match below.";
+        var backs = "";
+        if (whot){
+          var n = Math.min(whot.comp.length, 12);
+          for (var i = 0; i < n; i++) backs += '<span class="whot-back"></span>';
+          if (whot.comp.length > 12) backs += '<span class="wb-more">+' + (whot.comp.length - 12) + "</span>";
+        }
+        $("whotBacks").innerHTML = backs;
+        $("whotPile").innerHTML = whot ? whotCardHtml(whotTop()) : '<div class="whot-card dim"><span class="wc-num" style="color:#5A6285;">–</span></div>';
+        var req = $("whotRequired");
+        if (whot){
+          req.style.display = "";
+          req.innerHTML = "Next card must match: " + whotSuitSvg(whot.requiredSuit, 16) + " " + WHOT_SUIT_NAMES[whot.requiredSuit] +
+            (whotTop().whot ? "" : " or number " + whotTop().num);
+        } else req.style.display = "none";
+        $("whotDeckCount").textContent = whot ? whot.deck.length : 64;
+        var stuck = inGame && whot.turn === "user" && whot.drawnIdx === -1 && !whot.drewThisTurn && whotPendingWild === -1 && !whot.user.some(whotPlayable);
+        $("whotDeckBtn").disabled = !stuck;
+        var b = $("whotBanner");
+        if (!whot){
+          b.className = "game-banner";
+          b.textContent = "Enter a bid (min $1) and tap Play — first to empty their hand wins stake + 80%.";
+        } else if (whot.over){
+          b.className = "game-banner " + (whot.winner === "user" ? "win" : "lose");
+          b.textContent = whot.winner === "user"
+            ? "You emptied your hand first — you win " + fmtUSD(round2(whot.stake * 1.8)) + "!"
+            : "The computer emptied its hand first — your " + fmtUSD(whot.stake) + " stake is lost.";
+        } else if (whotPendingWild > -1){
+          b.className = "game-banner";
+          b.textContent = "Whot! Call a shape below — the next card must match it.";
+        } else if (whot.turn === "user"){
+          b.className = "game-banner";
+          b.textContent = whot.drawnIdx > -1
+            ? "You picked a playable card — tap it to play it, or pass the turn."
+            : "Your turn — tap a highlighted card to play it." + (stuck ? " Nothing matches: tap the market deck to pick 1." : "");
+        } else {
+          b.className = "game-banner";
+          b.textContent = "Computer's turn…";
+        }
+        $("whotSuitPicker").className = "whot-suits" + (whotPendingWild > -1 ? " show" : "");
+        $("whotPassBtn").style.display = (inGame && whot.turn === "user" && whot.drawnIdx > -1) ? "" : "none";
+        var hand = $("whotHand");
+        if (!whot){ hand.innerHTML = '<div class="whot-empty">Your cards will appear here.</div>'; return; }
+        hand.innerHTML = whot.user.map(function(card, i){
+          var playable = inGame && whot.turn === "user" && whotPendingWild === -1 && whotPlayable(card) &&
+                         (whot.drawnIdx === -1 || whot.drawnIdx === i);
+          var cls = "whot-card" + (card.whot ? " wild" : "") +
+                    (whot.drawnIdx === i ? " drawn" : (playable ? " playable" : (inGame && whot.turn === "user" ? " dim" : "")));
+          return '<button type="button" class="' + cls + '" data-whot-idx="' + i + '"' + (playable ? "" : " disabled") + ">" + whotCardInner(card) + "</button>";
+        }).join("");
+      }
+
+      /* ================= Games lifecycle & wiring ================= */
+      function initGames(){
+        buildWheel();
+        loadRecentPlays();
+        resolveStaleAviatorPlays();
+        refreshWhotWinCount();
+        if (!av) avResetCycle();
+        if (!avTimer) avTimer = setInterval(avTick, 100);
+        avRender();
+        whotRender();
+      }
+      function stopGames(){
+        if (avTimer){ clearInterval(avTimer); avTimer = null; }
+        av = null; whot = null; whotPendingWild = -1;
+        spinState.spinning = false;
+      }
+      // Suit picker buttons (built once).
+      (function(){
+        var picker = $("whotSuitPicker");
+        WHOT_SUITS.forEach(function(s){
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.setAttribute("data-suit", s);
+          btn.innerHTML = whotSuitSvg(s, 15) + " " + WHOT_SUIT_NAMES[s];
+          picker.appendChild(btn);
+        });
+        picker.addEventListener("click", function(e){
+          var t = e.target.closest ? e.target.closest("[data-suit]") : null;
+          if (t) whotCallSuit(t.getAttribute("data-suit"));
+        });
+      })();
+      bindInfoToggle("avInfoBtn");
+      bindInfoToggle("spinInfoBtn");
+      bindInfoToggle("whotInfoBtn");
+      $("avBidBtn").addEventListener("click", avPlaceBid);
+      $("avCashBtn").addEventListener("click", avCashOut);
+      $("spinBtn").addEventListener("click", spinGo);
+      $("whotPlayBtn").addEventListener("click", whotStart);
+      $("whotDeckBtn").addEventListener("click", whotUserDraw);
+      $("whotPassBtn").addEventListener("click", whotUserPass);
+      $("whotHand").addEventListener("click", function(e){
+        var t = e.target.closest ? e.target.closest("[data-whot-idx]") : null;
+        if (t) whotUserPlay(parseInt(t.getAttribute("data-whot-idx"), 10));
+      });
+      buildWheel();
+      whotRender();
     </script>
 
   </body>
