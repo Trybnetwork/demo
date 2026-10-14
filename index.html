@@ -412,6 +412,7 @@
       .drawer-profile .dp-name{font-family:"Sora",sans-serif; font-weight:800; font-size:15.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
       .drawer-profile .dp-email{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
       .drawer-nav{margin-top:22px; display:flex; flex-direction:column; gap:6px;}
+      .drawer-sec-label{font-size:10.5px; font-weight:800; letter-spacing:1.1px; text-transform:uppercase; color:var(--muted-2); padding:10px 12px 2px;}
       .drawer-item{
         cursor:pointer; display:flex; align-items:center; gap:13px; width:100%; text-align:left;
         background:transparent; border:1px solid transparent; border-radius:12px; padding:13px 12px;
@@ -595,8 +596,28 @@
       .av-sky{position:relative; height:172px; background:linear-gradient(180deg, #0A1030, #101A48); border:1px solid var(--line-soft); border-radius:14px; overflow:hidden;}
       .av-mult{position:absolute; top:12px; left:14px; font-family:"Sora",sans-serif; font-weight:800; font-size:31px; color:var(--gold-bright); line-height:1;}
       .av-status{position:absolute; top:14px; right:14px; font-size:12px; font-weight:800; color:var(--muted); text-align:right; max-width:52%; line-height:1.45;}
-      .av-plane{position:absolute; left:3%; bottom:9%; transition:left .12s linear, bottom .12s linear, transform .3s ease, opacity .3s ease; filter:drop-shadow(0 4px 8px rgba(0,0,0,.45));}
-      .av-plane.crashed{opacity:.3; transform:rotate(42deg);}
+      .av-trail{position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none;}
+      .av-plane{position:absolute; left:10%; bottom:14%; width:64px; height:28px; transform:translate(-50%,45%); transition:left .12s linear, bottom .12s linear; filter:drop-shadow(0 4px 8px rgba(0,0,0,.45)); z-index:3;}
+      .av-jet{display:block; transition:opacity .25s ease;}
+      .av-plane.exploded .av-jet{opacity:0;}
+      .av-boom{position:absolute; left:50%; top:50%; width:124px; height:94px; transform:translate(-50%,-50%); display:none; pointer-events:none; overflow:visible;}
+      .av-plane.exploded .av-boom{display:block;}
+      .av-boom .boom-flash{transform-box:fill-box; transform-origin:center; animation:boomFlash .5s ease-out both;}
+      .av-boom .boom-star{transform-box:fill-box; transform-origin:center; animation:boomStar .85s ease-out both;}
+      .av-boom .boom-smoke{transform-box:fill-box; transform-origin:center; animation:boomSmoke 1.5s ease-out both;}
+      .av-boom .db{transform-box:fill-box; transform-origin:center; animation-duration:1.05s; animation-timing-function:cubic-bezier(.17,.67,.35,1); animation-fill-mode:both;}
+      .av-boom .db1{animation-name:dbFly1;} .av-boom .db2{animation-name:dbFly2;}
+      .av-boom .db3{animation-name:dbFly3;} .av-boom .db4{animation-name:dbFly4;}
+      .av-boom .db5{animation-name:dbFly5;} .av-boom .db6{animation-name:dbFly6;}
+      @keyframes boomFlash{0%{transform:scale(.3); opacity:1;} 100%{transform:scale(2.6); opacity:0;}}
+      @keyframes boomStar{0%{transform:scale(.35) rotate(0deg); opacity:1;} 100%{transform:scale(1.55) rotate(24deg); opacity:0;}}
+      @keyframes boomSmoke{0%{transform:scale(.5); opacity:.7;} 100%{transform:scale(1.7) translateY(-8px); opacity:0;}}
+      @keyframes dbFly1{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(-38px,-26px) rotate(-160deg); opacity:0;}}
+      @keyframes dbFly2{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(34px,-30px) rotate(150deg); opacity:0;}}
+      @keyframes dbFly3{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(-30px,22px) rotate(120deg); opacity:0;}}
+      @keyframes dbFly4{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(36px,18px) rotate(-120deg); opacity:0;}}
+      @keyframes dbFly5{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(-6px,-40px) rotate(90deg); opacity:0;}}
+      @keyframes dbFly6{0%{transform:translate(0,0) rotate(0deg); opacity:1;} 100%{transform:translate(8px,34px) rotate(-200deg); opacity:0;}}
       .av-ground{position:absolute; left:0; right:0; bottom:0; height:6px; background:repeating-linear-gradient(90deg, var(--gold) 0 14px, transparent 14px 28px); opacity:.45;}
 
       /* Spin wheel */
@@ -604,10 +625,6 @@
       #spinWheelSvg{display:block; width:100%; height:auto; transform-origin:50% 50%;}
       .wheel-pointer{position:absolute; top:-5px; left:50%; transform:translateX(-50%); z-index:2; width:0; height:0; border-left:11px solid transparent; border-right:11px solid transparent; border-top:18px solid var(--gold-bright);}
       .wheel-hub{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:58px; height:58px; border-radius:50%; background:var(--card-2); border:2px solid var(--gold); color:var(--gold-bright); display:flex; align-items:center; justify-content:center; font-family:"Sora",sans-serif; font-weight:800; font-size:12px; letter-spacing:.5px; pointer-events:none;}
-      .spin-legend{display:grid; gap:6px; margin-top:14px;}
-      .spin-legend .sl-row{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted);}
-      .spin-legend .sl-dot{width:11px; height:11px; border-radius:3px; flex:0 0 auto;}
-      .spin-legend .sl-pct{margin-left:auto; font-weight:800; color:var(--text);}
 
       /* Whot */
       .whot-top{display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap;}
@@ -870,67 +887,8 @@
         <div id="myReqList"></div>
       </section>
 
-      <div class="grid">
-        <!-- Arena -->
-        <section class="panel" aria-label="Binary options arena">
-          <h2 class="sec">Binary Arena
-            <button class="info-btn" id="arenaInfoBtn" type="button" aria-expanded="false" aria-controls="arenaCardSub" aria-label="About Binary Arena">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
-            </button>
-          </h2>
-          <p class="sec-sub card-info" id="arenaCardSub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays back your stake plus 90% profit on it — a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
-
-          <div class="assets" id="assetTabs"></div>
-
-          <div class="price-row">
-            <div class="price-name" id="priceName">—</div>
-            <span class="feed-note"><span class="pulse"></span>Live chart · TradingView</span>
-          </div>
-
-          <div class="chart-box"><div id="tvChart"></div></div>
-
-          <div class="controls">
-            <div class="field">
-              <label for="stakeInput">Stake (from Main Balance)</label>
-              <div class="stake-wrap"><span>$</span><input id="stakeInput" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
-            </div>
-            <div class="payout-line">
-              <span>Potential return on a win: <b class="num" id="payoutInfo">—</b></span>
-              <span class="win-amt num" id="profitInfo"></span>
-            </div>
-          </div>
-
-          <div class="trade-btns">
-            <button class="trade-btn higher" id="btnHigher" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-              Higher
-            </button>
-            <button class="trade-btn lower" id="btnLower" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
-              Lower
-            </button>
-          </div>
-
-          <div class="martingale">
-            <div class="mg-head">
-              <span class="mg-title">Martingale Mode</span>
-              <button class="switch" id="mgToggle" type="button" role="switch" aria-checked="false" aria-label="Martingale Mode"></button>
-              <button class="info-btn" id="mgInfoBtn" type="button" aria-expanded="false" aria-controls="mgRisk" aria-label="About Martingale Mode">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
-              </button>
-            </div>
-            <div class="mg-status" id="mgStatus"></div>
-            <p class="mg-risk card-info" id="mgRisk">Martingale doubles stakes after losses — a losing streak can wipe the balance.</p>
-          </div>
-
-          <div class="open-trades">
-            <h3>Bids awaiting result</h3>
-            <div id="openTradesList"><div class="empty">No bids waiting. Place a Higher or Lower bid above and it will sit here until the result is in.</div></div>
-          </div>
-        </section>
-
         <!-- History -->
-        <section class="panel" id="historyPanel" aria-label="History">
+        <section class="panel" id="historyPanel" aria-label="History" style="margin-top:14px;">
           <h2 class="sec">History
             <button class="info-btn" id="histInfoBtn" type="button" aria-expanded="false" aria-controls="histCardSub" aria-label="About History">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
@@ -953,109 +911,6 @@
             <div class="hist-list" id="walletHistory"></div>
           </div>
         </section>
-      </div>
-
-      <!-- Games -->
-      <div class="games-grid">
-        <!-- Aviator -->
-        <section class="panel" aria-label="Aviator game">
-          <h2 class="sec">Aviator
-            <button class="info-btn" id="avInfoBtn" type="button" aria-expanded="false" aria-controls="avCardSub" aria-label="About Aviator">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
-            </button>
-          </h2>
-          <p class="sec-sub card-info" id="avCardSub">Every 30 seconds a new flight opens for bids — enter at least $1 and tap Place Bid before takeoff. The multiplier starts at 1.00x and climbs 0.10x every second, so 10 seconds of flight is 2.00x. Tap Cash Out while the plane is flying to bank your stake × the multiplier shown. If the plane crashes first, the bid is lost — and if you hold past 1.50x without cashing out, the bid crashes on the spot. Flights last at most 100 seconds (11.00x).</p>
-          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="avRecent"><span class="recent-none">No rounds yet</span></div></div>
-          <div class="av-sky">
-            <div class="av-mult num" id="avMult">—</div>
-            <div class="av-status" id="avStatus">Next flight in 0:30</div>
-            <div class="av-plane" id="avPlane"><svg width="36" height="36" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.7 20.3 21.9 12 2.7 3.7l2.5 6.8L16.8 12l-11.6 1.5z" fill="#E7CB7E" stroke="#9A7B2D" stroke-width=".8" stroke-linejoin="round"/></svg></div>
-            <div class="av-ground"></div>
-          </div>
-          <div class="game-banner" id="avBanner" style="display:none;"></div>
-          <div class="game-controls">
-            <div class="field">
-              <label for="avAmount">Bid amount (min $1)</label>
-              <div class="stake-wrap"><span>$</span><input id="avAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
-            </div>
-            <button class="btn game-btn" id="avBidBtn" type="button">Place Bid</button>
-            <button class="btn game-btn cashout" id="avCashBtn" type="button" style="display:none;">Cash Out $0.00</button>
-          </div>
-          <p class="game-note" id="avBidState">Bids close when the countdown ends. No bid? The flight still runs — watch it for free.</p>
-        </section>
-
-        <!-- Spin Wheel -->
-        <section class="panel" aria-label="Spin Wheel game">
-          <h2 class="sec">Spin Wheel
-            <button class="info-btn" id="spinInfoBtn" type="button" aria-expanded="false" aria-controls="spinCardSub" aria-label="About Spin Wheel">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
-            </button>
-          </h2>
-          <p class="sec-sub card-info" id="spinCardSub">Enter at least $1 and spin. The wheel is weighted: Try again 70% (stake lost), $1 reward 10% (your stake back plus $1), $0.50 reward 10% (your stake back plus $0.50), No result 9% (stake returned), 2x 0.9% (double your stake), 10x 0.1% (ten times your stake). Winnings are credited to your Main Balance.</p>
-          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="spinRecent"><span class="recent-none">No rounds yet</span></div></div>
-          <div class="wheel-wrap">
-            <div class="wheel-pointer"></div>
-            <svg id="spinWheelSvg" viewBox="0 0 260 260" role="img" aria-label="Spin wheel with five weighted segments"></svg>
-            <div class="wheel-hub">SPIN</div>
-          </div>
-          <div class="game-banner" id="spinBanner" style="display:none;"></div>
-          <div class="game-controls">
-            <div class="field">
-              <label for="spinAmount">Bid amount (min $1)</label>
-              <div class="stake-wrap"><span>$</span><input id="spinAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
-            </div>
-            <button class="btn game-btn" id="spinBtn" type="button">Spin</button>
-          </div>
-          <div class="spin-legend">
-            <div class="sl-row"><span class="sl-dot" style="background:#2A2150;"></span>Try again — stake lost<span class="sl-pct num">70%</span></div>
-            <div class="sl-row"><span class="sl-dot" style="background:#14714B;"></span>$1 reward — stake + $1<span class="sl-pct num">10%</span></div>
-            <div class="sl-row"><span class="sl-dot" style="background:#2F9E77;"></span>$0.50 reward — stake + $0.50<span class="sl-pct num">10%</span></div>
-            <div class="sl-row"><span class="sl-dot" style="background:#3D4A7A;"></span>No result — stake returned<span class="sl-pct num">9%</span></div>
-            <div class="sl-row"><span class="sl-dot" style="background:#9A7B2D;"></span>2x — double your stake<span class="sl-pct num">0.9%</span></div>
-            <div class="sl-row"><span class="sl-dot" style="background:#C9A24B;"></span>10x — ten times your stake<span class="sl-pct num">0.1%</span></div>
-          </div>
-        </section>
-
-        <!-- Whot -->
-        <section class="panel wide" aria-label="Whot card game">
-          <h2 class="sec">Whot
-            <button class="info-btn" id="whotInfoBtn" type="button" aria-expanded="false" aria-controls="whotCardSub" aria-label="About Whot">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
-            </button>
-          </h2>
-          <p class="sec-sub card-info" id="whotCardSub">Nigerian Whot against the computer. You both start with 6 cards — play a card that matches the pile's shape or number, or play a Whot wild card and call any shape. Specials: 1 = Hold On (play again), 2 = opponent picks 2 and misses a turn, 5 = opponent picks 3 and misses a turn, 8 = Suspension (opponent misses a turn), 14 = General Market (both players pick 1). If you can't play, pick 1 from the market — if it plays, you may play it, otherwise the turn passes. First to empty their hand wins their stake plus 80% profit.</p>
-          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="whotRecent"><span class="recent-none">No rounds yet</span></div></div>
-          <div class="whot-top">
-            <div class="whot-comp-info">
-              <div class="whot-comp-name">Computer · <span class="num" id="whotCompCount">—</span> cards</div>
-              <div class="whot-comp-action" id="whotCompAction">Waiting for a challenger — start a match below.</div>
-            </div>
-            <div class="whot-backs" id="whotBacks"></div>
-          </div>
-          <div class="whot-mid">
-            <div class="whot-pilebox">
-              <div class="whot-mini-label">Pile</div>
-              <div id="whotPile"><div class="whot-card dim"><span class="wc-num" style="color:#5A6285;">–</span></div></div>
-            </div>
-            <div class="whot-pilebox">
-              <div class="whot-mini-label">Market</div>
-              <button class="whot-deck" id="whotDeckBtn" type="button" disabled><span class="wd-count num" id="whotDeckCount">64</span><span class="wd-label">Pick 1</span></button>
-            </div>
-          </div>
-          <div class="whot-required" id="whotRequired" style="display:none;"></div>
-          <div class="game-banner" id="whotBanner">Enter a bid (min $1) and tap Play — first to empty their hand wins stake + 80%.</div>
-          <div class="whot-suits" id="whotSuitPicker"><span>Call a shape:</span></div>
-          <div class="whot-hand" id="whotHand"><div class="whot-empty">Your cards will appear here.</div></div>
-          <div class="game-controls">
-            <div class="field">
-              <label for="whotAmount">Bid amount (min $1)</label>
-              <div class="stake-wrap"><span>$</span><input id="whotAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
-            </div>
-            <button class="btn game-btn" id="whotPlayBtn" type="button">Play</button>
-            <button class="btn game-btn ghost" id="whotPassBtn" type="button" style="display:none;">Pass turn</button>
-          </div>
-        </section>
-      </div>
 
       <!-- Referrals -->
       <section class="panel ref-panel" aria-label="Referral program">
@@ -1120,6 +975,228 @@
         </div>
         <section class="panel" aria-label="All transactions">
           <div class="txh-list" id="txFullList"></div>
+        </section>
+      </div>
+
+      <div id="binaryView" style="display:none;">
+        <div class="txh-head">
+          <button class="btn ghost txh-back" id="binaryBackBtn" type="button">← Back</button>
+          <div>
+            <h2>Binary Trading</h2>
+            <p>Live prices, Higher or Lower — your stake locks the moment you bid and a win pays 90% profit.</p>
+          </div>
+        </div>
+        <!-- Arena -->
+        <section class="panel" aria-label="Binary options arena" style="margin-top:16px;">
+          <h2 class="sec">Binary Arena
+            <button class="info-btn" id="arenaInfoBtn" type="button" aria-expanded="false" aria-controls="arenaCardSub" aria-label="About Binary Arena">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="arenaCardSub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays back your stake plus 90% profit on it — a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
+
+          <div class="assets" id="assetTabs"></div>
+
+          <div class="price-row">
+            <div class="price-name" id="priceName">—</div>
+            <span class="feed-note"><span class="pulse"></span>Live chart · TradingView</span>
+          </div>
+
+          <div class="chart-box"><div id="tvChart"></div></div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="stakeInput">Stake (from Main Balance)</label>
+              <div class="stake-wrap"><span>$</span><input id="stakeInput" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <div class="payout-line">
+              <span>Potential return on a win: <b class="num" id="payoutInfo">—</b></span>
+              <span class="win-amt num" id="profitInfo"></span>
+            </div>
+          </div>
+
+          <div class="trade-btns">
+            <button class="trade-btn higher" id="btnHigher" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              Higher
+            </button>
+            <button class="trade-btn lower" id="btnLower" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+              Lower
+            </button>
+          </div>
+
+          <div class="martingale">
+            <div class="mg-head">
+              <span class="mg-title">Martingale Mode</span>
+              <button class="switch" id="mgToggle" type="button" role="switch" aria-checked="false" aria-label="Martingale Mode"></button>
+              <button class="info-btn" id="mgInfoBtn" type="button" aria-expanded="false" aria-controls="mgRisk" aria-label="About Martingale Mode">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+              </button>
+            </div>
+            <div class="mg-status" id="mgStatus"></div>
+            <p class="mg-risk card-info" id="mgRisk">Martingale doubles stakes after losses — a losing streak can wipe the balance.</p>
+          </div>
+
+          <div class="open-trades">
+            <h3>Bids awaiting result</h3>
+            <div id="openTradesList"><div class="empty">No bids waiting. Place a Higher or Lower bid above and it will sit here until the result is in.</div></div>
+          </div>
+        </section>
+      </div>
+
+      <div id="aviatorView" style="display:none;">
+        <div class="txh-head">
+          <button class="btn ghost txh-back" id="aviatorBackBtn" type="button">← Back</button>
+          <div>
+            <h2>Aviator</h2>
+            <p>Bid inside the 15-second window, then cash out before the plane crashes.</p>
+          </div>
+        </div>
+        <!-- Aviator -->
+        <section class="panel" aria-label="Aviator game" style="margin-top:16px;">
+          <h2 class="sec">Aviator
+            <button class="info-btn" id="avInfoBtn" type="button" aria-expanded="false" aria-controls="avCardSub" aria-label="About Aviator">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="avCardSub">Every 15 seconds a new flight opens for bids — enter at least $1 and tap Place Bid before takeoff. The multiplier starts at 1.00x and climbs 0.10x every second, so 10 seconds of flight is 2.00x. Tap Cash Out while the plane is flying to bank your stake × the multiplier shown. If the plane crashes first, the bid is lost. High multipliers are rare — most flights crash low, so cash out early or hold on for a miracle run.</p>
+          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="avRecent"><span class="recent-none">No rounds yet</span></div></div>
+          <div class="av-sky">
+            <svg class="av-trail" id="avTrailSvg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path id="avTrailGlow" fill="none" stroke="rgba(201,162,75,.22)" stroke-width="3" stroke-linecap="round" d=""/>
+              <path id="avTrailPath" fill="none" stroke="#E7CB7E" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2.6 2" d=""/>
+            </svg>
+            <div class="av-mult num" id="avMult">—</div>
+            <div class="av-status" id="avStatus">Next flight in 0:15</div>
+            <div class="av-plane" id="avPlane">
+              <svg class="av-jet" width="64" height="28" viewBox="0 0 120 52" aria-hidden="true">
+                <g fill="#D8402F" stroke="#7E1F14" stroke-width="1" stroke-linejoin="round">
+                  <path d="M22 24 L12 5 C11.4 3.7 12.4 2.2 13.9 2 L20 1.4 C21.4 1.3 22.6 2.2 23.1 3.5 L28 22 Z"/>
+                  <path d="M6 27 C6 23 11 20.6 18 20.2 L88 16.4 C103 15.7 114 18.6 118 23 C119 24.2 119 25.8 118 27 C114 31.6 103 34.6 88 34 L26 31.4 C14 30.9 6 29.8 6 27 Z"/>
+                  <polygon points="57,29.5 85,28.8 66,47.8 61,38"/>
+                  <polygon points="9,29 24,29.4 16.5,37.5"/>
+                </g>
+                <rect x="63" y="32.5" width="13" height="5.5" rx="2.75" fill="#7E1F14"/>
+                <g fill="#0B1132">
+                  <polygon points="103,20.2 112,22.2 103,24.4"/>
+                  <rect x="90" y="20.2" width="5.5" height="3" rx="1.5"/>
+                  <rect x="80.5" y="20.6" width="5.5" height="3" rx="1.5"/>
+                  <rect x="71" y="21" width="5.5" height="3" rx="1.5"/>
+                  <rect x="61.5" y="21.4" width="5.5" height="3" rx="1.5"/>
+                </g>
+              </svg>
+              <svg class="av-boom" viewBox="0 0 120 92" aria-hidden="true">
+                <g class="boom-smoke" fill="#8B94BC">
+                  <circle cx="45" cy="38" r="13"/>
+                  <circle cx="68" cy="31" r="16"/>
+                  <circle cx="59" cy="54" r="12"/>
+                </g>
+                <polygon class="boom-star" fill="#C9A24B" points="60,18 66.5,37 85,32.5 70.5,45 87,57 68,56.5 73,75 60,60 47,75 52,56.5 33,57 49.5,45 35,32.5 53.5,37"/>
+                <polygon class="db db1" points="44,40 62,43 48,50" fill="#E7CB7E"/>
+                <polygon class="db db2" points="66,36 79,44 64,46.5" fill="#C9A24B"/>
+                <rect class="db db3" x="52" y="53" width="13" height="5" rx="2.5" fill="#9A7B2D"/>
+                <polygon class="db db4" points="70,52 83,56.5 70,60.5" fill="#E7CB7E"/>
+                <circle class="db db5" cx="58" cy="29" r="3.5" fill="#E7CB7E"/>
+                <rect class="db db6" x="39" y="55" width="9" height="4" rx="2" fill="#C9A24B"/>
+                <circle class="boom-star" cx="60" cy="46" r="7.5" fill="#E5534B"/>
+                <circle class="boom-flash" cx="60" cy="46" r="9" fill="#FFF3D6"/>
+              </svg>
+            </div>
+            <div class="av-ground"></div>
+          </div>
+          <div class="game-banner" id="avBanner" style="display:none;"></div>
+          <div class="game-controls">
+            <div class="field">
+              <label for="avAmount">Bid amount (min $1)</label>
+              <div class="stake-wrap"><span>$</span><input id="avAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <button class="btn game-btn" id="avBidBtn" type="button">Place Bid</button>
+            <button class="btn game-btn cashout" id="avCashBtn" type="button" style="display:none;">Cash Out $0.00</button>
+          </div>
+          <p class="game-note" id="avBidState">Bids close when the countdown ends. No bid? The flight still runs — watch it for free.</p>
+        </section>
+      </div>
+
+      <div id="spinView" style="display:none;">
+        <div class="txh-head">
+          <button class="btn ghost txh-back" id="spinBackBtn" type="button">← Back</button>
+          <div>
+            <h2>Spin Wheel</h2>
+            <p>One spin, one outcome — winnings land in your Main Balance.</p>
+          </div>
+        </div>
+        <!-- Spin Wheel -->
+        <section class="panel" aria-label="Spin Wheel game" style="margin-top:16px;">
+          <h2 class="sec">Spin Wheel
+            <button class="info-btn" id="spinInfoBtn" type="button" aria-expanded="false" aria-controls="spinCardSub" aria-label="About Spin Wheel">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="spinCardSub">Enter at least $1 and spin. Each outcome pays differently: Try again loses your stake; $1 returns your stake plus $1; $0.5 returns your stake plus $0.50; 0 returns your stake; 2x doubles your stake; 10x pays ten times your stake. Winnings are credited to your Main Balance.</p>
+          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="spinRecent"><span class="recent-none">No rounds yet</span></div></div>
+          <div class="wheel-wrap">
+            <div class="wheel-pointer"></div>
+            <svg id="spinWheelSvg" viewBox="0 0 260 260" role="img" aria-label="Spin wheel with six equal segments"></svg>
+            <div class="wheel-hub">SPIN</div>
+          </div>
+          <div class="game-banner" id="spinBanner" style="display:none;"></div>
+          <div class="game-controls">
+            <div class="field">
+              <label for="spinAmount">Bid amount (min $1)</label>
+              <div class="stake-wrap"><span>$</span><input id="spinAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <button class="btn game-btn" id="spinBtn" type="button">Spin</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="whotView" style="display:none;">
+        <div class="txh-head">
+          <button class="btn ghost txh-back" id="whotBackBtn" type="button">← Back</button>
+          <div>
+            <h2>Whot</h2>
+            <p>Nigerian Whot against the computer — first to empty their hand wins.</p>
+          </div>
+        </div>
+        <!-- Whot -->
+        <section class="panel wide" aria-label="Whot card game" style="margin-top:16px;">
+          <h2 class="sec">Whot
+            <button class="info-btn" id="whotInfoBtn" type="button" aria-expanded="false" aria-controls="whotCardSub" aria-label="About Whot">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="whotCardSub">Nigerian Whot against the computer. You both start with 6 cards — play a card that matches the pile's shape or number, or play a Whot wild card and call any shape. Specials: 1 = Hold On (play again), 2 = opponent picks 2 and misses a turn, 5 = opponent picks 3 and misses a turn, 8 = Suspension (opponent misses a turn), 14 = General Market (both players pick 1). If you can't play, pick 1 from the market — if it plays, you may play it, otherwise the turn passes. First to empty their hand wins their stake plus 80% profit.</p>
+          <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="whotRecent"><span class="recent-none">No rounds yet</span></div></div>
+          <div class="whot-top">
+            <div class="whot-comp-info">
+              <div class="whot-comp-name">Computer · <span class="num" id="whotCompCount">—</span> cards</div>
+              <div class="whot-comp-action" id="whotCompAction">Waiting for a challenger — start a match below.</div>
+            </div>
+            <div class="whot-backs" id="whotBacks"></div>
+          </div>
+          <div class="whot-mid">
+            <div class="whot-pilebox">
+              <div class="whot-mini-label">Pile</div>
+              <div id="whotPile"><div class="whot-card dim"><span class="wc-num" style="color:#5A6285;">–</span></div></div>
+            </div>
+            <div class="whot-pilebox">
+              <div class="whot-mini-label">Market</div>
+              <button class="whot-deck" id="whotDeckBtn" type="button" disabled><span class="wd-count num" id="whotDeckCount">64</span><span class="wd-label">Pick 1</span></button>
+            </div>
+          </div>
+          <div class="whot-required" id="whotRequired" style="display:none;"></div>
+          <div class="game-banner" id="whotBanner">Enter a bid (min $1) and tap Play — first to empty their hand wins stake + 80%.</div>
+          <div class="whot-suits" id="whotSuitPicker"><span>Call a shape:</span></div>
+          <div class="whot-hand" id="whotHand"><div class="whot-empty">Your cards will appear here.</div></div>
+          <div class="game-controls">
+            <div class="field">
+              <label for="whotAmount">Bid amount (min $1)</label>
+              <div class="stake-wrap"><span>$</span><input id="whotAmount" class="num" type="number" inputmode="decimal" min="1" step="1" value="10" /></div>
+            </div>
+            <button class="btn game-btn" id="whotPlayBtn" type="button">Play</button>
+            <button class="btn game-btn ghost" id="whotPassBtn" type="button" style="display:none;">Pass turn</button>
+          </div>
         </section>
       </div>
 
@@ -1214,6 +1291,28 @@
         </button>
       </div>
       <nav class="drawer-nav" aria-label="Menu items">
+        <div class="drawer-sec-label">Ways to earn</div>
+        <button class="drawer-item" id="menuBinary" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>
+          <span>Binary Trading<span class="di-sub">Higher or Lower on live prices</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuAviator" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+          <span>Aviator<span class="di-sub">Cash out before the crash</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuSpin" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.5"/><path d="M12 3v7.5M19.8 16.5l-6.4-3.7M4.2 16.5l6.4-3.7"/></svg></span>
+          <span>Spin Wheel<span class="di-sub">One spin, one outcome</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuWhot" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M12 7.5l1.3 2.6 2.9.4-2.1 2 .5 2.9L12 14.2l-2.6 1.2.5-2.9-2.1-2 2.9-.4z"/></svg></span>
+          <span>Whot<span class="di-sub">Card game vs the computer</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <div class="drawer-sec-label">Others</div>
         <button class="drawer-item" id="menuHistory" type="button">
           <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/></svg></span>
           <span>Transaction History<span class="di-sub">Trades &amp; wallet movements</span></span>
@@ -1741,16 +1840,20 @@
 
       /* ================= Live chart (TradingView) ================= */
       var curAsset = "BTCUSD";
-      var tvAttempts = 0;
+      var tvAttempts = 0, tvPending = false;
       function loadTvChart(){
         var box = $("tvChart");
         if (!box) return;
+        // Container hidden (Binary Trading view not open yet): defer —
+        // setView loads the chart the moment the view becomes visible.
+        if (!box.clientWidth){ tvPending = true; return; }
         if (typeof TradingView === "undefined" || !TradingView.widget){
           if (tvAttempts++ < 20){ setTimeout(loadTvChart, 500); return; }
           box.innerHTML = '<div class="empty" style="padding:18px;">The live chart could not load — check your connection and reopen the app.</div>';
           return;
         }
         tvAttempts = 0;
+        tvPending = false;
         box.innerHTML = "";
         new TradingView.widget({
           container_id: "tvChart",
@@ -3025,12 +3128,36 @@
         $("tabWallet").classList.add("active"); $("tabTrades").classList.remove("active");
         $("walletPane").style.display = ""; $("tradesPane").style.display = "none";
       });
-      function setView(v){
-        $("appView").style.display = v === "app" ? "" : "none";
-        $("txHistoryView").style.display = v === "history" ? "" : "none";
+      /* ---------- View router ----------
+         Views swap in place of the dashboard — nothing is unmounted,
+         so live game state (an Aviator flight in progress, a Whot
+         match, a spinning wheel) survives leaving and returning.
+         Entering a non-dashboard view pushes a history entry so the
+         device back button returns to the dashboard; the on-screen
+         Back buttons go through the same history step. */
+      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };
+      var viewPushed = false;
+      function setView(v, skipPush){
+        if (!VIEW_IDS[v]) v = "app";
+        for (var k in VIEW_IDS) $(VIEW_IDS[k]).style.display = k === v ? "" : "none";
         if (v === "app" || v === "history") refreshFromServer(true);
-        if (v === "history"){ renderTxHistory(); window.scrollTo(0, 0); }
+        if (v === "history") renderTxHistory();
+        if (v === "binary" && (tvPending || !$("tvChart").querySelector("iframe"))) loadTvChart();
+        window.scrollTo(0, 0);
+        if (!skipPush && v !== "app"){
+          try { history.pushState({ tnView: v }, ""); viewPushed = true; }
+          catch (e) { viewPushed = false; }
+        }
       }
+      function goHome(){
+        if (viewPushed){ viewPushed = false; history.back(); }
+        else setView("app", true);
+      }
+      window.addEventListener("popstate", function(e){
+        viewPushed = false;
+        var v = (e.state && VIEW_IDS[e.state.tnView]) ? e.state.tnView : "app";
+        setView(v, true);
+      });
       // Referrals: codes are real now — share the code; signups appear live.
       var simBtn = $("simRefBtn");
       if (simBtn){
@@ -3054,11 +3181,19 @@
         if (e.key !== "Escape") return;
         closeDrawer(); closeScreen("profileOverlay"); closeScreen("paymentOverlay"); closeScreen("helpOverlay"); closeMinerSheet();
       });
+      $("menuBinary").addEventListener("click", function(){ closeDrawer(); setView("binary"); });
+      $("menuAviator").addEventListener("click", function(){ closeDrawer(); setView("aviator"); });
+      $("menuSpin").addEventListener("click", function(){ closeDrawer(); setView("spin"); });
+      $("menuWhot").addEventListener("click", function(){ closeDrawer(); setView("whot"); });
+      $("binaryBackBtn").addEventListener("click", goHome);
+      $("aviatorBackBtn").addEventListener("click", goHome);
+      $("spinBackBtn").addEventListener("click", goHome);
+      $("whotBackBtn").addEventListener("click", goHome);
       $("menuHistory").addEventListener("click", function(){
         closeDrawer();
         setView("history");
       });
-      $("txBackBtn").addEventListener("click", function(){ setView("app"); });
+      $("txBackBtn").addEventListener("click", goHome);
       $("txFilters").addEventListener("click", function(e){
         var chip = e.target.closest ? e.target.closest("[data-txf]") : null;
         if (!chip) return;
@@ -3446,32 +3581,56 @@
       }
 
       /* ================= Aviator =================
-         BETTING (30s) → FLYING → RESOLVED (5s) → BETTING… The crash
-         multiplier is fixed at takeoff: 60% early crash 1.00x–1.30x,
-         40% fly round 2.0x–11.0x. The multiplier grows as 1 + t/10.
-         Greed rule: a bidder who has not cashed out by 1.50x loses the
-         bid on the spot; the plane still flies on to its predetermined
-         crash point for everyone watching. */
-      var AV_BET_MS = 30000, AV_RESOLVED_MS = 5000, AV_GREED_MULT = 1.5, AV_MAX_T = 100;
+         BETTING (15s) → FLYING → RESOLVED (5s) → BETTING… At takeoff
+         a bid flight draws R ~ Uniform(0,1): if R < 1/99 it is a win
+         flight with crash multiplier C uniform on 5x–10x — the plane
+         flies and the bidder may cash out at any moment before C is
+         reached (never cashing out loses the bid at C). Otherwise
+         (98/99) C = 1.00x exactly: the plane crashes on takeoff, an
+         instant loss with no cashout window. The multiplier grows
+         as 1 + t/10 and there is no forced crash. Flights with no
+         bid on board are display-only teases: 80% fly to a uniform
+         9x–10x, 20% crash instantly at 1.00x. No flight ever flies
+         past 10x. */
+      var AV_BET_MS = 15000, AV_RESOLVED_MS = 5000, AV_POS_T = 100; // AV_POS_T only eases the on-screen flight path
       var av = null, avTimer = null, avBidBusy = false;
-      var avFlightNo = 0; // flights taken off in this page session (resets on reload)
+      function avDrawBidCrash(){
+        // Flat 1-in-99 win chance; otherwise an instant 1.00x crash.
+        if (Math.random() < 1 / 99) return round2(5 + Math.random() * 5);
+        return 1;
+      }
+      function avDrawTeaseCrash(){
+        // Display-only: 80% soar to a uniform 9x–10x, 20% crash at 1.00x.
+        return Math.random() < 0.8 ? round2(9 + Math.random()) : 1;
+      }
       function avResetCycle(){
         av = { phase: "betting", endsAt: Date.now() + AV_BET_MS, flightStart: 0, crashMult: 0, bid: null };
-        var pl = $("avPlane"); if (pl) pl.classList.remove("crashed");
+        var pl = $("avPlane"); if (pl) pl.classList.remove("exploded");
+        var tp = $("avTrailPath"), tg = $("avTrailGlow");
+        if (tp) tp.setAttribute("d", ""); if (tg) tg.setAttribute("d", "");
         var bn = $("avBanner"); if (bn) bn.style.display = "none";
       }
       function avMultNow(){
         if (!av || av.phase !== "flying") return 1;
         var t = (Date.now() - av.flightStart) / 1000;
-        return Math.min(1 + t / 10, 11);
+        return 1 + t / 10;
       }
       function avRenderFlight(m){
         $("avMult").textContent = m.toFixed(2) + "x";
         var t = (Date.now() - av.flightStart) / 1000;
-        var p = Math.sqrt(Math.min(t, AV_MAX_T) / AV_MAX_T);
+        var p = Math.sqrt(Math.min(t, AV_POS_T) / AV_POS_T);
         var plane = $("avPlane");
-        plane.style.left = (3 + p * 82) + "%";
-        plane.style.bottom = (9 + p * 64) + "%";
+        plane.style.left = (10 + p * 78) + "%";
+        plane.style.bottom = (14 + p * 58) + "%";
+        // Motion trail: the path flown so far, on the same easing curve
+        // (trail coordinates are sky percentages, y flipped for SVG).
+        var d = "", steps = 14;
+        for (var i = 0; i <= steps; i++){
+          var q = p * i / steps;
+          d += (i === 0 ? "M" : "L") + (10 + q * 78).toFixed(1) + " " + (86 - q * 58).toFixed(1) + " ";
+        }
+        var tp = $("avTrailPath"), tg = $("avTrailGlow");
+        if (tp) tp.setAttribute("d", d); if (tg) tg.setAttribute("d", d);
         if (av.bid && av.bid.active) $("avCashBtn").textContent = "Cash Out " + fmtUSD(round2(av.bid.stake * m));
       }
       function avRender(){
@@ -3481,13 +3640,13 @@
         if (av.phase === "betting"){
           $("avMult").textContent = "—";
           var plane = $("avPlane");
-          plane.style.left = "3%"; plane.style.bottom = "9%";
+          plane.style.left = "10%"; plane.style.bottom = "14%";
           bidBtn.style.display = ""; cashBtn.style.display = "none";
           bidBtn.disabled = !!b || avBidBusy;
           bidBtn.textContent = avBidBusy ? "Placing…" : (b ? "Bid locked · " + fmtUSD(b.stake) : "Place Bid");
           amt.disabled = !!b || avBidBusy;
           note.textContent = b
-            ? "Your bid is locked for the next flight — cash out before the crash, and before 1.50x."
+            ? "Your bid is locked for the next flight — cash out before the crash."
             : "Bids close when the countdown ends. No bid? The flight still runs — watch it for free.";
         } else if (av.phase === "flying"){
           bidBtn.style.display = "none";
@@ -3495,7 +3654,7 @@
           amt.disabled = true;
           note.textContent = !b
             ? "No bid on this flight — sit back and watch."
-            : b.active ? "Cash out before the plane crashes — hold past 1.50x and the bid is gone."
+            : b.active ? "Cash out before the plane crashes."
             : b.cashed ? "Cashed out at " + b.cashMult.toFixed(2) + "x — the flight continues to its crash point."
             : "Bid lost — the flight continues to its crash point.";
           avRenderFlight(avMultNow());
@@ -3507,38 +3666,37 @@
       function avStartFlight(){
         av.phase = "flying";
         av.flightStart = Date.now();
-        avFlightNo++;
-        if (avFlightNo > 6){
-          // From the 7th flight of the session the sky turns hostile:
-          // 90% of rounds crash at 1.01x — effectively no cashout window —
-          // and the other 10% are normal fly rounds (greed rule applies).
-          av.crashMult = Math.random() < 0.9 ? 1.01 : round2(2 + Math.random() * 9);
+        if (av.bid && av.bid.active){
+          // Bid flight: flat 1-in-99 win chance — a win flight flies
+          // to a uniform 5x–10x crash point; anything else crashes on
+          // takeoff at exactly 1.00x.
+          av.crashMult = avDrawBidCrash();
         } else {
-          av.crashMult = Math.random() < 0.6
-            ? round2(1 + Math.random() * 0.30)
-            : round2(2 + Math.random() * 9);
+          // No bid on board: a display-only tease flight. 80% of the
+          // time it soars to a uniform 9x–10x; 20% it crashes
+          // instantly at 1.00x. Nobody can cash out on these flights.
+          av.crashMult = avDrawTeaseCrash();
         }
         $("avBanner").style.display = "none";
         $("avStatus").textContent = "Flying…";
         avRender();
       }
-      function avResolveBidLost(cm, greed){
+      function avResolveBidLost(cm){
         var bid = av.bid;
         if (!bid || !bid.active) return;
-        bid.active = false; bid.lost = true; bid.greed = !!greed; bid.lostMult = cm;
+        bid.active = false; bid.lost = true; bid.lostMult = cm;
         updatePlay(bid.playId, "lost", 0, { crash_mult: cm });
         pushRecent("aviator", { stake: bid.stake, payout: 0, status: "lost", time: Date.now() });
         toast("Aviator bid lost",
-          greed ? "You held past 1.50x — the bid crashed at 1.50x. Stake of " + fmtUSD(bid.stake) + " forfeited."
-                : "The plane crashed at " + cm.toFixed(2) + "x before you cashed out. Stake of " + fmtUSD(bid.stake) + " forfeited.",
+          "The plane crashed at " + cm.toFixed(2) + "x before you cashed out. Stake of " + fmtUSD(bid.stake) + " forfeited.",
           "lose");
         avRender();
       }
       function avCrash(){
-        if (av.bid && av.bid.active) avResolveBidLost(av.crashMult, false);
+        if (av.bid && av.bid.active) avResolveBidLost(av.crashMult);
         av.phase = "resolved";
         av.endsAt = Date.now() + AV_RESOLVED_MS;
-        $("avPlane").classList.add("crashed");
+        $("avPlane").classList.add("exploded");
         $("avStatus").textContent = "Crashed at " + av.crashMult.toFixed(2) + "x";
         var b = $("avBanner"), bid = av.bid;
         b.style.display = "";
@@ -3547,9 +3705,7 @@
           b.textContent = "Cashed out at " + bid.cashMult.toFixed(2) + "x · won " + fmtUSD(bid.payout) + " — the flight crashed at " + av.crashMult.toFixed(2) + "x.";
         } else if (bid && bid.lost){
           b.className = "game-banner lose";
-          b.textContent = bid.greed
-            ? "Bid lost — held past 1.50x. The flight itself crashed at " + av.crashMult.toFixed(2) + "x."
-            : "Crashed at " + av.crashMult.toFixed(2) + "x · bid lost.";
+          b.textContent = "Crashed at " + av.crashMult.toFixed(2) + "x · bid lost.";
         } else {
           b.className = "game-banner";
           b.textContent = "Flight crashed at " + av.crashMult.toFixed(2) + "x. Next flight opens shortly.";
@@ -3567,7 +3723,6 @@
         }
         if (av.phase === "flying"){
           var m = avMultNow();
-          if (av.bid && av.bid.active && m >= AV_GREED_MULT && av.crashMult > AV_GREED_MULT) avResolveBidLost(AV_GREED_MULT, true);
           if (m >= av.crashMult){ avCrash(); return; }
           avRenderFlight(m);
           return;
@@ -3596,7 +3751,7 @@
             }
             av.bid = { playId: playId, stake: stake, active: true, cashed: false, lost: false };
             renderWallets(); avRender();
-            toast("Bid placed · " + fmtUSD(stake), "Locked from Main Balance for the next flight — cash out before the crash, and before 1.50x.");
+            toast("Bid placed · " + fmtUSD(stake), "Locked from Main Balance for the next flight — cash out before the crash.");
           });
         });
       }
@@ -3629,14 +3784,15 @@
           .then(function(){ loadRecentPlays(); }).catch(function(){});
       }
       /* ================= Spin Wheel =================
-         Segments are sized by their true weights. The outcome is drawn
-         by weight first, then the wheel is rotated (with a 4s easing
-         spin) so the pointer lands in the middle of that segment. */
+         The wheel is drawn as six EQUAL segments — presentation only.
+         The outcome is drawn by the segment weights first, then the
+         wheel is rotated (with a 4s easing spin) so the pointer lands
+         in the middle of that segment. */
       var SPIN_SEGS = [
         { key: "again",   label: "Try again", w: 70,  fill: "#2A2150", text: "#9AA3C7" },
-        { key: "reward1", label: "$1 reward", w: 10,  fill: "#14714B", text: "#D9F5E7" },
-        { key: "reward05", label: "$0.50 reward", w: 10, fill: "#2F9E77", text: "#E2F7EC" },
-        { key: "none",    label: "No result", w: 9,   fill: "#3D4A7A", text: "#C7CEE8" },
+        { key: "reward1", label: "$1", w: 10,  fill: "#14714B", text: "#D9F5E7" },
+        { key: "reward05", label: "$0.5", w: 10, fill: "#2F9E77", text: "#E2F7EC" },
+        { key: "none",    label: "0", w: 9,   fill: "#3D4A7A", text: "#C7CEE8" },
         { key: "x2",      label: "2x",        w: 0.9, fill: "#9A7B2D", text: "#FFF3D6" },
         { key: "x10",     label: "10x",       w: 0.1, fill: "#C9A24B", text: "#181203" }
       ];
@@ -3651,7 +3807,7 @@
         if (!svg || svg.childNodes.length) return;
         var cx = 130, cy = 130, r = 124, a = 0, parts = "";
         SPIN_SEGS.forEach(function(seg){
-          var sweep = seg.w / 100 * 360;
+          var sweep = 360 / SPIN_SEGS.length; // equal segments, one per outcome
           var a1 = a, a2 = a + sweep; a = a2;
           seg.center = a1 + sweep / 2;
           function pt(ang){
@@ -3715,7 +3871,7 @@
         var b = $("spinBanner");
         b.style.display = "";
         if (seg.key === "again"){ b.className = "game-banner lose"; b.textContent = "Try again — your " + fmtUSD(stake) + " stake is lost."; }
-        else if (seg.key === "none"){ b.className = "game-banner"; b.textContent = "No result — your " + fmtUSD(stake) + " stake is returned to your Main Balance."; }
+        else if (seg.key === "none"){ b.className = "game-banner"; b.textContent = "0 — your " + fmtUSD(stake) + " stake is returned to your Main Balance."; }
         else { b.className = "game-banner win"; b.textContent = seg.label + "! " + fmtUSD(payout) + " credited to your Main Balance."; }
         spinState.spinning = false;
         $("spinBtn").disabled = false;
