@@ -751,17 +751,7 @@
               </button>
             </span>
           </div>
-          <div class="mining-figs">
-            <div class="mfig">
-              <div class="mfig-label">Mining profits</div>
-              <div class="mfig-value num" id="miningBalance">$0.00</div>
-            </div>
-            <div class="mfig">
-              <div class="mfig-label">Locked principal</div>
-              <div class="mfig-value num" id="miningPrincipal">$0.00</div>
-              <div class="mfig-note num" id="principalNote"></div>
-            </div>
-          </div>
+          <div class="w-balance num" id="miningBalance">$0.00</div>
           <div class="w-sub num" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
           <div class="w-actions">
             <button class="btn" id="btnBuyMiner" type="button">Buy Miner</button>
@@ -770,7 +760,7 @@
           </div>
           <div class="lock-note card-info" id="miningInfo">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E77A0" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-            <span>Pick a mining pack and put in any amount in its range with your Main Balance — your daily profit is the pack's percentage of what you put in. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. Cashout moves everything currently unlocked into Main Balance in one go: your mining profits once your pack's profit lock has passed (Starter any day, Pro after 3 days, Industrial after 7 days, Whale after 30 days), plus the amount you put in once 14 days have passed since purchase — that 14-day principal lock applies to every pack. Cashing out the principal closes your miner; cashing out profits only keeps it running. Buying a new pack replaces your current rig; your Mining profits carry over.</span>
+            <span>Pick a mining pack and put in any amount in its range with your Main Balance — buying a miner is a straight purchase, and your daily profit is the pack's percentage of what you put in. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. Cashout moves your mining profits into Main Balance once your pack's profit lock has passed (Starter any day, Pro after 3 days, Industrial after 7 days, Whale after 30 days) — cashing out never closes your miner. Buying a new pack replaces your current rig; your Mining profits carry over.</span>
           </div>
         </div>
       </section>
@@ -994,7 +984,7 @@
     <div class="overlay" id="minerOverlay">
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="minerTitle">
         <h3 id="minerTitle">Buy a Mining Pack</h3>
-        <p class="sheet-sub">Pick a pack, then enter how much to put in — the amount comes out of your Main Balance, and your daily profit is the pack's percentage of it. Start it from the Mining card and it runs for 24 hours, then credits its profit to your Mining profits. The amount you put in stays locked for 14 days, then it can be cashed out too — cashing it out closes the miner. One miner per account: buying a new pack replaces your current one, and your Mining profits carry over.</p>
+        <p class="sheet-sub">Pick a pack, then enter how much to put in — the amount comes out of your Main Balance, and your daily profit is the pack's percentage of it. Start it from the Mining card and it runs for 24 hours, then credits its profit to your Mining profits. Buying a miner is a straight purchase — the amount you put in is spent on the rig, not locked or returned. One miner per account: buying a new pack replaces your current one, and your Mining profits carry over.</p>
         <div id="minerTiers"></div>
         <div class="pack-form" id="packForm" style="display:none;">
           <div class="form-field" style="margin-bottom:0;">
@@ -1171,7 +1161,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Mining work, and when can I cash out?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Buy a mining pack from the Mining card — <b>Starter</b> ($5–$49, 3% per day), <b>Pro</b> ($50–$499, 7% per day), <b>Industrial</b> ($500–$4,999, 15% per day) or <b>Whale</b> ($5,000+, 30% per day) — and enter any amount in the pack's range; your daily profit is that percentage of your amount. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. <b>Profit</b> cashout locks depend on the pack: Starter can cash out profits any day, Pro after 3 days, Industrial after 7 days and Whale after 30 days. The <b>amount you put in</b> is locked for <b>14 days</b> on every pack, then it becomes available for cashout too — but cashing it out <b>closes your miner</b>. Cashout moves everything currently unlocked into Main Balance in one go.</div>
+            <div class="faq-a">Buy a mining pack from the Mining card — <b>Starter</b> ($5–$49, 3% per day), <b>Pro</b> ($50–$499, 7% per day), <b>Industrial</b> ($500–$4,999, 15% per day) or <b>Whale</b> ($5,000+, 30% per day) — and enter any amount in the pack's range; your daily profit is that percentage of your amount. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. <b>Profit</b> cashout locks depend on the pack: Starter can cash out profits any day, Pro after 3 days, Industrial after 7 days and Whale after 30 days. Buying a miner is a straight purchase — the amount you put in is spent on the rig and isn't returned. Cashout moves your mining profits into Main Balance and never closes your miner.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How do deposits and withdrawals work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1212,10 +1202,10 @@
 
       var CYCLE_MS = 24 * 3600 * 1000;
       /* Flexible mining packs: the user puts in any amount within the
-         pack's range and earns rate × amount per 24h cycle. Profit
-         cashout is locked for lockDays counted from purchased_at
-         (0 = any day); the purchase principal itself is locked for
-         PRINCIPAL_LOCK_DAYS from purchased_at on every pack. */
+         pack's range and earns rate × amount per 24h cycle. Buying a
+         miner is a straight purchase — the amount put in is spent, not
+         locked or returned. Profit cashout is locked for lockDays
+         counted from purchased_at (0 = any day). */
       var MINER_PACKS = [
         { name: "Starter pack", min: 5, max: 49, rate: 0.03, lockDays: 0 },
         { name: "Pro pack", min: 50, max: 499, rate: 0.07, lockDays: 3 },
@@ -1232,30 +1222,16 @@
         var p = packByName(tier);
         return (p ? p.lockDays : 7) * 24 * 3600 * 1000;
       }
-      // The purchase principal is locked for 14 days from purchase on
-      // every pack; after that it can be cashed out (which closes the miner).
-      var PRINCIPAL_LOCK_MS = 14 * 24 * 3600 * 1000;
-      // What a cashout would move right now: the mining profits once the
-      // pack's profit lock has passed, plus the principal once its 14-day
-      // lock has passed. Each part is 0 while its own lock is still running.
+      // What a cashout would move right now: the mining profits, once the
+      // pack's profit lock has passed (0 while that lock is still running).
       function minerWithdrawable(now){
         var m = state.miner;
-        var out = { profits: 0, principal: 0, total: 0 };
+        var out = { profits: 0, total: 0 };
         if (!m) return out;
         now = now || Date.now();
         if (now >= m.purchasedAt + lockMsForTier(m.tier)) out.profits = Math.round(m.balance * 100) / 100;
-        if (now >= m.purchasedAt + PRINCIPAL_LOCK_MS) out.principal = Math.round(m.price * 100) / 100;
-        out.total = Math.round((out.profits + out.principal) * 100) / 100;
+        out.total = out.profits;
         return out;
-      }
-      // Delete the tn_miners row (used when a cashout takes the principal
-      // and the miner closes). Returns success.
-      function deleteMinerRow(){
-        if (!sb || !currentUser) return Promise.resolve(false);
-        return sb.from("tn_miners").delete().eq("user_id", currentUser.id).then(function(res){
-          if (res.error){ netErrorToast("Closing your miner"); return false; }
-          return true;
-        }).catch(function(){ netErrorToast("Closing your miner"); return false; });
       }
       var PAYOUT_RATE = 0.9;
       var BLACK_MARKET_RATE = 1380; // NGN per USD, parallel market — bank transfer instructions only; requests stay in USD
@@ -1328,6 +1304,39 @@
       }
       var state = blankState();
 
+      /* ================= Referral profit share =================
+         When this user earns a profit — a completed mining cycle or a
+         won bid — 1% of that profit goes to whoever referred them. The
+         share is ledgered in tn_referral_earnings under the unique
+         (source_type, source_id) pair with ignore-duplicates semantics,
+         and the referrer's Main Balance is credited only when the
+         insert actually created the row — a share can never pay twice. */
+      var REFERRAL_SHARE_RATE = 0.01;
+      function creditReferralShare(sourceType, sourceId, profit){
+        if (!sb || !currentUser || !(profit > 0)) return Promise.resolve(false);
+        var amount = Math.round(profit * REFERRAL_SHARE_RATE * 10000) / 10000;
+        if (!(amount > 0)) return Promise.resolve(false);
+        return sb.from("tn_referrals").select("referrer_id").eq("referred_id", currentUser.id).limit(1)
+          .then(function(res){
+            var ref = (res.data || [])[0];
+            if (!ref || !ref.referrer_id) return false;
+            var referrerId = ref.referrer_id;
+            return sb.from("tn_referral_earnings").upsert({
+              source_type: sourceType, source_id: String(sourceId),
+              referrer_id: referrerId, referred_id: currentUser.id, amount: amount
+            }, { onConflict: "source_type,source_id", ignoreDuplicates: true }).select("id").then(function(ins){
+              if (ins.error || !ins.data || !ins.data.length) return false; // already ledgered — never double-credit
+              // The ledger row is new: credit the referrer's Main Balance.
+              return sb.from("tn_wallets").select("main_balance").eq("user_id", referrerId).maybeSingle().then(function(w){
+                if (w.error || !w.data) return false;
+                var bal = Math.round(((Number(w.data.main_balance) || 0) + amount) * 100) / 100;
+                return sb.from("tn_wallets").update({ main_balance: bal, updated_at: new Date().toISOString() }).eq("user_id", referrerId)
+                  .then(function(u){ return !u.error; });
+              });
+            });
+          }).catch(function(){ return false; });
+      }
+
       /* ================= Mining =================
          One miner per user, stored in tn_miners. A cycle runs 24h from
          miner_started_at; when it elapses, exactly one cycle's profit is
@@ -1378,13 +1387,17 @@
         minerSettling = true;
         minerSettleKey = m.startedAt;
         var profit = m.profit;
+        var cycleStartedAt = m.startedAt; // identifies this cycle for the referral-share ledger
         m.balance = Math.round((m.balance + profit) * 100) / 100;
         m.status = "idle";
         m.startedAt = null;
         renderWallets();
         persistMiner().then(function(ok){
           minerSettling = false;
-          if (ok) toast("Mining complete: +" + fmtUSD(profit), "Your " + m.tier + " finished its 24h cycle — the profit is in your Mining balance. Start it again from the Mining card for the next cycle.", "win");
+          if (ok){
+            toast("Mining complete: +" + fmtUSD(profit), "Your " + m.tier + " finished its 24h cycle — the profit is in your Mining balance. Start it again from the Mining card for the next cycle.", "win");
+            if (currentUser) creditReferralShare("mining_cycle", currentUser.id + ":" + new Date(cycleStartedAt).toISOString(), profit);
+          }
           else refreshFromServer(true);
           renderWallets();
         });
@@ -1573,11 +1586,6 @@
         var m = state.miner;
         var now = Date.now();
         $("miningBalance").textContent = fmtUSD(m ? m.balance : 0);
-        $("miningPrincipal").textContent = fmtUSD(m ? m.price : 0);
-        var pNote = $("principalNote");
-        if (!m){ pNote.textContent = ""; pNote.className = "mfig-note num"; }
-        else if (now >= m.purchasedAt + PRINCIPAL_LOCK_MS){ pNote.textContent = "Available"; pNote.className = "mfig-note num avail"; }
-        else { pNote.textContent = "Unlocks in " + fmtDuration(m.purchasedAt + PRINCIPAL_LOCK_MS - now); pNote.className = "mfig-note num"; }
         $("minerChip").textContent = m ? m.tier : "No miner";
         var line = $("minerStatusLine");
         var startBtn = $("btnStartMining");
@@ -1597,15 +1605,12 @@
         if (!m){ co.disabled = true; co.textContent = "Cashout"; }
         else if (w.total > 0.004){ co.disabled = minerBusy; co.textContent = "Cashout " + fmtUSD(w.total); }
         else {
-          // Nothing unlocked yet: the disabled button names the nearest unlock.
+          // Profits still locked: the disabled button names when they unlock.
           co.disabled = true;
           var profitEnd = m.purchasedAt + lockMsForTier(m.tier);
-          var principalEnd = m.purchasedAt + PRINCIPAL_LOCK_MS;
-          var candidates = [];
-          if (m.balance > 0.004 && now < profitEnd) candidates.push({ at: profitEnd, label: "Profits unlock in " + fmtDuration(profitEnd - now) });
-          if (now < principalEnd) candidates.push({ at: principalEnd, label: "Principal unlocks in " + fmtDuration(principalEnd - now) });
-          candidates.sort(function(a, b){ return a.at - b.at; });
-          co.textContent = candidates.length ? candidates[0].label : "Cashout";
+          co.textContent = (m.balance > 0.004 && now < profitEnd)
+            ? "Profits unlock in " + fmtDuration(profitEnd - now)
+            : "Cashout";
         }
       }
       function renderWallets(){
@@ -1805,6 +1810,8 @@
           payout = stake * (1 + PAYOUT_RATE);
           state.main += payout;
           if (state.mgOn) state.mgStep = 0;
+          // 1% of the win's profit (stake × PAYOUT_RATE) to the referrer.
+          creditReferralShare("bid", row.id, stake * PAYOUT_RATE);
         } else {
           if (state.mgOn) state.mgStep++;
         }
@@ -2101,8 +2108,9 @@
       function closeMinerSheet(){ $("minerOverlay").className = "overlay"; }
       // Buying deducts the entered amount from Main Balance (through the
       // wallet write path) and upserts the tn_miners row with the pack
-      // name as tier and profit_24h = amount × rate. Replacing a rig keeps
-      // the mining profits; both cashout locks restart at purchase.
+      // name as tier and profit_24h = amount × rate. It's a straight
+      // purchase — the amount is spent, not locked. Replacing a rig
+      // keeps the mining profits; the profit lock restarts at purchase.
       function buyMiner(){
         if (minerBusy) return;
         var p = MINER_PACKS[selectedPack];
@@ -2142,8 +2150,7 @@
             toast(replacing ? "Miner replaced" : "Miner purchased",
               "You put " + fmtUSD(amt) + " into the " + p.name + " — it earns " + fmtUSD(profit) + " per 24h cycle. Tap Start Mining on the Mining card to run it." +
               (replacing ? " Your mining profits carried over." : "") +
-              (p.lockDays === 0 ? " Profits can be cashed out any day." : " Profits unlock " + p.lockDays + " days from this purchase.") +
-              " The " + fmtUSD(amt) + " you put in unlocks after 14 days.");
+              (p.lockDays === 0 ? " Profits can be cashed out any day." : " Profits unlock " + p.lockDays + " days from this purchase."));
           });
         });
       }
@@ -2159,43 +2166,30 @@
           renderWallets();
         });
       }
-      // Cashout moves everything currently unlocked into Main Balance in
-      // one go: the mining profits once the pack's profit lock has passed,
-      // plus the purchase principal once 14 days have passed since
-      // purchase. Taking the principal closes the miner — its tn_miners
-      // row is deleted and any unfinished 24h cycle is forfeited (only
-      // completed cycles were ever credited). A profits-only cashout
-      // leaves the miner running.
+      // Cashout moves the mining profits into Main Balance once the
+      // pack's profit lock has passed. It never closes the miner.
       function cashoutMiner(){
         var m = state.miner;
         if (!m || minerBusy) return;
         var w = minerWithdrawable();
-        if (!(w.total > 0)) return; // nothing unlocked yet; button is disabled too
+        if (!(w.total > 0)) return; // profits still locked; button is disabled too
         var amt = w.total;
-        var closesMiner = w.principal > 0;
         minerBusy = true;
         renderWallets();
         state.main += amt;
-        function finish(ok){
+        m.balance = Math.round((m.balance - w.profits) * 100) / 100;
+        persistMiner().then(function(ok){
           if (!ok){ minerBusy = false; refreshFromServer(true); return; }
           return persistWallet().then(function(){
             minerBusy = false;
             state.txs.unshift({ id: uid(), type: "cashout", amount: amt,
-              note: closesMiner ? "Mining profits and principal cashed out to Main Balance — miner closed" : "Mining profits cashed out to Main Balance",
+              note: "Mining profits cashed out to Main Balance",
               time: Date.now() });
             if (state.txs.length > 120) state.txs.length = 120;
             renderWallets(); renderHistory();
-            toast("Cashout complete", fmtUSD(amt) + " moved into Main Balance." +
-              (closesMiner ? " Your principal was included, so your miner is now closed." : " Your miner keeps running."));
+            toast("Cashout complete", fmtUSD(amt) + " moved into Main Balance. Your miner keeps running.");
           });
-        }
-        if (closesMiner){
-          state.miner = null;
-          deleteMinerRow().then(finish);
-        } else {
-          m.balance = Math.round((m.balance - w.profits) * 100) / 100;
-          persistMiner().then(finish);
-        }
+        });
       }
       function confirmSheet(){
         var amt = parseFloat($("sheetAmount").value);
