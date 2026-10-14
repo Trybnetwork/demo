@@ -573,6 +573,21 @@
       .auth-card form .btn{width:100%; padding:13px 10px; margin-top:2px;}
       .auth-note{margin:16px 0 0; text-align:center; font-size:11.5px; color:var(--muted-2); line-height:1.5;}
 
+      /* ---------- Password show/hide ---------- */
+      .pw-wrap{position:relative;}
+      .pw-wrap .text-input{padding-right:48px;}
+      .pw-toggle{
+        position:absolute; right:8px; top:50%; transform:translateY(-50%);
+        width:34px; height:34px; padding:0; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        background:transparent; border:0; border-radius:8px; color:var(--muted);
+      }
+      .pw-toggle:active{transform:translateY(calc(-50% + 1px));}
+      .pw-toggle .ico-eye-off{display:none;}
+      .pw-toggle.on{color:var(--gold-bright);}
+      .pw-toggle.on .ico-eye{display:none;}
+      .pw-toggle.on .ico-eye-off{display:block;}
+
       /* ---------- Toasts ---------- */
       .toasts{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:80; width:min(92vw, 420px); display:flex; flex-direction:column; gap:8px;}
       .toast{
@@ -644,7 +659,13 @@
           </div>
           <div class="form-field">
             <label for="suPass">Password</label>
-            <input class="text-input" id="suPass" type="password" maxlength="64" placeholder="At least 6 characters" autocomplete="new-password" />
+            <div class="pw-wrap">
+              <input class="text-input" id="suPass" type="password" maxlength="64" placeholder="At least 6 characters" autocomplete="new-password" />
+              <button class="pw-toggle" type="button" data-pw-toggle="suPass" aria-label="Show password" aria-pressed="false">
+                <svg class="ico-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="ico-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 8 10 8a13.5 13.5 0 0 1-2.68 3.19"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 8 10 8a9.74 9.74 0 0 0 5.39-1.61"/><path d="M2 2l20 20"/><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/></svg>
+              </button>
+            </div>
           </div>
           <div class="form-field">
             <label for="suDob">Date of birth <span style="text-transform:none; letter-spacing:0; color:var(--muted-2);">(optional)</span></label>
@@ -665,7 +686,13 @@
           </div>
           <div class="form-field">
             <label for="liPass">Password</label>
-            <input class="text-input" id="liPass" type="password" maxlength="64" placeholder="Your password" autocomplete="current-password" />
+            <div class="pw-wrap">
+              <input class="text-input" id="liPass" type="password" maxlength="64" placeholder="Your password" autocomplete="current-password" />
+              <button class="pw-toggle" type="button" data-pw-toggle="liPass" aria-label="Show password" aria-pressed="false">
+                <svg class="ico-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="ico-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 8 10 8a13.5 13.5 0 0 1-2.68 3.19"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 8 10 8a9.74 9.74 0 0 0 5.39-1.61"/><path d="M2 2l20 20"/><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/></svg>
+              </button>
+            </div>
           </div>
           <div class="sheet-err" id="liErr"></div>
           <button class="btn" type="submit">Log In</button>
@@ -2711,6 +2738,19 @@
       }
       $("authTabSignup").addEventListener("click", function(){ authTab("signup"); });
       $("authTabLogin").addEventListener("click", function(){ authTab("login"); });
+      /* Show/hide password toggles on the auth forms */
+      document.querySelectorAll("[data-pw-toggle]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          var input = $(btn.getAttribute("data-pw-toggle"));
+          if (!input) return;
+          var show = input.type === "password";
+          input.type = show ? "text" : "password";
+          btn.classList.toggle("on", show);
+          btn.setAttribute("aria-pressed", show ? "true" : "false");
+          btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+          input.focus();
+        });
+      });
       function authError(id, msg){ var e = $(id); e.textContent = msg; e.className = "sheet-err show"; }
       function enterApp(){
         $("authGate").classList.remove("show");
