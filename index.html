@@ -632,38 +632,51 @@
       .whot-comp-name{font-family:"Sora",sans-serif; font-weight:800; font-size:14.5px;}
       .whot-comp-action{font-size:12px; color:var(--muted); margin-top:3px; line-height:1.5; min-height:18px;}
       .whot-backs{display:flex; align-items:center; padding-left:12px;}
-      .whot-back{width:26px; height:38px; margin-left:-12px; border-radius:5px; border:1px solid var(--line); background:repeating-linear-gradient(45deg, #1B2450 0 5px, #141B40 5px 10px); flex:0 0 auto;}
+      .whot-back{width:26px; height:38px; margin-left:-12px; border-radius:5px; flex:0 0 auto;}
+      .whot-back .wb-word{font-size:6.5px;}
+      /* Card back (market deck + computer's hand): deep red with the
+         "Whot" wordmark printed twice, one rotated 180°, centered. */
+      .whot-backface{
+        background:linear-gradient(165deg, #9A2A22, #7E1D19);
+        border:1px solid rgba(0,0,0,.4);
+        box-shadow:0 1px 3px rgba(0,0,0,.35);
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+        overflow:hidden;
+      }
+      .whot-backface .wb-word{
+        font-family:Georgia, "Times New Roman", serif; font-weight:700; font-style:italic;
+        color:#FFFFFF; line-height:1; letter-spacing:.2px; white-space:nowrap;
+      }
+      .whot-backface .wb-flip{transform:rotate(180deg);}
       .whot-backs .wb-more{font-size:12px; font-weight:800; color:var(--muted); margin-left:6px;}
       .whot-mid{display:flex; align-items:flex-start; justify-content:center; gap:30px; margin-top:16px;}
       .whot-pilebox{text-align:center;}
       .whot-mini-label{font-size:10.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted-2); margin-bottom:6px;}
       .whot-required{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; font-size:12.5px; color:var(--muted); font-weight:700;}
       .whot-card{
-        width:56px; height:78px; border-radius:10px; padding:4px;
-        background:linear-gradient(165deg, #FCF9F0, #EDE6D2); color:#1B2140;
-        border:1px solid rgba(0,0,0,.3);
-        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+        position:relative; width:56px; height:78px; border-radius:10px; padding:0;
+        background:#FFFFFF; color:#CE2029;
+        border:1px solid rgba(0,0,0,.22);
+        box-shadow:0 1px 3px rgba(0,0,0,.35);
       }
-      .whot-card .wc-num{font-family:"Sora",sans-serif; font-weight:800; font-size:19px; line-height:1;}
-      .whot-card .wc-special{font-size:8px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; color:#5A6285; text-align:center; line-height:1.3;}
-      .whot-card.wild{background:linear-gradient(165deg, #1B2450, #0F173C); color:var(--gold-bright); border-color:var(--gold);}
-      .whot-card .wc-whot{font-family:"Sora",sans-serif; font-weight:800; font-size:14px; letter-spacing:1px;}
-      .whot-card .wc-wild-sub{font-size:8.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; font-weight:800;}
+      .whot-card .wc-corner{position:absolute; display:flex; flex-direction:column; align-items:center; gap:1px; line-height:1;}
+      .whot-card .wc-tl{top:4px; left:4px;}
+      .whot-card .wc-br{bottom:4px; right:4px; transform:rotate(180deg);}
+      .whot-card .wc-cnum{font-family:"Sora",sans-serif; font-weight:800; font-size:13px; line-height:1; color:#CE2029;}
+      .whot-card .wc-center{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+      .whot-card .wc-whot{font-family:"Sora",sans-serif; font-weight:800; font-size:14px; letter-spacing:1px; color:#CE2029;}
+      .whot-card .wc-dash{font-family:"Sora",sans-serif; font-weight:800; font-size:20px; color:#9AA0B5;}
       button.whot-card{cursor:pointer; font-family:inherit; transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;}
       button.whot-card:disabled{cursor:default;}
       .whot-card.dim{opacity:.42;}
       .whot-card.playable{box-shadow:0 0 0 2px var(--gold); transform:translateY(-4px);}
       .whot-card.drawn{box-shadow:0 0 0 2px var(--green);}
       .whot-deck{
-        width:56px; height:78px; border-radius:10px; border:1px solid var(--line);
-        background:repeating-linear-gradient(45deg, #232B5C 0 6px, #171F52 6px 12px);
-        color:var(--gold-bright); cursor:pointer;
-        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-        font-family:"Sora",sans-serif; font-weight:800; padding:4px;
+        width:56px; height:78px; border-radius:10px;
+        cursor:pointer; padding:4px;
       }
       .whot-deck:disabled{opacity:.45; cursor:not-allowed;}
-      .whot-deck .wd-count{font-size:17px; line-height:1;}
-      .whot-deck .wd-label{font-size:8.5px; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); font-family:"Manrope",sans-serif;}
+      .whot-deck .wb-word{font-size:15px;}
       .whot-hand{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; justify-content:center;}
       .whot-empty{font-size:13px; color:var(--muted-2); text-align:center; width:100%; padding:10px 0;}
       .whot-suits{display:none; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; font-size:13px; font-weight:700;}
@@ -1166,7 +1179,7 @@
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             </button>
           </h2>
-          <p class="sec-sub card-info" id="whotCardSub">Nigerian Whot against the computer. You both start with 6 cards — play a card that matches the pile's shape or number, or play a Whot wild card and call any shape. Specials: 1 = Hold On (play again), 2 = opponent picks 2 and misses a turn, 5 = opponent picks 3 and misses a turn, 8 = Suspension (opponent misses a turn), 14 = General Market (both players pick 1). If you can't play, pick 1 from the market — if it plays, you may play it, otherwise the turn passes. First to empty their hand wins their stake plus 80% profit.</p>
+          <p class="sec-sub card-info" id="whotCardSub">Nigerian Whot against the computer. You both start with 6 cards — play a card that matches the pile's shape or number, or play a Whot wild card and call any shape. Specials: 1 = Hold On (play again), 2 = opponent picks 2 and misses a turn, 5 = opponent picks 3 and misses a turn, 8 = Suspension (opponent misses a turn), 14 = General Market (both players pick 1). If you can't play, pick 1 from the market — if it plays, you may play it, otherwise the turn passes. First to empty their hand wins their stake plus 80% profit. If the market runs out completely and neither side can play, the lower hand total wins instead (a Whot wild counts 20) — a tie returns your stake.</p>
           <div class="recent-row"><span class="recent-label">Recent rounds</span><div class="recent-strip" id="whotRecent"><span class="recent-none">No rounds yet</span></div></div>
           <div class="whot-top">
             <div class="whot-comp-info">
@@ -1178,11 +1191,11 @@
           <div class="whot-mid">
             <div class="whot-pilebox">
               <div class="whot-mini-label">Pile</div>
-              <div id="whotPile"><div class="whot-card dim"><span class="wc-num" style="color:#5A6285;">–</span></div></div>
+              <div id="whotPile"><div class="whot-card dim"><span class="wc-center"><span class="wc-dash">–</span></span></div></div>
             </div>
             <div class="whot-pilebox">
-              <div class="whot-mini-label">Market</div>
-              <button class="whot-deck" id="whotDeckBtn" type="button" disabled><span class="wd-count num" id="whotDeckCount">64</span><span class="wd-label">Pick 1</span></button>
+              <div class="whot-mini-label">Market · <span class="num" id="whotDeckCount">64</span> left</div>
+              <button class="whot-deck whot-backface" id="whotDeckBtn" type="button" disabled aria-label="Market draw pile — pick 1"><span class="wb-word wb-flip">Whot</span><span class="wb-word">Whot</span></button>
             </div>
           </div>
           <div class="whot-required" id="whotRequired" style="display:none;"></div>
@@ -3886,6 +3899,7 @@
       var WHOT_SUITS = ["circle", "triangle", "cross", "square", "star"];
       var WHOT_SUIT_NAMES = { circle: "Circle", triangle: "Triangle", cross: "Cross", square: "Square", star: "Star" };
       var WHOT_SUIT_COLORS = { circle: "#C7433B", triangle: "#9A7B2D", cross: "#14714B", square: "#3D5A9E", star: "#7A4FA3" };
+      var WHOT_RED = "#CE2029"; // card faces print every shape and number in this red
       var WHOT_NUMS = [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14];
       var WHOT_SPECIALS = { 1: "Hold On", 2: "Pick 2", 5: "Pick 3", 8: "Suspension", 14: "General Market" };
       var whot = null, whotBusy = false, whotPendingWild = -1;
@@ -3910,9 +3924,9 @@
             whotHardMode = whotWinCount >= 3;
           }).catch(function(){ /* keep the local fallback */ });
       }
-      function whotSuitSvg(suit, size){
+      function whotSuitSvg(suit, size, color){
         size = size || 22;
-        var c = WHOT_SUIT_COLORS[suit], inner = "";
+        var c = color || WHOT_SUIT_COLORS[suit], inner = "";
         if (suit === "circle") inner = '<circle cx="12" cy="12" r="8" fill="' + c + '"/>';
         else if (suit === "triangle") inner = '<polygon points="12,4 21,20 3,20" fill="' + c + '"/>';
         else if (suit === "cross") inner = '<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="' + c + '"/>';
@@ -3921,10 +3935,13 @@
         return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" aria-hidden="true">' + inner + "</svg>";
       }
       function whotCardInner(card){
-        if (card.whot) return '<span class="wc-whot">WHOT</span><span class="wc-wild-sub">Wild card</span>';
-        return '<span class="wc-num num" style="color:' + WHOT_SUIT_COLORS[card.suit] + '">' + card.num + '</span>' +
-               '<span class="wc-shape">' + whotSuitSvg(card.suit, 24) + "</span>" +
-               (WHOT_SPECIALS[card.num] ? '<span class="wc-special">' + WHOT_SPECIALS[card.num] + "</span>" : "");
+        if (card.whot) return '<span class="wc-corner wc-tl"><span class="wc-cnum">20</span></span>' +
+               '<span class="wc-center"><span class="wc-whot">WHOT</span></span>' +
+               '<span class="wc-corner wc-br"><span class="wc-cnum">20</span></span>';
+        var corner = '<span class="wc-cnum">' + card.num + '</span>' + whotSuitSvg(card.suit, 9, WHOT_RED);
+        return '<span class="wc-corner wc-tl">' + corner + '</span>' +
+               '<span class="wc-center">' + whotSuitSvg(card.suit, 32, WHOT_RED) + "</span>" +
+               '<span class="wc-corner wc-br">' + corner + "</span>";
       }
       function whotCardHtml(card){
         return '<div class="whot-card' + (card.whot ? " wild" : "") + '">' + whotCardInner(card) + "</div>";
@@ -3979,6 +3996,7 @@
         if (idx > -1) hand.splice(idx, 1);
         whot.pile.push(card);
         whot.rounds++;
+        whot.deadPasses = 0; // a card was played — the stalemate count resets
         whot.requiredSuit = card.whot ? (calledSuit || whot.requiredSuit) : card.suit;
         if (!hand.length){ whotFinish(who); return null; }
         var other = who === "user" ? "comp" : "user", next = other;
@@ -4006,6 +4024,33 @@
         whotRender();
         if (next === "comp") setTimeout(whotCompTurn, 950);
       }
+      /* Market-exhaustion stalemate: the market is empty and cannot be
+         recycled (deck 0, pile down to its top card) and both sides have
+         consecutively passed with no playable card and no draw possible.
+         Total each hand — a Whot wild counts 20 — and the lower total
+         wins through the normal finish path; a tie returns the stake. */
+      function whotHandTotal(hand){
+        var t = 0;
+        hand.forEach(function(c){ t += c.whot ? 20 : c.num; });
+        return t;
+      }
+      function whotStalemate(){
+        var uT = whotHandTotal(whot.user), cT = whotHandTotal(whot.comp);
+        whot.stalemate = { user: uT, comp: cT };
+        if (uT === cT){
+          whot.over = true; whot.winner = "draw"; whot.turn = null;
+          whotPendingWild = -1;
+          state.main = round2(state.main + whot.stake);
+          persistWallet();
+          updatePlay(whot.playId, "draw", whot.stake, { rounds_played: whot.rounds });
+          pushRecent("whot", { stake: whot.stake, payout: whot.stake, status: "draw", time: Date.now() });
+          toast("Market exhausted — tied, stake returned",
+            "Both hands total " + uT + " — your " + fmtUSD(whot.stake) + " stake is back in your Main Balance.");
+          renderWallets(); whotRender();
+          return;
+        }
+        whotFinish(uT < cT ? "user" : "comp");
+      }
       function whotFinish(winner){
         whot.over = true; whot.winner = winner; whot.turn = null;
         whotPendingWild = -1;
@@ -4021,11 +4066,21 @@
           whotHardMode = whotWinCount >= 3;
           try { localStorage.setItem("tn_whot_wins", String(whotWinCount)); } catch(e){}
           pushRecent("whot", { stake: whot.stake, payout: payout, status: "won", time: Date.now() });
-          toast("You won the Whot match!", fmtUSD(payout) + " — your stake plus 80% profit — credited to Main Balance.", "win");
+          if (whot.stalemate){
+            toast("Market exhausted — lowest hand total wins",
+              "Your hand totals " + whot.stalemate.user + " vs the computer's " + whot.stalemate.comp + " — " + fmtUSD(payout) + " credited to Main Balance.", "win");
+          } else {
+            toast("You won the Whot match!", fmtUSD(payout) + " — your stake plus 80% profit — credited to Main Balance.", "win");
+          }
         } else {
           updatePlay(whot.playId, "lost", 0, { rounds_played: whot.rounds });
           pushRecent("whot", { stake: whot.stake, payout: 0, status: "lost", time: Date.now() });
-          toast("Computer wins the Whot match", "Your " + fmtUSD(whot.stake) + " stake is forfeited.", "lose");
+          if (whot.stalemate){
+            toast("Market exhausted — lowest hand total wins",
+              "The computer's hand totals " + whot.stalemate.comp + " vs your " + whot.stalemate.user + " — your " + fmtUSD(whot.stake) + " stake is forfeited.", "lose");
+          } else {
+            toast("Computer wins the Whot match", "Your " + fmtUSD(whot.stake) + " stake is forfeited.", "lose");
+          }
         }
         renderWallets(); whotRender();
       }
@@ -4050,6 +4105,7 @@
               deck: whotBuildDeck(), user: [], comp: [], pile: [],
               requiredSuit: null, turn: "user", over: false, winner: null,
               playId: playId, stake: stake, rounds: 0, drawnIdx: -1, drewThisTurn: false,
+              deadPasses: 0, stalemate: null,
               lastAction: "Match started — your move."
             };
             whotPendingWild = -1;
@@ -4097,7 +4153,16 @@
         }
         whot.drewThisTurn = true;
         var drawn = whotDrawCards(1);
-        if (!drawn.length){ whotAfterTurn("comp"); return; }
+        if (!drawn.length){
+          // No playable card and nothing to draw: the market is empty and
+          // the pile can't be recycled — this turn passes dead. If the
+          // computer's turn passes the same way, it's a stalemate.
+          whot.deadPasses++;
+          whot.lastAction = "You had no matching card and the market is empty — turn passes.";
+          if (whot.deadPasses >= 2){ whotStalemate(); return; }
+          whotAfterTurn("comp"); return;
+        }
+        whot.deadPasses = 0; // a card changed hands — no longer consecutive dead passes
         whot.user.push(drawn[0]);
         if (whotPlayable(drawn[0])){
           whot.drawnIdx = whot.user.length - 1;
@@ -4200,6 +4265,7 @@
         // Stuck: pick 1 from the market, and play it if it plays.
         var drawn = whotDrawCards(1);
         if (drawn.length){
+          whot.deadPasses = 0; // a card changed hands — no longer consecutive dead passes
           whot.comp.push(drawn[0]);
           whot.lastAction = "Computer had no matching card and picked 1 from the market.";
           if (whotPlayable(drawn[0])){
@@ -4208,7 +4274,12 @@
             return;
           }
         } else {
+          // No playable card and the market can't supply one — this turn
+          // passes dead. If the user's turn already passed the same way,
+          // the match is a stalemate.
+          whot.deadPasses++;
           whot.lastAction = "Computer had no matching card and the market is empty — turn passes.";
+          if (whot.deadPasses >= 2){ whotStalemate(); return; }
         }
         whotAfterTurn("user");
       }
@@ -4224,11 +4295,11 @@
         var backs = "";
         if (whot){
           var n = Math.min(whot.comp.length, 12);
-          for (var i = 0; i < n; i++) backs += '<span class="whot-back"></span>';
+          for (var i = 0; i < n; i++) backs += '<span class="whot-back whot-backface"><span class="wb-word wb-flip">Whot</span><span class="wb-word">Whot</span></span>';
           if (whot.comp.length > 12) backs += '<span class="wb-more">+' + (whot.comp.length - 12) + "</span>";
         }
         $("whotBacks").innerHTML = backs;
-        $("whotPile").innerHTML = whot ? whotCardHtml(whotTop()) : '<div class="whot-card dim"><span class="wc-num" style="color:#5A6285;">–</span></div>';
+        $("whotPile").innerHTML = whot ? whotCardHtml(whotTop()) : '<div class="whot-card dim"><span class="wc-center"><span class="wc-dash">–</span></span></div>';
         var req = $("whotRequired");
         if (whot){
           req.style.display = "";
@@ -4243,10 +4314,20 @@
           b.className = "game-banner";
           b.textContent = "Enter a bid (min $1) and tap Play — first to empty their hand wins stake + 80%.";
         } else if (whot.over){
-          b.className = "game-banner " + (whot.winner === "user" ? "win" : "lose");
-          b.textContent = whot.winner === "user"
-            ? "You emptied your hand first — you win " + fmtUSD(round2(whot.stake * 1.8)) + "!"
-            : "The computer emptied its hand first — your " + fmtUSD(whot.stake) + " stake is lost.";
+          if (whot.winner === "draw"){
+            b.className = "game-banner";
+            b.textContent = "Market exhausted — hands tied at " + whot.stalemate.user + " each. Your " + fmtUSD(whot.stake) + " stake is returned.";
+          } else if (whot.stalemate){
+            b.className = "game-banner " + (whot.winner === "user" ? "win" : "lose");
+            b.textContent = whot.winner === "user"
+              ? "Market exhausted — lowest hand total wins. Your hand " + whot.stalemate.user + " beats the computer's " + whot.stalemate.comp + " — you win " + fmtUSD(round2(whot.stake * 1.8)) + "!"
+              : "Market exhausted — lowest hand total wins. The computer's hand " + whot.stalemate.comp + " beats your " + whot.stalemate.user + " — your " + fmtUSD(whot.stake) + " stake is lost.";
+          } else {
+            b.className = "game-banner " + (whot.winner === "user" ? "win" : "lose");
+            b.textContent = whot.winner === "user"
+              ? "You emptied your hand first — you win " + fmtUSD(round2(whot.stake * 1.8)) + "!"
+              : "The computer emptied its hand first — your " + fmtUSD(whot.stake) + " stake is lost.";
+          }
         } else if (whotPendingWild > -1){
           b.className = "game-banner";
           b.textContent = "Whot! Call a shape below — the next card must match it.";
