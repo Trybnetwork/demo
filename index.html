@@ -329,6 +329,31 @@
       .copy-btn:active{transform:translateY(1px);}
       .pd-qr{display:block; width:190px; max-width:100%; height:auto; margin:14px auto 4px; border-radius:10px; background:#fff; padding:10px;}
       .pd-note{font-size:12px; color:var(--muted); line-height:1.55; margin:10px 0 0; text-align:center;}
+      .pd-ngn{margin-top:14px; text-align:center; font-size:13px; color:var(--muted); font-weight:700;}
+      .pd-ngn .pd-ngn-amt{display:block; font-family:"Sora",sans-serif; font-weight:800; font-size:24px; color:var(--gold-bright); margin-top:2px; letter-spacing:-.3px;}
+      .pd-rate{font-size:11.5px; color:var(--muted-2); text-align:center; margin:5px 0 0; font-weight:700;}
+
+      /* ---------- Receipt upload (bank deposits) ---------- */
+      .receipt-block{margin-top:16px; border-top:1px solid var(--line-soft); padding-top:14px;}
+      .receipt-block label{display:block; font-size:11.5px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;}
+      .receipt-input{
+        width:100%; color:var(--muted); font-family:"Manrope",sans-serif; font-size:13px; font-weight:600;
+        background:var(--card-2); border:1px dashed rgba(201,162,75,.45); border-radius:12px; padding:11px 12px;
+      }
+      .receipt-input::file-selector-button{
+        cursor:pointer; border:1px solid var(--line); background:rgba(201,162,75,.12); color:var(--gold-bright);
+        font-family:"Manrope",sans-serif; font-weight:800; font-size:12.5px; padding:8px 13px; border-radius:9px; margin-right:10px;
+      }
+      .receipt-status{font-size:12.5px; color:var(--muted); margin-top:9px; line-height:1.5; font-weight:600;}
+      .receipt-status.ok{color:var(--green); font-weight:800;}
+      .receipt-status.err{color:#F0857E; font-weight:700;}
+      .receipt-bar{display:none; height:6px; background:#232B5C; border-radius:99px; margin-top:9px; overflow:hidden;}
+      .receipt-bar.show{display:block;}
+      .receipt-bar i{display:block; height:100%; width:40%; background:var(--gold); border-radius:99px; animation:receiptSlide 1.1s ease-in-out infinite;}
+      @keyframes receiptSlide{0%{transform:translateX(-110%);} 100%{transform:translateX(280%);}}
+      .receipt-thumb{display:none; width:100%; max-height:190px; object-fit:contain; margin-top:11px; border-radius:10px; border:1px solid var(--line-soft); background:var(--card-2);}
+      .receipt-thumb.show{display:block;}
+      .req-thumb{display:block; width:76px; height:76px; object-fit:cover; border-radius:10px; border:1px solid var(--line-soft); margin-top:9px;}
 
       /* ---------- Referral ---------- */
       .ref-panel{margin-top:14px;}
@@ -938,7 +963,16 @@
             <div class="pd-row"><span class="pd-label">Account number</span><span class="pd-value num">07010000000</span><button class="copy-btn" type="button" data-copy="07010000000" data-copy-label="Account number">Copy</button></div>
             <div class="pd-row"><span class="pd-label">Account name</span><span class="pd-value">Trybnetwork inc.</span><button class="copy-btn" type="button" data-copy="Trybnetwork inc." data-copy-label="Account name">Copy</button></div>
             <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="bankAmt">$0.00</span><button class="copy-btn" type="button" id="copyBankAmt">Copy</button></div>
-            <p class="pd-note">Send the amount above to this account, then tap “I've sent it” below. Your balance is credited once the deposit is approved.</p>
+            <div class="pd-ngn">Send<span class="pd-ngn-amt num" id="bankNgn">₦0</span></div>
+            <p class="pd-rate">Rate: ₦1,380/$ (parallel market)</p>
+            <p class="pd-note">Send the Naira amount above to this OPay account, attach your receipt below, then tap “I've sent it”. Your balance is credited in USD once the deposit is approved.</p>
+            <div class="receipt-block">
+              <label for="receiptInput">Transfer receipt (required)</label>
+              <input class="receipt-input" id="receiptInput" type="file" accept="image/*" capture="environment" />
+              <div class="receipt-bar" id="receiptBar"><i></i></div>
+              <div class="receipt-status" id="receiptStatus">Attach a screenshot or photo of your transfer receipt — the deposit can't be submitted without one.</div>
+              <img class="receipt-thumb" id="receiptPreview" alt="Your transfer receipt" />
+            </div>
           </div>
           <div class="pay-details" id="cryptoDetails">
             <div class="pd-row"><span class="pd-label">Coin</span><span class="pd-value">USDT (TRC-20)</span><button class="copy-btn" type="button" data-copy="USDT (TRC-20)" data-copy-label="Coin">Copy</button></div>
@@ -1224,6 +1258,7 @@
         }).catch(function(){ netErrorToast("Closing your miner"); return false; });
       }
       var PAYOUT_RATE = 0.9;
+      var BLACK_MARKET_RATE = 1380; // NGN per USD, parallel market — bank transfer instructions only; requests stay in USD
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
       var REFERRAL_REWARD = 3;
@@ -1382,6 +1417,7 @@
             id: r.id, user: "You (this account)", self: true,
             type: reqTypeFromDb(r.type), amount: Number(r.amount) || 0,
             method: r.method || null,
+            receiptUrl: r.receipt_url || null,
             status: r.status, time: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
             decidedAt: r.decided_at ? new Date(r.decided_at).getTime() : null
           };
@@ -1590,7 +1626,7 @@
         var box = $("myReqList");
         if (!box) return;
         var mine = state.adminRequests.filter(function(r){ return r.self; });
-        var sig = mine.map(function(r){ return r.id + ":" + r.status + ":" + r.amount + ":" + (r.method || ""); }).join("|");
+        var sig = mine.map(function(r){ return r.id + ":" + r.status + ":" + r.amount + ":" + (r.method || "") + ":" + (r.receiptUrl || ""); }).join("|");
         if (sig === myReqSig) return;
         myReqSig = sig;
         var panel = $("myRequestsPanel");
@@ -1610,7 +1646,8 @@
             '<span class="req-type ' + r.type + '">' + (isDep ? "Deposit" : "Withdrawal") + "</span>" +
             '<span class="req-user num">' + fmtUSD(r.amount) + "</span>" +
             (methodTxt ? '<span class="req-type" style="background:#232B5C; color:var(--muted);">' + methodTxt + "</span>" : "") + statusTag + "</div>" +
-            '<div class="req-meta">Requested ' + fmtTime(r.time) + " · " + detail + "</div></div>";
+            '<div class="req-meta">Requested ' + fmtTime(r.time) + " · " + detail + "</div>" +
+            (r.receiptUrl ? '<a href="' + esc(r.receiptUrl) + '" target="_blank" rel="noopener"><img class="req-thumb" src="' + esc(r.receiptUrl) + '" alt="Receipt attached to this deposit" loading="lazy" /></a>' : "") + "</div>";
         }).join("");
       }
       function renderPrice(){
@@ -1847,11 +1884,85 @@
       /* ================= Fund sheet ================= */
       var sheetMode = "deposit";
       var depositMethod = null; // "bank" | "crypto" | null (deposit flow only)
+      function fmtNGN(v){
+        return "₦" + Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
       function syncDepositAmounts(){
         var amt = parseFloat($("sheetAmount").value);
-        var txt = isFinite(amt) && amt > 0 ? fmtUSD(amt) : "$0.00";
-        $("bankAmt").textContent = txt;
-        $("cryptoAmt").textContent = txt;
+        var ok = isFinite(amt) && amt > 0;
+        $("bankAmt").textContent = ok ? fmtUSD(amt) : "$0.00";
+        $("cryptoAmt").textContent = ok ? fmtUSD(amt) : "$0.00";
+        $("bankNgn").textContent = ok ? fmtNGN(amt * BLACK_MARKET_RATE) : "₦0";
+      }
+      /* ---- Bank-transfer receipt upload (Supabase Storage: tn-receipts) ---- */
+      var receiptUrl = null;       // public URL once the upload completes
+      var receiptUploading = false;
+      var receiptLocalUrl = null;  // object URL for the instant local preview
+      function receiptNeeded(){
+        return sheetMode === "deposit" && depositMethod === "bank";
+      }
+      function updateSheetConfirmState(){
+        var btn = $("sheetConfirm");
+        btn.disabled = receiptNeeded() && (receiptUploading || !receiptUrl);
+        btn.textContent = receiptNeeded() && receiptUploading ? "Uploading receipt…"
+          : sheetMode === "deposit" ? "I've sent it" : "Request withdrawal";
+      }
+      function setReceiptStatus(msg, cls){
+        var s = $("receiptStatus");
+        s.textContent = msg;
+        s.className = "receipt-status" + (cls ? " " + cls : "");
+      }
+      function resetReceipt(){
+        receiptUrl = null;
+        receiptUploading = false;
+        if (receiptLocalUrl){ try { URL.revokeObjectURL(receiptLocalUrl); } catch(e){} receiptLocalUrl = null; }
+        $("receiptInput").value = "";
+        $("receiptBar").className = "receipt-bar";
+        var pv = $("receiptPreview");
+        pv.removeAttribute("src");
+        pv.className = "receipt-thumb";
+        setReceiptStatus("Attach a screenshot or photo of your transfer receipt — the deposit can't be submitted without one.");
+      }
+      function onReceiptChosen(){
+        var input = $("receiptInput");
+        var file = input.files && input.files[0];
+        if (!file) return;
+        if (!sb || !currentUser){ setReceiptStatus("You're not signed in — log in again, then attach your receipt.", "err"); return; }
+        receiptUrl = null;
+        receiptUploading = true;
+        if (receiptLocalUrl){ try { URL.revokeObjectURL(receiptLocalUrl); } catch(e){} }
+        receiptLocalUrl = URL.createObjectURL(file);
+        var pv = $("receiptPreview");
+        pv.src = receiptLocalUrl;
+        pv.className = "receipt-thumb show";
+        $("receiptBar").className = "receipt-bar show";
+        setReceiptStatus("Uploading your receipt…");
+        updateSheetConfirmState();
+        var ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        var path = currentUser.id + "/" + Date.now() + "." + ext;
+        sb.storage.from("tn-receipts").upload(path, file, { contentType: file.type || "image/jpeg", upsert: false }).then(function(res){
+          receiptUploading = false;
+          $("receiptBar").className = "receipt-bar";
+          if (res.error){
+            setReceiptStatus("The receipt upload failed — check your connection and attach it again.", "err");
+            updateSheetConfirmState();
+            return;
+          }
+          var pub = sb.storage.from("tn-receipts").getPublicUrl(path);
+          receiptUrl = pub && pub.data ? pub.data.publicUrl : null;
+          if (receiptUrl){
+            pv.src = receiptUrl;
+            setReceiptStatus("Receipt attached — you're good to submit.", "ok");
+          } else {
+            setReceiptStatus("The receipt uploaded but its link couldn't be read — attach it again.", "err");
+          }
+          updateSheetConfirmState();
+        }).catch(function(){
+          receiptUploading = false;
+          $("receiptBar").className = "receipt-bar";
+          setReceiptStatus("The receipt upload failed — check your connection and attach it again.", "err");
+          updateSheetConfirmState();
+        });
       }
       function selectDepositMethod(m){
         depositMethod = m;
@@ -1860,6 +1971,7 @@
         $("bankDetails").classList.toggle("show", m === "bank");
         $("cryptoDetails").classList.toggle("show", m === "crypto");
         syncDepositAmounts();
+        updateSheetConfirmState();
       }
       function openSheet(mode){
         sheetMode = mode;
@@ -1885,7 +1997,9 @@
         $("sheetSub").textContent = cfg.sub;
         $("sheetAvail").textContent = cfg.avail;
         $("sheetMax").style.display = cfg.max === null ? "none" : "";
+        resetReceipt();
         $("sheetConfirm").textContent = cfg.btn;
+        updateSheetConfirmState();
         $("sheetAmount").value = "";
         $("sheetErr").className = "sheet-err";
         $("sheetOverlay").className = "overlay show";
@@ -1893,15 +2007,18 @@
       }
       function closeSheet(){ $("sheetOverlay").className = "overlay"; }
       function sheetError(msg){ var e = $("sheetErr"); e.textContent = msg; e.className = "sheet-err show"; }
-      // The tn_requests "method" column may not exist yet: the first insert
-      // carries it, and if the database rejects the unknown column we retry
-      // without it and remember not to send it again this session.
+      // The tn_requests "method" and "receipt_url" columns may not exist
+      // yet: the first insert carries them, and if the database rejects an
+      // unknown column we retry without it and remember not to send it
+      // again this session.
       var methodColumnKnown = null; // null = untested, true = present, false = absent
-      function createFundRequest(type, amt, method){
+      var receiptColumnKnown = null; // same convention, for receipt_url
+      function createFundRequest(type, amt, method, receipt){
         if (!sb || !currentUser) return Promise.resolve(false);
-        function attempt(withMethod){
+        function attempt(withMethod, withReceipt){
           var row = { user_id: currentUser.id, type: reqTypeToDb(type), amount: amt, status: "pending" };
           if (withMethod && method) row.method = method;
+          if (withReceipt && receipt) row.receipt_url = receipt;
           return sb.from("tn_requests").insert(row).select().single();
         }
         function finish(res){
@@ -1909,23 +2026,27 @@
           state.adminRequests.unshift({
             id: r.id, user: "You (this account)", self: true, type: type, amount: amt,
             method: r.method || (method || null),
+            receiptUrl: r.receipt_url || (receipt || null),
             status: "pending", time: r.created_at ? new Date(r.created_at).getTime() : Date.now()
           });
           myReqSig = null;
           return true;
         }
+        function tryInsert(withMethod, withReceipt){
+          return attempt(withMethod, withReceipt).then(function(res){
+            if (!res.error){
+              if (withMethod) methodColumnKnown = true;
+              if (withReceipt) receiptColumnKnown = true;
+              return finish(res);
+            }
+            if (withMethod){ methodColumnKnown = false; return tryInsert(false, withReceipt); }
+            if (withReceipt){ receiptColumnKnown = false; return tryInsert(false, false); }
+            netErrorToast("Sending your request"); return false;
+          });
+        }
         var sendMethod = !!method && methodColumnKnown !== false;
-        return attempt(sendMethod).then(function(res){
-          if (!res.error){ if (sendMethod) methodColumnKnown = true; return finish(res); }
-          if (sendMethod){
-            methodColumnKnown = false;
-            return attempt(false).then(function(res2){
-              if (res2.error){ netErrorToast("Sending your request"); return false; }
-              return finish(res2);
-            });
-          }
-          netErrorToast("Sending your request"); return false;
-        }).catch(function(){ netErrorToast("Sending your request"); return false; });
+        var sendReceipt = !!receipt && receiptColumnKnown !== false;
+        return tryInsert(sendMethod, sendReceipt).catch(function(){ netErrorToast("Sending your request"); return false; });
       }
       /* ================= Mining actions ================= */
       function minerError(msg){ var e = $("minerErr"); e.textContent = msg; e.className = "sheet-err show"; }
@@ -2083,14 +2204,19 @@
         var now = Date.now();
         var btn = $("sheetConfirm");
         btn.disabled = true;
-        function done(){ btn.disabled = false; }
+        function done(){ updateSheetConfirmState(); }
         if (sheetMode === "deposit"){
           if (!depositMethod){
             done();
             sheetError("Choose a deposit method — Bank Transfer or Crypto — and send to the details shown first.");
             return;
           }
-          createFundRequest("deposit", amt, depositMethod).then(function(ok){
+          if (depositMethod === "bank" && !receiptUrl){
+            done();
+            sheetError(receiptUploading ? "Wait for your receipt to finish uploading." : "Attach your transfer receipt first — a bank deposit can't be submitted without one.");
+            return;
+          }
+          createFundRequest("deposit", amt, depositMethod, depositMethod === "bank" ? receiptUrl : null).then(function(ok){
             done();
             if (!ok) return;
             toast("Deposit requested", fmtUSD(amt) + " via " + (depositMethod === "crypto" ? "Crypto" : "Bank Transfer") + " is pending approval — the funds land as soon as it's approved.");
@@ -2442,6 +2568,7 @@
       $("methodBank").addEventListener("click", function(){ selectDepositMethod("bank"); });
       $("methodCrypto").addEventListener("click", function(){ selectDepositMethod("crypto"); });
       $("sheetAmount").addEventListener("input", syncDepositAmounts);
+      $("receiptInput").addEventListener("change", onReceiptChosen);
       function copyDetail(text, label){
         function doneCopy(){ toast(label + " copied", text); }
         if (navigator.clipboard && navigator.clipboard.writeText){
