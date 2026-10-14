@@ -127,11 +127,18 @@
       }
       .info-btn:active{transform:translateY(1px);}
       .info-btn[aria-expanded="true"]{color:var(--gold-bright); border-color:var(--line); background:rgba(201,162,75,.10);}
-      .wallet .card-info{display:none;}
-      .wallet.info-open .card-info{display:block;}
-      .wallet.info-open .lock-note.card-info{display:flex;}
+      .card-info{display:none;}
+      .info-open .card-info{display:block;}
+      .info-open .lock-note.card-info{display:flex;}
+      .panel h2.sec .info-btn{margin-left:auto;}
 
       /* ---------- Mining ---------- */
+      .mining-figs{display:flex; gap:18px; flex-wrap:wrap; margin-top:12px;}
+      .mfig{flex:1 1 128px; min-width:0;}
+      .mfig-label{font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted);}
+      .mfig-value{font-family:"Sora",sans-serif; font-weight:800; font-size:27px; line-height:1.1; margin-top:4px; letter-spacing:-.3px;}
+      .mfig-note{font-size:12px; color:var(--gold-bright); font-weight:700; margin-top:3px; min-height:15px;}
+      .mfig-note.avail{color:var(--green);}
       .cd{color:var(--gold-bright); font-weight:800;}
       .tier-row{display:flex; gap:12px; align-items:center; background:var(--bg-deep); border:1px solid var(--line-soft); border-radius:14px; padding:13px 14px; margin-bottom:10px;}
       .tier-row .tier-main{flex:1; min-width:0;}
@@ -719,7 +726,17 @@
               </button>
             </span>
           </div>
-          <div class="w-balance num" id="miningBalance">$0.00</div>
+          <div class="mining-figs">
+            <div class="mfig">
+              <div class="mfig-label">Mining profits</div>
+              <div class="mfig-value num" id="miningBalance">$0.00</div>
+            </div>
+            <div class="mfig">
+              <div class="mfig-label">Locked principal</div>
+              <div class="mfig-value num" id="miningPrincipal">$0.00</div>
+              <div class="mfig-note num" id="principalNote"></div>
+            </div>
+          </div>
           <div class="w-sub num" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
           <div class="w-actions">
             <button class="btn" id="btnBuyMiner" type="button">Buy Miner</button>
@@ -728,23 +745,31 @@
           </div>
           <div class="lock-note card-info" id="miningInfo">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E77A0" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-            <span>Pick a mining pack and put in any amount in its range with your Main Balance — your daily profit is the pack's percentage of what you put in. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining balance. Cashout moves your whole Mining balance into Main Balance once your pack's lock has passed: Starter can cash out any day, Pro after 3 days, Industrial after 7 days, Whale after 30 days. Buying a new pack replaces your current rig; your Mining balance carries over.</span>
+            <span>Pick a mining pack and put in any amount in its range with your Main Balance — your daily profit is the pack's percentage of what you put in. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. Cashout moves everything currently unlocked into Main Balance in one go: your mining profits once your pack's profit lock has passed (Starter any day, Pro after 3 days, Industrial after 7 days, Whale after 30 days), plus the amount you put in once 14 days have passed since purchase — that 14-day principal lock applies to every pack. Cashing out the principal closes your miner; cashing out profits only keeps it running. Buying a new pack replaces your current rig; your Mining profits carry over.</span>
           </div>
         </div>
       </section>
 
       <!-- My requests: live status of this account's deposit/withdrawal requests -->
       <section class="panel" id="myRequestsPanel" aria-label="My deposit and withdrawal requests" style="margin-top:14px; display:none;">
-        <h2 class="sec">My Requests</h2>
-        <p class="sec-sub">Your deposit and withdrawal requests with their live status. When a request is approved or rejected, the status below — and your Main Balance — update here automatically, no reload needed.</p>
+        <h2 class="sec">My Requests
+          <button class="info-btn" id="reqInfoBtn" type="button" aria-expanded="false" aria-controls="reqCardSub" aria-label="About My Requests">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+          </button>
+        </h2>
+        <p class="sec-sub card-info" id="reqCardSub">Your deposit and withdrawal requests with their live status. When a request is approved or rejected, the status below — and your Main Balance — update here automatically, no reload needed.</p>
         <div id="myReqList"></div>
       </section>
 
       <div class="grid">
         <!-- Arena -->
         <section class="panel" aria-label="Binary options arena">
-          <h2 class="sec">Binary Arena</h2>
-          <p class="sec-sub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays back your stake plus 90% profit on it — a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
+          <h2 class="sec">Binary Arena
+            <button class="info-btn" id="arenaInfoBtn" type="button" aria-expanded="false" aria-controls="arenaCardSub" aria-label="About Binary Arena">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="arenaCardSub">Pick an asset, set your stake, and bid Higher or Lower. Your stake is locked the moment you bid, and the bid then waits for the admin's result — a win pays back your stake plus 90% profit on it — a loss forfeits the locked stake. The chart below streams live prices for reference.</p>
 
           <div class="assets" id="assetTabs"></div>
 
@@ -781,9 +806,12 @@
             <div class="mg-head">
               <span class="mg-title">Martingale Mode</span>
               <button class="switch" id="mgToggle" type="button" role="switch" aria-checked="false" aria-label="Martingale Mode"></button>
+              <button class="info-btn" id="mgInfoBtn" type="button" aria-expanded="false" aria-controls="mgRisk" aria-label="About Martingale Mode">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+              </button>
             </div>
             <div class="mg-status" id="mgStatus"></div>
-            <p class="mg-risk">Martingale doubles stakes after losses — a losing streak can wipe the balance.</p>
+            <p class="mg-risk card-info" id="mgRisk">Martingale doubles stakes after losses — a losing streak can wipe the balance.</p>
           </div>
 
           <div class="open-trades">
@@ -794,8 +822,12 @@
 
         <!-- History -->
         <section class="panel" id="historyPanel" aria-label="History">
-          <h2 class="sec">History</h2>
-          <p class="sec-sub">Every trade and wallet movement in this simulation, synced to your account.</p>
+          <h2 class="sec">History
+            <button class="info-btn" id="histInfoBtn" type="button" aria-expanded="false" aria-controls="histCardSub" aria-label="About History">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+            </button>
+          </h2>
+          <p class="sec-sub card-info" id="histCardSub">Every trade and wallet movement in this simulation, synced to your account.</p>
           <div class="tabs" role="tablist">
             <button type="button" id="tabTrades" class="active">Trades</button>
             <button type="button" id="tabWallet">Wallet</button>
@@ -816,8 +848,12 @@
 
       <!-- Referrals -->
       <section class="panel ref-panel" aria-label="Referral program">
-        <h2 class="sec">Refer &amp; Earn</h2>
-        <p class="sec-sub">Earn a <b style="color:var(--gold-bright);">3 USDT</b> bonus for every referral whose first deposit is <b style="color:var(--gold-bright);">12 USDT</b>. Rewards land in your Main Balance. Signups with your code are recorded automatically, on any device.</p>
+        <h2 class="sec">Refer &amp; Earn
+          <button class="info-btn" id="refInfoBtn" type="button" aria-expanded="false" aria-controls="refCardSub" aria-label="About Refer and Earn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+          </button>
+        </h2>
+        <p class="sec-sub card-info" id="refCardSub">Earn a <b style="color:var(--gold-bright);">3 USDT</b> bonus for every referral whose first deposit is <b style="color:var(--gold-bright);">12 USDT</b>. Rewards land in your Main Balance. Signups with your code are recorded automatically, on any device.</p>
         <div class="ref-code-row">
           <div class="ref-code">
             <div>
@@ -924,7 +960,7 @@
     <div class="overlay" id="minerOverlay">
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="minerTitle">
         <h3 id="minerTitle">Buy a Mining Pack</h3>
-        <p class="sheet-sub">Pick a pack, then enter how much to put in — the amount comes out of your Main Balance, and your daily profit is the pack's percentage of it. Start it from the Mining card and it runs for 24 hours, then credits its profit to your Mining balance. One miner per account: buying a new pack replaces your current one, and your Mining balance carries over.</p>
+        <p class="sheet-sub">Pick a pack, then enter how much to put in — the amount comes out of your Main Balance, and your daily profit is the pack's percentage of it. Start it from the Mining card and it runs for 24 hours, then credits its profit to your Mining profits. The amount you put in stays locked for 14 days, then it can be cashed out too — cashing it out closes the miner. One miner per account: buying a new pack replaces your current one, and your Mining profits carry over.</p>
         <div id="minerTiers"></div>
         <div class="pack-form" id="packForm" style="display:none;">
           <div class="form-field" style="margin-bottom:0;">
@@ -1101,7 +1137,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Mining work, and when can I cash out?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Buy a mining pack from the Mining card — <b>Starter</b> ($5–$49, 3% per day), <b>Pro</b> ($50–$499, 7% per day), <b>Industrial</b> ($500–$4,999, 15% per day) or <b>Whale</b> ($5,000+, 30% per day) — and enter any amount in the pack's range; your daily profit is that percentage of your amount. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining balance; you start each new cycle yourself. <b>Cashout</b> locks depend on the pack: Starter can cash out any day, Pro after 3 days, Industrial after 7 days and Whale after 30 days — then it moves your whole Mining balance into Main Balance.</div>
+            <div class="faq-a">Buy a mining pack from the Mining card — <b>Starter</b> ($5–$49, 3% per day), <b>Pro</b> ($50–$499, 7% per day), <b>Industrial</b> ($500–$4,999, 15% per day) or <b>Whale</b> ($5,000+, 30% per day) — and enter any amount in the pack's range; your daily profit is that percentage of your amount. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. <b>Profit</b> cashout locks depend on the pack: Starter can cash out profits any day, Pro after 3 days, Industrial after 7 days and Whale after 30 days. The <b>amount you put in</b> is locked for <b>14 days</b> on every pack, then it becomes available for cashout too — but cashing it out <b>closes your miner</b>. Cashout moves everything currently unlocked into Main Balance in one go.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How do deposits and withdrawals work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -1142,8 +1178,10 @@
 
       var CYCLE_MS = 24 * 3600 * 1000;
       /* Flexible mining packs: the user puts in any amount within the
-         pack's range and earns rate × amount per 24h cycle. Cashout is
-         locked for lockDays counted from purchased_at (0 = any day). */
+         pack's range and earns rate × amount per 24h cycle. Profit
+         cashout is locked for lockDays counted from purchased_at
+         (0 = any day); the purchase principal itself is locked for
+         PRINCIPAL_LOCK_DAYS from purchased_at on every pack. */
       var MINER_PACKS = [
         { name: "Starter pack", min: 5, max: 49, rate: 0.03, lockDays: 0 },
         { name: "Pro pack", min: 50, max: 499, rate: 0.07, lockDays: 3 },
@@ -1154,11 +1192,36 @@
         for (var i = 0; i < MINER_PACKS.length; i++) if (MINER_PACKS[i].name === name) return MINER_PACKS[i];
         return null;
       }
-      // Cashout lock for a stored miner, derived from its tier name.
+      // Profit cashout lock for a stored miner, derived from its tier name.
       // Tiers from before the pack system keep the old 7-day lock.
       function lockMsForTier(tier){
         var p = packByName(tier);
         return (p ? p.lockDays : 7) * 24 * 3600 * 1000;
+      }
+      // The purchase principal is locked for 14 days from purchase on
+      // every pack; after that it can be cashed out (which closes the miner).
+      var PRINCIPAL_LOCK_MS = 14 * 24 * 3600 * 1000;
+      // What a cashout would move right now: the mining profits once the
+      // pack's profit lock has passed, plus the principal once its 14-day
+      // lock has passed. Each part is 0 while its own lock is still running.
+      function minerWithdrawable(now){
+        var m = state.miner;
+        var out = { profits: 0, principal: 0, total: 0 };
+        if (!m) return out;
+        now = now || Date.now();
+        if (now >= m.purchasedAt + lockMsForTier(m.tier)) out.profits = Math.round(m.balance * 100) / 100;
+        if (now >= m.purchasedAt + PRINCIPAL_LOCK_MS) out.principal = Math.round(m.price * 100) / 100;
+        out.total = Math.round((out.profits + out.principal) * 100) / 100;
+        return out;
+      }
+      // Delete the tn_miners row (used when a cashout takes the principal
+      // and the miner closes). Returns success.
+      function deleteMinerRow(){
+        if (!sb || !currentUser) return Promise.resolve(false);
+        return sb.from("tn_miners").delete().eq("user_id", currentUser.id).then(function(res){
+          if (res.error){ netErrorToast("Closing your miner"); return false; }
+          return true;
+        }).catch(function(){ netErrorToast("Closing your miner"); return false; });
       }
       var PAYOUT_RATE = 0.9;
       var WELCOME_BONUS = 3;
@@ -1474,6 +1537,11 @@
         var m = state.miner;
         var now = Date.now();
         $("miningBalance").textContent = fmtUSD(m ? m.balance : 0);
+        $("miningPrincipal").textContent = fmtUSD(m ? m.price : 0);
+        var pNote = $("principalNote");
+        if (!m){ pNote.textContent = ""; pNote.className = "mfig-note num"; }
+        else if (now >= m.purchasedAt + PRINCIPAL_LOCK_MS){ pNote.textContent = "Available"; pNote.className = "mfig-note num avail"; }
+        else { pNote.textContent = "Unlocks in " + fmtDuration(m.purchasedAt + PRINCIPAL_LOCK_MS - now); pNote.className = "mfig-note num"; }
         $("minerChip").textContent = m ? m.tier : "No miner";
         var line = $("minerStatusLine");
         var startBtn = $("btnStartMining");
@@ -1489,10 +1557,20 @@
           startBtn.style.display = "";
         }
         var co = $("btnCashout");
-        var lockEnd = m ? m.purchasedAt + lockMsForTier(m.tier) : 0;
-        if (!m || m.balance <= 0.004){ co.disabled = true; co.textContent = "Cashout"; }
-        else if (now < lockEnd){ co.disabled = true; co.textContent = "Unlocks in " + fmtDuration(lockEnd - now); }
-        else { co.disabled = minerBusy; co.textContent = "Cashout"; }
+        var w = minerWithdrawable(now);
+        if (!m){ co.disabled = true; co.textContent = "Cashout"; }
+        else if (w.total > 0.004){ co.disabled = minerBusy; co.textContent = "Cashout " + fmtUSD(w.total); }
+        else {
+          // Nothing unlocked yet: the disabled button names the nearest unlock.
+          co.disabled = true;
+          var profitEnd = m.purchasedAt + lockMsForTier(m.tier);
+          var principalEnd = m.purchasedAt + PRINCIPAL_LOCK_MS;
+          var candidates = [];
+          if (m.balance > 0.004 && now < profitEnd) candidates.push({ at: profitEnd, label: "Profits unlock in " + fmtDuration(profitEnd - now) });
+          if (now < principalEnd) candidates.push({ at: principalEnd, label: "Principal unlocks in " + fmtDuration(principalEnd - now) });
+          candidates.sort(function(a, b){ return a.at - b.at; });
+          co.textContent = candidates.length ? candidates[0].label : "Cashout";
+        }
       }
       function renderWallets(){
         $("mainBalance").textContent = fmtUSD(state.main);
@@ -1856,7 +1934,7 @@
         return p.max == null ? fmtUSD(p.min) + "+" : fmtUSD(p.min) + " – " + fmtUSD(p.max);
       }
       function packLockText(p){
-        return p.lockDays === 0 ? "Cashout any day" : "Cashout after " + p.lockDays + " days";
+        return p.lockDays === 0 ? "Profits cashout any day" : "Profits cashout after " + p.lockDays + " days";
       }
       function renderMinerTiers(){
         $("minerTiers").innerHTML = MINER_PACKS.map(function(p, i){
@@ -1903,7 +1981,7 @@
       // Buying deducts the entered amount from Main Balance (through the
       // wallet write path) and upserts the tn_miners row with the pack
       // name as tier and profit_24h = amount × rate. Replacing a rig keeps
-      // the mining balance; the pack's cashout lock restarts at purchase.
+      // the mining profits; both cashout locks restart at purchase.
       function buyMiner(){
         if (minerBusy) return;
         var p = MINER_PACKS[selectedPack];
@@ -1942,8 +2020,9 @@
             closeMinerSheet();
             toast(replacing ? "Miner replaced" : "Miner purchased",
               "You put " + fmtUSD(amt) + " into the " + p.name + " — it earns " + fmtUSD(profit) + " per 24h cycle. Tap Start Mining on the Mining card to run it." +
-              (replacing ? " Your mining balance carried over." : "") +
-              (p.lockDays === 0 ? " Cashout is open any day." : " Cashout unlocks " + p.lockDays + " days from this purchase."));
+              (replacing ? " Your mining profits carried over." : "") +
+              (p.lockDays === 0 ? " Profits can be cashed out any day." : " Profits unlock " + p.lockDays + " days from this purchase.") +
+              " The " + fmtUSD(amt) + " you put in unlocks after 14 days.");
           });
         });
       }
@@ -1959,26 +2038,43 @@
           renderWallets();
         });
       }
+      // Cashout moves everything currently unlocked into Main Balance in
+      // one go: the mining profits once the pack's profit lock has passed,
+      // plus the purchase principal once 14 days have passed since
+      // purchase. Taking the principal closes the miner — its tn_miners
+      // row is deleted and any unfinished 24h cycle is forfeited (only
+      // completed cycles were ever credited). A profits-only cashout
+      // leaves the miner running.
       function cashoutMiner(){
         var m = state.miner;
         if (!m || minerBusy) return;
-        if (Date.now() < m.purchasedAt + lockMsForTier(m.tier)) return; // still locked; button is disabled too
-        var amt = Math.round(m.balance * 100) / 100;
-        if (!(amt > 0)) return;
+        var w = minerWithdrawable();
+        if (!(w.total > 0)) return; // nothing unlocked yet; button is disabled too
+        var amt = w.total;
+        var closesMiner = w.principal > 0;
         minerBusy = true;
         renderWallets();
-        m.balance = 0;
         state.main += amt;
-        persistMiner().then(function(ok){
+        function finish(ok){
           if (!ok){ minerBusy = false; refreshFromServer(true); return; }
           return persistWallet().then(function(){
             minerBusy = false;
-            state.txs.unshift({ id: uid(), type: "cashout", amount: amt, note: "Mining balance cashed out to Main Balance", time: Date.now() });
+            state.txs.unshift({ id: uid(), type: "cashout", amount: amt,
+              note: closesMiner ? "Mining profits and principal cashed out to Main Balance — miner closed" : "Mining profits cashed out to Main Balance",
+              time: Date.now() });
             if (state.txs.length > 120) state.txs.length = 120;
             renderWallets(); renderHistory();
-            toast("Cashout complete", fmtUSD(amt) + " moved from your Mining balance into Main Balance.");
+            toast("Cashout complete", fmtUSD(amt) + " moved into Main Balance." +
+              (closesMiner ? " Your principal was included, so your miner is now closed." : " Your miner keeps running."));
           });
-        });
+        }
+        if (closesMiner){
+          state.miner = null;
+          deleteMinerRow().then(finish);
+        } else {
+          m.balance = Math.round((m.balance - w.profits) * 100) / 100;
+          persistMiner().then(finish);
+        }
       }
       function confirmSheet(){
         var amt = parseFloat($("sheetAmount").value);
@@ -2324,13 +2420,18 @@
       function bindInfoToggle(btnId){
         var btn = $(btnId);
         btn.addEventListener("click", function(){
-          var card = btn.closest(".wallet");
+          var card = btn.closest(".wallet, .panel, .martingale");
           var open = card.classList.toggle("info-open");
           btn.setAttribute("aria-expanded", open ? "true" : "false");
         });
       }
       bindInfoToggle("mainInfoBtn");
       bindInfoToggle("miningInfoBtn");
+      bindInfoToggle("reqInfoBtn");
+      bindInfoToggle("arenaInfoBtn");
+      bindInfoToggle("mgInfoBtn");
+      bindInfoToggle("histInfoBtn");
+      bindInfoToggle("refInfoBtn");
       $("sheetCancel").addEventListener("click", closeSheet);
       $("sheetOverlay").addEventListener("click", function(e){ if (e.target === $("sheetOverlay")) closeSheet(); });
       $("sheetMax").addEventListener("click", function(){
