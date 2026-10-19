@@ -888,14 +888,11 @@
     
       .info-icon{background:none;border:none;color:#C9A24B;font-size:15px;cursor:pointer;padding:0 2px;vertical-align:middle;line-height:1}
       .info-icon:hover{opacity:.8}
-      .lock-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-      .lock-popup{background:#0B1132;border:1px solid #C9A24B;border-radius:12px;padding:20px;max-width:340px;width:100%;color:#fff}
-      .lock-popup h4{margin:0 0 12px;color:#C9A24B;font-size:16px}
-      .lock-row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}
-      .lock-row .green{color:#4ade80}
-      .lock-row .gold{color:#C9A24B}
-      .lock-note{font-size:12px;color:#aaa;margin:12px 0;line-height:1.5}
-      .lock-close{background:#C9A24B;color:#0B1132;border:none;border-radius:8px;padding:10px;width:100%;font-weight:700;cursor:pointer;margin-top:4px}
+    
+      .wager-progress{margin:10px 0 4px}
+      .wager-bar{height:8px;background:#1a2140;border-radius:4px;overflow:hidden}
+      .wager-bar-fill{height:100%;background:linear-gradient(90deg,#C9A24B,#e8c96a);border-radius:4px;transition:width .4s ease}
+      .wager-bar-text{font-size:12px;color:#aaa;margin:6px 0 0;line-height:1.4}
     </style>
   </head>
   <body>
@@ -1532,6 +1529,10 @@
         <p class="sheet-sub" id="sheetSub"></p>
         <div class="amt-wrap"><span>$</span><input id="sheetAmount" class="num" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></div>
         <div class="max-row"><span id="sheetAvail"></span><button class="max-btn" id="sheetMax" type="button">Use max</button></div>
+        <div class="wager-progress" id="wagerProgress" style="display:none">
+          <div class="wager-bar"><div class="wager-bar-fill" id="wagerBarFill"></div></div>
+          <p class="wager-bar-text" id="wagerBarText"></p>
+        </div>
         <div class="deposit-methods" id="withdrawDest">
           <div id="wdDestSaved" style="display:none;">
             <div class="form-field" id="wdDestToggleWrap" style="display:none; margin-bottom:10px;">
@@ -2376,43 +2377,28 @@
       function availableToWithdraw(){
         return Math.max(0, Math.round((withdrawableMain() - lockedAmount()) * 100) / 100);
       }
+      function renderWagerProgress(){
+        var bar = $("wagerProgress");
+        if (!bar) return;
+        if (sheetMode !== "withdraw"){ bar.style.display = "none"; return; }
+        var target = Math.round(totalApprovedDeposits() * 100) / 100;
+        var traded = Math.round((Number(state.wagering) || 0) * 100) / 100;
+        if (!(target > 0)){ bar.style.display = "none"; return; }
+        bar.style.display = "";
+        var pct = Math.min(100, Math.round(traded / target * 100));
+        var remaining = Math.max(0, Math.round((target - traded) * 100) / 100);
+        $("wagerBarFill").style.width = pct + "%";
+        $("wagerBarText").textContent = remaining > 0
+          ? "Trade " + fmtUSD(remaining) + " more to unlock full withdrawals (" + fmtUSD(traded) + " of " + fmtUSD(target) + ")"
+          : "Fully unlocked — " + fmtUSD(traded) + " of " + fmtUSD(target) + " traded";
+      }
       function lockInfoText(){
         var locked = lockedAmount();
         var avail = availableToWithdraw();
         if (!(locked > 0)) return null;
         return "Available to withdraw: " + fmtUSD(avail) + " · Locked: " + fmtUSD(locked) + " (unlocks as you trade or buy miners)";
       }
-      function bindLockInfo(){
-        var btn = $("lockInfoBtn");
-        if (!btn || btn.dataset.bound) return;
-        btn.dataset.bound = "1";
-        btn.addEventListener("click", function(e){
-          e.stopPropagation();
-          var locked = lockedAmount();
-          var avail = availableToWithdraw();
-          var traded = Math.round((Number(state.wagering) || 0) * 100) / 100;
-          var target = Math.round(totalApprovedDeposits() * 100) / 100;
-          showLockPopup(avail, locked, traded, target);
-        });
-      }
-      function showLockPopup(avail, locked, traded, target){
-        closeLockPopup();
-        var ov = document.createElement("div");
-        ov.className = "lock-popup-overlay";
-        ov.id = "lockPopupOv";
-        ov.innerHTML = '<div class="lock-popup">' +
-          '<h4>Withdrawal balance</h4>' +
-          '<div class="lock-row"><span>Available to withdraw</span><b class="green">' + fmtUSD(avail) + '</b></div>' +
-          '<div class="lock-row"><span>Locked</span><b class="gold">' + fmtUSD(locked) + '</b></div>' +
-          '<p class="lock-note">Locked funds unlock as you trade or buy miners — ' + fmtUSD(traded) + ' of ' + fmtUSD(target) + ' traded so far.</p>' +
-          '<button class="lock-close" type="button">Got it</button></div>';
-        ov.addEventListener("click", function(e){ if (e.target === ov || e.target.classList.contains("lock-close")) closeLockPopup(); });
-        document.body.appendChild(ov);
-      }
-      function closeLockPopup(){
-        var ov = $("lockPopupOv");
-        if (ov) ov.remove();
-      }
+
 
       /* ================= Withdrawal freeze (admin) =================
          tn_profiles.withdrawals_frozen: when true for the logged-in
@@ -3637,14 +3623,13 @@
           withdraw: {
             title: "Withdraw from Main Balance",
             sub: "Request a withdrawal from your Main Balance. It is paid out once the request is approved.",
-            avail: "Available to withdraw: " + fmtUSD(availableToWithdraw()) + ' <button class="info-icon" id="lockInfoBtn" type="button" aria-label="Withdrawal lock info">ⓘ</button>',
-            availHtml: true, max: availableToWithdraw(), btn: "Request withdrawal"
+            avail: "Available to withdraw: " + fmtUSD(availableToWithdraw()), max: availableToWithdraw(), btn: "Request withdrawal"
           }
         }[mode];
         $("sheetTitle").textContent = cfg.title;
         $("sheetSub").textContent = cfg.sub;
-        if (cfg.availHtml) { $("sheetAvail").innerHTML = cfg.avail; bindLockInfo(); }
-        else { $("sheetAvail").textContent = cfg.avail; }
+        $("sheetAvail").textContent = cfg.avail;
+        renderWagerProgress();
         $("sheetMax").style.display = cfg.max === null ? "none" : "";
         resetReceipt();
         $("sheetConfirm").textContent = cfg.btn;
