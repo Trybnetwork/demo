@@ -885,6 +885,17 @@
       @media (prefers-reduced-motion: reduce){
         *{animation-duration:.001s !important; transition-duration:.001s !important;}
       }
+    
+      .info-icon{background:none;border:none;color:#C9A24B;font-size:15px;cursor:pointer;padding:0 2px;vertical-align:middle;line-height:1}
+      .info-icon:hover{opacity:.8}
+      .lock-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+      .lock-popup{background:#0B1132;border:1px solid #C9A24B;border-radius:12px;padding:20px;max-width:340px;width:100%;color:#fff}
+      .lock-popup h4{margin:0 0 12px;color:#C9A24B;font-size:16px}
+      .lock-row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}
+      .lock-row .green{color:#4ade80}
+      .lock-row .gold{color:#C9A24B}
+      .lock-note{font-size:12px;color:#aaa;margin:12px 0;line-height:1.5}
+      .lock-close{background:#C9A24B;color:#0B1132;border:none;border-radius:8px;padding:10px;width:100%;font-weight:700;cursor:pointer;margin-top:4px}
     </style>
   </head>
   <body>
@@ -2351,15 +2362,56 @@
           .reduce(function(a, r){ return a + (Number(r.amount) || 0); }, 0);
       }
       // null = withdrawals unlocked; otherwise how much playthrough is left.
-      function wageringGate(){
-        if (wageringColumnKnown === false) return null; // no column — nothing to enforce against
+      /* ============ Withdrawal lock: proportional unlock ============
+         Deposits are locked until wagered. Locked = total approved
+         deposits minus wagering volume (trades + game stakes + miner
+         purchases). Available to withdraw = withdrawable balance minus
+         locked. As the user trades, the locked amount unlocks. */
+      function lockedAmount(){
+        if (wageringColumnKnown === false) return 0;
         var target = Math.round(totalApprovedDeposits() * 100) / 100;
         var traded = Math.round((Number(state.wagering) || 0) * 100) / 100;
-        if (!(target > 0) || traded >= target) return null;
-        return { remaining: Math.round((target - traded) * 100) / 100, traded: traded, target: target };
+        return Math.max(0, Math.round((target - traded) * 100) / 100);
       }
-      function wageringGateText(g){
-        return "Withdrawals unlock after you trade " + fmtUSD(g.remaining) + " more (playthrough " + fmtUSD(g.traded) + " of " + fmtUSD(g.target) + ")";
+      function availableToWithdraw(){
+        return Math.max(0, Math.round((withdrawableMain() - lockedAmount()) * 100) / 100);
+      }
+      function lockInfoText(){
+        var locked = lockedAmount();
+        var avail = availableToWithdraw();
+        if (!(locked > 0)) return null;
+        return "Available to withdraw: " + fmtUSD(avail) + " · Locked: " + fmtUSD(locked) + " (unlocks as you trade or buy miners)";
+      }
+      function bindLockInfo(){
+        var btn = $("lockInfoBtn");
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", function(e){
+          e.stopPropagation();
+          var locked = lockedAmount();
+          var avail = availableToWithdraw();
+          var traded = Math.round((Number(state.wagering) || 0) * 100) / 100;
+          var target = Math.round(totalApprovedDeposits() * 100) / 100;
+          showLockPopup(avail, locked, traded, target);
+        });
+      }
+      function showLockPopup(avail, locked, traded, target){
+        closeLockPopup();
+        var ov = document.createElement("div");
+        ov.className = "lock-popup-overlay";
+        ov.id = "lockPopupOv";
+        ov.innerHTML = '<div class="lock-popup">' +
+          '<h4>Withdrawal balance</h4>' +
+          '<div class="lock-row"><span>Available to withdraw</span><b class="green">' + fmtUSD(avail) + '</b></div>' +
+          '<div class="lock-row"><span>Locked</span><b class="gold">' + fmtUSD(locked) + '</b></div>' +
+          '<p class="lock-note">Locked funds unlock as you trade or buy miners — ' + fmtUSD(traded) + ' of ' + fmtUSD(target) + ' traded so far.</p>' +
+          '<button class="lock-close" type="button">Got it</button></div>';
+        ov.addEventListener("click", function(e){ if (e.target === ov || e.target.classList.contains("lock-close")) closeLockPopup(); });
+        document.body.appendChild(ov);
+      }
+      function closeLockPopup(){
+        var ov = $("lockPopupOv");
+        if (ov) ov.remove();
       }
 
       /* ================= Withdrawal freeze (admin) =================
@@ -3486,13 +3538,11 @@
       function updateSheetConfirmState(){
         var btn = $("sheetConfirm");
         var frozen = sheetMode === "withdraw" && withdrawalsFrozen;
-        var gate = sheetMode === "withdraw" && !frozen ? wageringGate() : null;
         var noDest = sheetMode === "withdraw" && !savedPayoutDestination();
-        btn.disabled = (receiptNeeded() && (receiptUploading || !receiptUrl)) || !!gate || frozen || noDest;
+        btn.disabled = (receiptNeeded() && (receiptUploading || !receiptUrl)) || frozen || noDest;
         btn.textContent = receiptNeeded() && receiptUploading ? "Uploading receipt…"
           : sheetMode === "deposit" ? "I've sent it"
-          : frozen ? WITHDRAWALS_FROZEN_TEXT
-          : gate ? wageringGateText(gate) : "Request withdrawal";
+          : frozen ? WITHDRAWALS_FROZEN_TEXT : "Request withdrawal";
       }
       function setReceiptStatus(msg, cls){
         var s = $("receiptStatus");
@@ -3587,16 +3637,14 @@
           withdraw: {
             title: "Withdraw from Main Balance",
             sub: "Request a withdrawal from your Main Balance. It is paid out once the request is approved.",
-            avail: "Available to withdraw: " + fmtUSD(withdrawableMain()), max: withdrawableMain(), btn: "Request withdrawal"
+            avail: "Available to withdraw: " + fmtUSD(availableToWithdraw()) + ' <button class="info-icon" id="lockInfoBtn" type="button" aria-label="Withdrawal lock info">ⓘ</button>',
+            availHtml: true, max: availableToWithdraw(), btn: "Request withdrawal"
           }
         }[mode];
         $("sheetTitle").textContent = cfg.title;
         $("sheetSub").textContent = cfg.sub;
-        if (mode === "withdraw"){
-          var openGate = wageringGate();
-          if (openGate) $("sheetSub").textContent = wageringGateText(openGate) + " Bids, game stakes and miner purchases all count toward your playthrough.";
-        }
-        $("sheetAvail").textContent = cfg.avail;
+        if (cfg.availHtml) { $("sheetAvail").innerHTML = cfg.avail; bindLockInfo(); }
+        else { $("sheetAvail").textContent = cfg.avail; }
         $("sheetMax").style.display = cfg.max === null ? "none" : "";
         resetReceipt();
         $("sheetConfirm").textContent = cfg.btn;
@@ -3979,11 +4027,11 @@
           });
         } else if (sheetMode === "withdraw"){
           if (withdrawalsFrozen){ done(); sheetError(WITHDRAWALS_FROZEN_TEXT); return; }
-          var confirmGate = wageringGate();
-          if (confirmGate){ done(); sheetError(wageringGateText(confirmGate)); return; }
-          if (amt > withdrawableMain()){
+          var maxW = availableToWithdraw();
+          if (amt > maxW){
             done();
-            sheetError("You can withdraw up to " + fmtUSD(withdrawableMain()) + " from your Main Balance right now.");
+            var lk = lockedAmount();
+            sheetError("You can withdraw up to " + fmtUSD(maxW) + " right now" + (lk > 0 ? " — " + fmtUSD(lk) + " is locked until you trade or buy miners." : "."));
             return;
           }
           // The destination comes from the saved Payment Method only —
@@ -4563,7 +4611,7 @@
       $("sheetCancel").addEventListener("click", closeSheet);
       $("sheetOverlay").addEventListener("click", function(e){ if (e.target === $("sheetOverlay")) closeSheet(); });
       $("sheetMax").addEventListener("click", function(){
-        var v = sheetMode === "withdraw" ? withdrawableMain() : 0;
+        var v = sheetMode === "withdraw" ? availableToWithdraw() : 0;
         $("sheetAmount").value = v.toFixed(2);
       });
       $("sheetConfirm").addEventListener("click", confirmSheet);
