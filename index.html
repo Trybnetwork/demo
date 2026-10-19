@@ -2375,7 +2375,38 @@
         return Math.max(0, Math.round((target - traded) * 100) / 100);
       }
       function availableToWithdraw(){
-        return Math.max(0, Math.round((withdrawableMain() - lockedAmount()) * 100) / 100);
+        // Mining profits cashed out bypass the wagering lock entirely:
+        // the credit is added straight to available (capped by the lock,
+        // so it never double-counts once fully unlocked).
+        var bal = withdrawableMain();
+        var locked = lockedAmount();
+        var credit = miningCredit();
+        var base = Math.max(0, bal - locked);
+        var extra = Math.min(credit, locked, Math.max(0, bal - base));
+        return Math.max(0, Math.round((base + extra) * 100) / 100);
+      }
+      /* Mining profit credit: cashed-out mining profits are exempt from the
+         wagering lock. Tracked per-user in localStorage (keyed by user id);
+         credited on cashout, consumed first on withdrawal. */
+      function miningCreditKey(){
+        return "tn_mining_credit_" + (currentUser ? currentUser.id : "anon");
+      }
+      function miningCredit(){
+        try {
+          return Math.max(0, Number(localStorage.getItem(miningCreditKey())) || 0);
+        } catch(e){ return 0; }
+      }
+      function addMiningCredit(amt){
+        try {
+          var v = Math.round((miningCredit() + amt) * 100) / 100;
+          localStorage.setItem(miningCreditKey(), String(Math.max(0, v)));
+        } catch(e){}
+      }
+      function consumeMiningCredit(amt){
+        try {
+          var v = Math.round((miningCredit() - amt) * 100) / 100;
+          localStorage.setItem(miningCreditKey(), String(Math.max(0, v)));
+        } catch(e){}
       }
       function renderWagerProgress(){
         var bar = $("wagerProgress");
@@ -3980,8 +4011,9 @@
               note: "Mining profits cashed out to Main Balance",
               time: Date.now() });
             if (state.txs.length > 120) state.txs.length = 120;
+            addMiningCredit(amt);
             renderWallets(); renderHistory();
-            toast("Cashout complete", fmtUSD(amt) + " moved into Main Balance. Your miner keeps running — next cashout unlocks in 7 days.");
+            toast("Cashout complete", fmtUSD(amt) + " moved into Main Balance — instantly available for withdrawal. Your miner keeps running — next cashout unlocks in 7 days.");
           });
         });
       }
