@@ -1030,7 +1030,6 @@
       .v2-cards{ margin-top:12px; gap:12px; }
       .v2-card{ padding:14px; min-height:0; }
       .v2-wc-head{ flex-wrap:wrap; }
-      #minerChip{ order:3; flex-basis:100%; width:max-content; margin-top:8px; }
       .v2-wc-amount{ padding-top:8px; }
       #v2MinerCard .v2-status-line{ display:none; }
       .v2-card-btns{ margin-top:10px; }
@@ -1182,6 +1181,58 @@
       #txHistoryView .res-tag.tie{ background:#EEF0FA; color:#6B7086; }
       #txHistoryView .res-tag.await{ background:#FBF3DC; color:#9A7B2D; }
       #txHistoryView .empty{ color:#6B7086; }
+      /* ============ Pass 2.1 (2026-10-21): fund sheet chooser-first steps (artifact) ============ */
+      #sheetOverlay .fs-opt{
+        display:flex; align-items:center; gap:14px; width:100%; text-align:left;
+        border:1.5px solid #E6E7EE; border-radius:16px; padding:15px 16px; margin-bottom:11px;
+        background:#FFFFFF; color:#0B1132; font-family:"Manrope",sans-serif; cursor:pointer;
+      }
+      #sheetOverlay .fs-opt:active{ background:#F8F9FC; }
+      #sheetOverlay .fs-ic{ width:44px; height:44px; border-radius:50%; background:#F2F3F8; display:grid; place-items:center; color:#0B1132; flex:none; }
+      #sheetOverlay .fs-ic svg{ width:21px; height:21px; }
+      #sheetOverlay .fs-opt-main{ flex:1; min-width:0; }
+      #sheetOverlay .fs-opt-title{ display:block; font-size:16px; font-weight:800; }
+      #sheetOverlay .fs-opt-sub{ display:block; font-size:13px; color:#6B7086; font-weight:600; margin-top:2px; line-height:1.4; }
+      #sheetOverlay .fs-chev{ width:18px; height:18px; color:#6B7086; flex:none; }
+      #sheetOverlay .fs-avail{ background:#EEF0FA; border:1.5px solid #DDE1F2; border-radius:16px; padding:16px; text-align:center; margin-bottom:16px; }
+      #sheetOverlay .fs-avail-lbl{ font-size:12.5px; font-weight:800; letter-spacing:.08em; color:#6B7086; }
+      #sheetOverlay .fs-avail-val{ font-size:30px; font-weight:800; margin-top:5px; font-variant-numeric:tabular-nums; color:#0B1132; }
+      #sheetOverlay .fs-close{
+        width:100%; margin-top:6px; padding:14px; border-radius:13px; border:none;
+        background:#F2F3F8; color:#0B1132; font-size:15.5px; font-weight:800; font-family:"Manrope",sans-serif; cursor:pointer;
+      }
+      #sheetOverlay .fs-back{
+        display:none; align-items:center; gap:3px; background:none; border:none; padding:2px 0 10px;
+        color:#6B7086; font-family:"Manrope",sans-serif; font-size:14px; font-weight:800; cursor:pointer;
+      }
+      #sheetOverlay .fs-back svg{ width:16px; height:16px; }
+      #sheetOverlay .sheet.fs-form .fs-back{ display:inline-flex; }
+      #sheetOverlay .sheet.fs-choose #depositMethods > .form-field,
+      #sheetOverlay .sheet.fs-form #depositMethods > .form-field{ display:none; }
+      #sheetOverlay .sheet.fs-form .fs-chooser{ display:none; }
+      #sheetOverlay .sheet.fs-choose .amt-wrap,
+      #sheetOverlay .sheet.fs-choose .max-row,
+      #sheetOverlay .sheet.fs-choose .sheet-btns,
+      #sheetOverlay .sheet.fs-choose .sheet-err{ display:none !important; }
+      #sheetOverlay .sheet.fs-choose #wagerProgress{ display:none !important; }
+      #sheetOverlay .sheet.fs-choose .pay-details{ display:none !important; }
+      #sheetOverlay .sheet.fs-choose #wdDestSaved,
+      #sheetOverlay .sheet.fs-choose #wdDestNone{ display:none !important; }
+      /* Pass 2.1: Miner card info opens as a popup, not in-flow (card only) */
+      #v2MinerCard.info-open #miningInfo{
+        display:block; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+        width:min(88vw,340px); max-height:72vh; overflow-y:auto; z-index:120;
+        background:#fff; color:#0B1132; border:1.5px solid #E6E7EE; border-radius:18px;
+        padding:18px; box-shadow:0 24px 60px rgba(11,17,50,.35); margin:0;
+      }
+      #v2MinerCard.info-open #miningInfo{ color:#0B1132 !important; }
+      #v2MinerCard.info-open::after{ content:""; position:fixed; inset:0; background:rgba(5,7,26,.5); z-index:119; }
+      /* --- Dock everywhere: the tabbar lives outside #appView now, so it floats over every view ---
+         Clear its height (~84px incl. offset) at the bottom of each view so end-of-view controls
+         (binary stake/High-Low, Aviator bet, Spin button, Whot/Ayo bottom bars, Earn tasks) stay reachable. */
+      #txHistoryView, #binaryView, #aviatorView, #spinView, #whotView, #ayoView, #earnView{ padding-bottom:110px; }
+
+
     </style>
   </head>
   <body>
@@ -1403,7 +1454,6 @@
               <div class="v2-wc-title">Miner</div>
               <div class="v2-wc-sub">2% daily profit</div>
             </div>
-            <span class="w-chip" id="minerChip" style="color:#9A7B2D;border-color:rgba(201,162,75,.45);background:rgba(201,162,75,.10);">No miner</span>
             <button class="v2-info-btn" id="miningInfoBtn" type="button" aria-expanded="false" aria-controls="miningInfo" aria-label="About Mining" style="padding:2px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             </button>
@@ -1465,6 +1515,10 @@
         <div class="v2-tx-list" id="v2TxList"></div>
       </section>
 
+      </div>
+
+      </div><!-- /appView -->
+
       <!-- Dashboard v2 bottom nav -->
       <nav class="v2-tabbar" aria-label="Main">
         <button class="v2-tab active" id="v2TabHome" type="button">
@@ -1484,9 +1538,6 @@
           Mine
         </button>
       </nav>
-      </div>
-
-      </div><!-- /appView -->
 
       <!-- Transaction History view (dedicated page) -->
       <div id="txHistoryView" style="display:none;">
@@ -1869,6 +1920,24 @@
           <p class="wager-bar-text" id="wagerBarText"></p>
         </div>
         <div class="deposit-methods" id="withdrawDest">
+          <button class="fs-back" id="wdBackBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>Back</button>
+          <div class="fs-chooser" id="wdChooser">
+            <div class="fs-avail">
+              <div class="fs-avail-lbl">AVAILABLE TO WITHDRAW</div>
+              <div class="fs-avail-val num" id="wdAvailAmt">$0.00</div>
+            </div>
+            <button class="fs-opt" id="wdRowBank" type="button">
+              <span class="fs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3 3 8h18l-9-5z"/></svg></span>
+              <span class="fs-opt-main"><span class="fs-opt-title">Bank Account</span><span class="fs-opt-sub">Withdraw in Naira to your saved bank</span></span>
+              <svg class="fs-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+            <button class="fs-opt" id="wdRowUsdt" type="button">
+              <span class="fs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 8h5.6M12 8v8.2M9.8 12h4.4"/></svg></span>
+              <span class="fs-opt-main"><span class="fs-opt-title">USDT Wallet</span><span class="fs-opt-sub">Withdraw in Tether (TRC-20) to your wallet</span></span>
+              <svg class="fs-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+            <button class="fs-close" id="wdCloseBtn" type="button">Close</button>
+          </div>
           <div id="wdDestSaved" style="display:none;">
             <div class="form-field" id="wdDestToggleWrap" style="display:none; margin-bottom:10px;">
               <label>Withdraw to</label>
@@ -1896,6 +1965,20 @@
           </div>
         </div>
         <div class="deposit-methods" id="depositMethods">
+          <button class="fs-back" id="depBackBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>Back</button>
+          <div class="fs-chooser" id="depChooser">
+            <button class="fs-opt" id="depRowBank" type="button">
+              <span class="fs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 18h16M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3 3 8h18l-9-5z"/></svg></span>
+              <span class="fs-opt-main"><span class="fs-opt-title">Bank Transfer</span><span class="fs-opt-sub">Send Naira to your dedicated account details</span></span>
+              <svg class="fs-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+            <button class="fs-opt" id="depRowCrypto" type="button">
+              <span class="fs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 8h5.6M12 8v8.2M9.8 12h4.4"/></svg></span>
+              <span class="fs-opt-main"><span class="fs-opt-title">USDT (TRC-20)</span><span class="fs-opt-sub">Send Tether to your assigned wallet address</span></span>
+              <svg class="fs-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+            <button class="fs-close" id="depCloseBtn" type="button">Close</button>
+          </div>
           <div class="form-field" style="margin-bottom:0;">
             <label>Deposit method</label>
             <div class="seg" role="group" aria-label="Deposit method">
@@ -3215,7 +3298,7 @@
         var m = state.miner;
         var now = Date.now();
         $("miningBalance").textContent = fmtUSD(m ? m.balance : 0);
-        $("minerChip").textContent = m ? m.tier : "No miner";
+        var _mc = $("minerChip"); if (_mc) _mc.textContent = m ? m.tier : "No miner";
         var line = $("minerStatusLine");
         var startBtn = $("btnStartMining");
         if (!m){
@@ -3988,13 +4071,13 @@
         $("cryptoDetails").classList.remove("show");
         var cfg = {
           deposit: {
-            title: "Deposit to Main Balance",
-            sub: "Enter an amount, pick how you're sending it — Bank Transfer or Crypto — then send to the details shown. The deposit lands in your Main Balance once the request is approved.",
+            title: "Deposit",
+            sub: "Choose how you want to fund your account. Minimum deposit is $12.",
             avail: "", max: null, btn: "I've sent it"
           },
           withdraw: {
-            title: "Withdraw from Main Balance",
-            sub: "Request a withdrawal from your Main Balance. It is paid out once the request is approved.",
+            title: "Withdraw",
+            sub: "Cash out to your saved bank account or USDT wallet. Minimum withdrawal is $10.",
             avail: "Available to withdraw: " + fmtUSD(availableToWithdraw()), max: availableToWithdraw(), btn: "Request withdrawal"
           }
         }[mode];
@@ -7743,6 +7826,7 @@
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+Tawk_API.customStyle = { visibility: { desktop: { position: "br", xOffset: 20, yOffset: 96 }, mobile: { position: "br", xOffset: 14, yOffset: 96 } } };
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
 s1.async=true;
@@ -8130,7 +8214,33 @@ s0.parentNode.insertBefore(s1,s0);
       bind("v2TabHome", function(){ if (typeof setView === "function") setView("app", true); window.scrollTo(0, 0); });
       bind("v2TabTrade", function(){ if (typeof setView === "function") setView("binary"); });
       bind("v2TabGames", function(){ if (typeof openScreen === "function") openScreen("v2GamesOverlay"); });
-      bind("v2TabMine", function(){ window.scrollTo(0, 0); setTimeout(scrollToMiner, 60); });
+      bind("v2TabMine", function(){
+        if (window.__v2View && window.__v2View !== "app" && typeof setView === "function") setView("app", true);
+        window.scrollTo(0, 0);
+        setTimeout(scrollToMiner, 80);
+      });
+      /* ---------- Dock everywhere: keep the active tab in sync with the current view ---------- */
+      (function(){
+        if (typeof setView !== "function" || window.__v2DockSync) return;
+        window.__v2DockSync = true;
+        var _setViewOrig = setView;
+        var tabFor = { app: "v2TabHome", binary: "v2TabTrade", aviator: "v2TabGames", spin: "v2TabGames", whot: "v2TabGames", ayo: "v2TabGames", earn: "v2TabHome", history: "v2TabHome" };
+        var tabIds = ["v2TabHome", "v2TabTrade", "v2TabGames", "v2TabMine"];
+        function syncDock(v){
+          window.__v2View = v;
+          var target = tabFor[v] || "v2TabHome";
+          for (var i = 0; i < tabIds.length; i++){
+            var el = document.getElementById(tabIds[i]);
+            if (el) el.classList.toggle("active", tabIds[i] === target);
+          }
+        }
+        window.setView = function(v, skipPush){
+          var r = _setViewOrig(v, skipPush);
+          try { syncDock((typeof VIEW_IDS !== "undefined" && VIEW_IDS[v]) ? v : "app"); } catch (e) {}
+          return r;
+        };
+        syncDock("app");
+      })();
       bind("v2SetupBtn", function(){
         var list = $("v2SetupList"); if (!list) return;
         var open = list.classList.toggle("open");
@@ -8168,6 +8278,62 @@ s0.parentNode.insertBefore(s1,s0);
         var g = e.target.closest ? e.target.closest("[data-v2game]") : null;
         if (g){ closeScreen("v2GamesOverlay"); if (typeof setView === "function") setView(g.getAttribute("data-v2game")); }
       });
+      /* ---------- Pass 2.1: fund sheet chooser-first steps ---------- */
+      function fsSheetEl(){ var ov = $("sheetOverlay"); return ov ? ov.querySelector(".sheet") : null; }
+      function fsSetStep(step){
+        var sh = fsSheetEl(); if (!sh) return;
+        sh.classList.toggle("fs-choose", step === "choose");
+        sh.classList.toggle("fs-form", step === "form");
+      }
+      function fsHasDest(type){
+        if (typeof savedPayoutDestination !== "function") return null;
+        try { return !!savedPayoutDestination(type); } catch(e){ return null; }
+      }
+      function fsWdEnter(){
+        var bank = fsHasDest("bank"), usdt = fsHasDest("usdt");
+        var back = $("wdBackBtn");
+        if (bank === null || usdt === null){ fsSetStep("form"); if (back) back.style.display = ""; return; }
+        if (!bank && !usdt){ fsSetStep("form"); if (back) back.style.display = "none"; return; }
+        var rb = $("wdRowBank"), ru = $("wdRowUsdt");
+        if (rb) rb.style.display = bank ? "" : "none";
+        if (ru) ru.style.display = usdt ? "" : "none";
+        if (back) back.style.display = "";
+        var amt = $("wdAvailAmt");
+        if (amt && typeof availableToWithdraw === "function" && typeof fmtUSD === "function"){
+          try { amt.textContent = fmtUSD(availableToWithdraw()); } catch(e){}
+        }
+        fsSetStep("choose");
+      }
+      function fsEnter(mode){
+        if (mode === "withdraw") fsWdEnter();
+        else fsSetStep("choose");
+      }
+      if (typeof openSheet === "function" && !window.__fsOpenSheet){
+        var _fsOpenSheet = openSheet;
+        window.__fsOpenSheet = _fsOpenSheet;
+        window.openSheet = function(mode){
+          _fsOpenSheet(mode);
+          try { fsEnter(mode); } catch(e){}
+        };
+      }
+      bind("depRowBank", function(){ var b = $("methodBank"); if (b) b.click(); fsSetStep("form"); });
+      bind("depRowCrypto", function(){ var b = $("methodCrypto"); if (b) b.click(); fsSetStep("form"); });
+      bind("depBackBtn", function(){ fsSetStep("choose"); });
+      bind("depCloseBtn", function(){ if (typeof closeSheet === "function") closeSheet(); });
+      bind("wdRowBank", function(){ var b = $("wdDestBank"); if (b) b.click(); fsSetStep("form"); });
+      bind("wdRowUsdt", function(){ var b = $("wdDestUsdt"); if (b) b.click(); fsSetStep("form"); });
+      bind("wdBackBtn", function(){ fsWdEnter(); });
+      bind("wdCloseBtn", function(){ if (typeof closeSheet === "function") closeSheet(); });
+      document.addEventListener("click", function(e){
+        var card = $("v2MinerCard");
+        if (!card || !card.classList.contains("info-open")) return;
+        var t = e.target;
+        if (t && t.closest && (t.closest("#miningInfo") || t.closest("#miningInfoBtn"))) return;
+        card.classList.remove("info-open");
+        var mb = $("miningInfoBtn");
+        if (mb) mb.setAttribute("aria-expanded", "false");
+      });
+
       window.addEventListener("resize", function(){ window.renderDashV2(); });
       window.renderDashV2();
     })();
