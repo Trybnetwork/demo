@@ -8092,6 +8092,9 @@
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 Tawk_API.customStyle = { visibility: { desktop: { position: "br", xOffset: 20, yOffset: 96 }, mobile: { position: "br", xOffset: 14, yOffset: 96 } } };
+Tawk_API.onLoad = function(){ if (typeof Tawk_API.hideWidget === "function") Tawk_API.hideWidget(); };
+Tawk_API.onChatMinimized = function(){ if (typeof Tawk_API.hideWidget === "function") Tawk_API.hideWidget(); };
+Tawk_API.onChatEnded = function(){ if (typeof Tawk_API.hideWidget === "function") Tawk_API.hideWidget(); };
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
 s1.async=true;
@@ -8459,6 +8462,7 @@ s0.parentNode.insertBefore(s1,s0);
       });
       bind("v2ChatBtn", function(){
         try {
+          if (window.Tawk_API && typeof Tawk_API.showWidget === "function") Tawk_API.showWidget();
           if (window.Tawk_API && typeof Tawk_API.maximize === "function") Tawk_API.maximize();
           else if (window.Tawk_API && typeof Tawk_API.toggle === "function") Tawk_API.toggle();
         } catch(e){}
