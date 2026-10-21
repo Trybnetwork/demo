@@ -1503,6 +1503,16 @@
     
       /* Emblem is a plain brand mark now (dock Menu tab opens the drawer) */
       #menuBtn{ cursor:default; }
+    
+      /* Balance hero as a raised 3D card with a deep navy shadow (2026-10-21) */
+      #appView .v2-hero{
+        background:linear-gradient(165deg, #FFFFFF 0%, #F3F5FB 100%) !important;
+        border:1.5px solid rgba(11,17,50,.10) !important;
+        border-radius:24px !important;
+        padding:20px 18px 16px !important;
+        margin:6px 0 12px !important;
+        box-shadow:0 30px 50px -18px rgba(11,17,50,.38), 0 14px 24px -12px rgba(11,17,50,.24), 0 3px 6px rgba(11,17,50,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(11,17,50,.05) !important;
+      }
     </style>
   </head>
   <body>
@@ -1687,6 +1697,13 @@
           <div class="v2-balance-sub" id="v2TotalSub"></div>
           <span id="mainBalance" class="v2-gone">$0.00</span>
           <div class="pending-note" id="mainPending" style="display:none;"></div>
+          <div class="v2-info-row">
+            <button class="v2-info-btn" id="mainInfoBtn" type="button" aria-expanded="false" aria-controls="mainCardSub" aria-label="About Main Balance">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
+              About your balance
+            </button>
+            <div class="v2-info-text card-info" id="mainCardSub">Deposits and withdrawals apply to your Main Balance only — and it's the only balance you can trade with. The total above adds your Main Balance, Mining balance and the dollar value of your TrybCoin.</div>
+          </div>
         </div>
       </section>
 
