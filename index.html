@@ -1236,6 +1236,7 @@
     
       /* Global primary buttons (2026-10-21): navy background + white text, replacing the gold style */
       .btn:not(.ghost){ background:#0B1132 !important; color:#FFFFFF !important; border-color:rgba(201,162,75,.55) !important; }
+      #v2MinerCard{ cursor:pointer; }
     </style>
   </head>
   <body>
@@ -1465,7 +1466,6 @@
           <div class="v2-wc-foot" id="v2MinerFoot"><span style="color:#6B7086;">No active miner</span></div>
           <div class="v2-status-line" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
           <div class="v2-card-btns">
-            <button class="btn" id="btnBuyMiner" type="button">Buy Miner</button>
             <button class="btn" id="btnStartMining" type="button" style="display:none;">Start Mining</button>
             <button class="btn ghost" id="btnCashout" type="button" disabled style="color:#0B1132;border-color:#D8DCE6;">Cashout</button>
           </div>
@@ -1486,7 +1486,6 @@
           </div>
           <div class="v2-wc-amount" id="v2CoinAmount"><span id="trybcoinChipBal">0</span> TN</div>
           <div class="v2-wc-foot" id="v2CoinUsd">≈ $0.00</div>
-          <div class="v2-wc-foot" style="margin-top:2px;">Tap the card to earn more TrybCoin</div>
         </article>
       </section>
 
@@ -5028,7 +5027,7 @@
       });
       $("btnDeposit").addEventListener("click", function(){ openSheet("deposit"); });
       $("btnWithdraw").addEventListener("click", function(){ openSheet("withdraw"); });
-      $("btnBuyMiner").addEventListener("click", openMinerSheet);
+      var _bbm = $("btnBuyMiner"); if (_bbm) _bbm.addEventListener("click", openMinerSheet);
       $("btnStartMining").addEventListener("click", startMining);
       $("btnCashout").addEventListener("click", cashoutMiner);
       $("minerClose").addEventListener("click", closeMinerSheet);
@@ -8262,8 +8261,9 @@ s0.parentNode.insertBefore(s1,s0);
       });
       var minerCard = $("v2MinerCard");
       if (minerCard) minerCard.addEventListener("click", function(e){
-        if (e.target.closest && e.target.closest("button")) return;
-        if (typeof state !== "undefined" && !state.miner && typeof openMinerSheet === "function") openMinerSheet();
+        if (minerCard.classList.contains("info-open")) return;
+        if (e.target.closest && (e.target.closest("button") || e.target.closest("#miningInfo"))) return;
+        if (typeof openMinerSheet === "function") openMinerSheet();
       });
       var coinCard = $("v2CoinCard");
       if (coinCard) coinCard.addEventListener("click", function(e){
