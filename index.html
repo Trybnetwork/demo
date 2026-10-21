@@ -894,8 +894,22 @@
       .wager-bar-fill{height:100%;background:linear-gradient(90deg,#C9A24B,#e8c96a);border-radius:4px;transition:width .4s ease}
       .wager-bar-text{font-size:12px;color:#aaa;margin:6px 0 0;line-height:1.4}
     </style>
+
+    <!-- Auto-translate (Google Translate engine, auto-detect) -->
+    <style>
+      .goog-te-banner-frame.skiptranslate, .goog-te-gadget-icon { display:none !important; }
+      body { top:0 !important; }
+      .skiptranslate iframe { display:none !important; }
+      #google_translate_element { position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden; }
+      .lang-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+      .lang-item { display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid var(--line); border-radius:12px; background:#fff; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; text-align:left; width:100%; }
+      .lang-item .lang-check { color:var(--gold-d); font-weight:800; visibility:hidden; }
+      .lang-item.active .lang-check { visibility:visible; }
+    </style>
   </head>
   <body>
+    <div id="google_translate_element" aria-hidden="true"></div>
+
     <!-- Auth gate: shown whenever there is no signed-in session -->
     <div class="auth-gate" id="authGate">
       <div class="auth-card">
@@ -1696,6 +1710,11 @@
         <button class="drawer-item" id="menuHelp" type="button">
           <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3A2.6 2.6 0 1 1 12 12.4V14"/><path d="M12 17.2h.01"/></svg></span>
           <span>Help<span class="di-sub">Wallets, mining, bonuses &amp; the arena</span></span>
+          <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="drawer-item" id="menuLang" type="button">
+          <span class="di-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.9 5.7 3.9 9S14.5 18.4 12 21c-2.5-2.6-3.9-5.7-3.9-9S9.5 5.6 12 3z"/></svg></span>
+          <span>Language<span class="di-sub" id="langSub">Auto (device language)</span></span>
           <svg class="di-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
         <button class="drawer-item" id="menuLogout" type="button">
@@ -7414,5 +7433,106 @@ s0.parentNode.insertBefore(s1,s0);
     <div class="duel-overlay" id="duelOverlay" style="display:none;">
     <div class="wt-card" id="duelCard"></div>
   </div>
+
+    <!-- Language sheet -->
+    <div class="overlay" id="langOverlay">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="langTitle">
+        <h3 id="langTitle">Language</h3>
+        <p class="sheet-sub">The app translates automatically to your device language. You can change it here anytime.</p>
+        <div class="lang-list" id="langList"></div>
+        <button class="btn ghost" id="langClose" type="button" style="margin-top:14px;">Close</button>
+      </div>
+    </div>
+    <script>
+    /* ---------- Auto-translate: Google engine, auto-detect + manual override ---------- */
+    (function(){
+      var SUPPORTED = ["en","fr","es","pt","ar","ha","yo","ig","sw","hi","ur","zh-CN","de","it","ru","tr","id","vi","th","tl"];
+      var NAMES = {"en":"English","fr":"Fran\u00e7ais","es":"Espa\u00f1ol","pt":"Portugu\u00eas","ar":"\u0627\u0644\u0639\u0631\u0628\u064a\u0629","ha":"Hausa","yo":"Yor\u00f9b\u00e1","ig":"Igbo","sw":"Kiswahili","hi":"\u0939\u093f\u0928\u094d\u0926\u0940","ur":"\u0627\u0631\u062f\u0648","zh-CN":"\u4e2d\u6587","de":"Deutsch","it":"Italiano","ru":"\u0420\u0443\u0441\u0441\u043a\u0438\u0439","tr":"T\u00fcrk\u00e7e","id":"Bahasa Indonesia","vi":"Ti\u1ebfng Vi\u1ec7t","th":"\u0e44\u0e17\u0e22","tl":"Filipino"};
+      function cookieLang(){
+        var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
+        return m ? decodeURIComponent(m[1]) : null;
+      }
+      function setTransCookie(lang){
+        var v = "/en/" + lang;
+        document.cookie = "googtrans=" + v + "; path=/";
+        document.cookie = "googtrans=" + v + "; path=/; domain=" + location.hostname;
+      }
+      function clearTransCookie(){
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=" + location.hostname;
+      }
+      function deviceLang(){
+        var l = (navigator.language || "en").toLowerCase();
+        if (l.indexOf("zh") === 0) return "zh-CN";
+        var base = l.split("-")[0];
+        return SUPPORTED.indexOf(base) >= 0 ? base : "en";
+      }
+      function currentLang(){
+        var saved = null;
+        try { saved = localStorage.getItem("tn_lang"); } catch(e){}
+        if (saved) return saved;
+        return cookieLang() || "en";
+      }
+      window.__tnSetLang = function(lang){
+        try { localStorage.setItem("tn_lang", lang); } catch(e){}
+        if (lang === "en") { clearTransCookie(); } else { setTransCookie(lang); }
+        location.reload();
+      };
+      window.googleTranslateElementInit = function(){
+        try {
+          new google.translate.TranslateElement({ pageLanguage: "en", autoDisplay: false }, "google_translate_element");
+        } catch(e){}
+        // First visit, no saved choice: auto-translate to the device language
+        var saved = null;
+        try { saved = localStorage.getItem("tn_lang"); } catch(e){}
+        if (!saved) {
+          var dev = deviceLang();
+          if (dev !== "en" && cookieLang() !== dev) {
+            setTransCookie(dev);
+            setTimeout(function(){ location.reload(); }, 600);
+          }
+        }
+      };
+      var s = document.createElement("script");
+      s.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      s.async = true;
+      document.head.appendChild(s);
+      /* Language menu + sheet */
+      function renderLangList(){
+        var list = document.getElementById("langList");
+        if (!list) return;
+        var cur = currentLang();
+        list.innerHTML = "";
+        SUPPORTED.forEach(function(code){
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "lang-item" + (code === cur ? " active" : "");
+          b.innerHTML = "<span></span><span class='lang-check'>\u2713</span>";
+          b.firstChild.textContent = NAMES[code] || code;
+          b.addEventListener("click", function(){ window.__tnSetLang(code); });
+          list.appendChild(b);
+        });
+        var sub = document.getElementById("langSub");
+        if (sub) sub.textContent = NAMES[cur] || cur;
+      }
+      document.addEventListener("DOMContentLoaded", function(){
+        renderLangList();
+        var menu = document.getElementById("menuLang");
+        if (menu) menu.addEventListener("click", function(){
+          if (typeof closeDrawer === "function") closeDrawer();
+          renderLangList();
+          if (typeof openScreen === "function") openScreen("langOverlay");
+        });
+        var close = document.getElementById("langClose");
+        if (close) close.addEventListener("click", function(){
+          if (typeof closeScreen === "function") closeScreen("langOverlay");
+        });
+        var ov = document.getElementById("langOverlay");
+        if (ov) ov.addEventListener("click", function(e){
+          if (e.target === ov && typeof closeScreen === "function") closeScreen("langOverlay");
+        });
+      });
+    })();
+    </script>
 </body>
 </html>
