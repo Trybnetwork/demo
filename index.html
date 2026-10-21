@@ -5212,6 +5212,13 @@
         $("drawerName").textContent = state.profile.name;
         $("drawerEmail").textContent = profileSubLine(state.profile);
         paintAvatar($("headerAvatar"), state.profile.avatar, state.profile.name, state.profile.photo);
+        /* Header icon: once the user uploads a profile photo, the header
+           emblem shows their photo; with no photo it stays the emblem. */
+        var emblemImg = document.querySelector("#menuBtn img");
+        if (emblemImg){
+          var wantSrc = state.profile.photo ? state.profile.photo : "./emblem.jpg";
+          if (emblemImg.getAttribute("src") !== wantSrc) emblemImg.src = wantSrc;
+        }
         $("headerName").textContent = state.profile.name;
         $("headerSub").textContent = profileSubLine(state.profile);
         $("logoutSub").textContent = currentUser ? "Signed in as @" + state.profile.username : "Sign out of this account";
