@@ -1461,6 +1461,45 @@
       .coin-pop-sub{ color:#6B7086; }
       .coin-pop-earn{ color:#9A7B2D; }
       .coin-pop .btn.ghost{ background:#F2F3F8; color:#0B1132; border-color:#E6E7EE; }
+
+      /* ============ Pass 4 (2026-10-21): auth gate (sign up / log in / reset) in the artifact design language ============ */
+      #authGate{ background:#FFFFFF; }
+      #authGate .auth-card{
+        background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:20px;
+        box-shadow:0 24px 60px rgba(11,17,50,.12);
+      }
+      #authGate .auth-brand h2{ color:#0B1132; }
+      #authGate .auth-brand h2 .gold{ color:#C9A24B; }
+      #authGate .auth-brand p{ color:#6B7086; }
+      #authGate .auth-intro{ color:#6B7086; }
+      #authGate .seg{ background:#F2F3F8; border:1.5px solid #E6E7EE; border-radius:14px; padding:4px; gap:4px; }
+      #authGate .seg button{ color:#6B7086; border-radius:10px; font-family:"Manrope",sans-serif; }
+      #authGate .seg button.active{ background:#0B1132; color:#FFFFFF; }
+      #authGate .form-field label{ color:#6B7086; }
+      #authGate .form-field label span{ color:#9AA0BD !important; }
+      #authGate .text-input{
+        background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:12px; color:#0B1132;
+        font-family:"Manrope",sans-serif;
+      }
+      #authGate .text-input:focus{ border-color:#C9A24B; box-shadow:0 0 0 3px rgba(201,162,75,.22); outline:0; }
+      #authGate .text-input::placeholder{ color:#9AA0BD; }
+      #authGate input[type="date"].text-input{ color-scheme:light; }
+      #authGate .user-wrap{ background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:12px; }
+      #authGate .user-wrap span{ color:#9A7B24; }
+      #authGate .user-wrap input{ color:#0B1132; }
+      #authGate .user-wrap:focus-within{ border-color:#C9A24B; box-shadow:0 0 0 3px rgba(201,162,75,.22); }
+      #authGate .pw-toggle{ color:#6B7086; }
+      #authGate .pw-toggle.on{ color:#9A7B24; }
+      #authGate .forgot-link{ color:#9A7B24; }
+      #authGate .auth-back{ color:#9A7B24; }
+      #authGate .auth-note{ color:#6B7086; }
+      #authGate .sheet-err{ color:#D64545; }
+      #authGate .sheet-err.show{
+        display:block; background:#FDECEC; border:1px solid #F3C2C2; border-radius:12px; padding:11px 13px;
+      }
+      #authGate .auth-success{
+        color:#146C46; background:#E9F8F1; border:1px solid rgba(29,157,99,.35);
+      }
     </style>
   </head>
   <body>
