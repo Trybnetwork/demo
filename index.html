@@ -1513,6 +1513,9 @@
         margin:6px 0 12px !important;
         box-shadow:0 30px 50px -18px rgba(11,17,50,.38), 0 14px 24px -12px rgba(11,17,50,.24), 0 3px 6px rgba(11,17,50,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(11,17,50,.05) !important;
       }
+      /* Country support (2026-10-21): pill flag emoji + USDT amount unit on the fund sheet */
+      #v2TotalPill .v2-flags{ font-size:17px; line-height:1; }
+      #sheetOverlay .amt-wrap.usdt span{ font-size:14px; letter-spacing:.5px; }
     </style>
   </head>
   <body>
@@ -1571,6 +1574,10 @@
           <div class="form-field">
             <label for="suEmail">Email</label>
             <input class="text-input" id="suEmail" type="email" maxlength="80" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="form-field">
+            <label for="suCountry">Country</label>
+            <select class="text-input" id="suCountry" required autocomplete="country-name"></select>
           </div>
           <div class="form-field">
             <label for="suPass">Password</label>
@@ -2283,9 +2290,9 @@
           <div class="pay-details" id="cryptoDetails">
             <div class="pd-row"><span class="pd-label">Coin</span><span class="pd-value">USDT (TRC-20)</span><button class="copy-btn" type="button" data-copy="USDT (TRC-20)" data-copy-label="Coin">Copy</button></div>
             <div class="pd-row"><span class="pd-label">Wallet address</span><span class="pd-value addr num" id="cryptoAddr"></span><button class="copy-btn" type="button" id="copyCryptoAddr" data-copy="" data-copy-label="Wallet address">Copy</button></div>
-            <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="cryptoAmt">$0.00</span><button class="copy-btn" type="button" id="copyCryptoAmt">Copy</button></div>
+            <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="cryptoAmt">0.00 USDT</span><button class="copy-btn" type="button" id="copyCryptoAmt">Copy</button></div>
             <img class="pd-qr" id="cryptoQr" alt="QR code for your USDT (TRC-20) deposit wallet address" />
-            <p class="pd-note">Scan the QR code or copy the address — the wallet address changes with each deposit, so always use the one shown here. Send USDT on the TRC-20 network only, then tap “I've sent it” below.</p>
+            <p class="pd-note">Send exactly <span class="num" id="cryptoExact">0.00 USDT</span> — scan the QR code or copy the address above. The wallet address changes with each deposit, so always use the one shown here. Send USDT on the TRC-20 network only, then tap “I've sent it” below.</p>
           </div>
         </div>
         <div class="sheet-err" id="sheetErr"></div>
@@ -2897,6 +2904,62 @@
       var AUTO_SETTLE_AFTER_MS = 5 * 60 * 1000;
       var AUTO_SETTLE_CHECK_MS = 30 * 1000;
       var BLACK_MARKET_RATE = 1380; // NGN per USD, parallel market — bank transfer instructions only; requests stay in USD
+      /* Signup country + per-user display currency (tn-country.sql).
+         rate = units of the local currency per 1 USD, approximate and
+         display-only — balances are always stored in USD/USDT.
+         Nigeria uses the live parallel-market constant, never a copy. */
+      var COUNTRIES = [
+        { code: "NG", name: "Nigeria", ccy: "NGN", symbol: "₦", flag: "🇳🇬", rate: BLACK_MARKET_RATE },
+        { code: "GH", name: "Ghana", ccy: "GHS", symbol: "GH₵", flag: "🇬🇭", rate: 15.5 },
+        { code: "KE", name: "Kenya", ccy: "KES", symbol: "KSh", flag: "🇰🇪", rate: 129 },
+        { code: "ZA", name: "South Africa", ccy: "ZAR", symbol: "R", flag: "🇿🇦", rate: 17.8 },
+        { code: "TZ", name: "Tanzania", ccy: "TZS", symbol: "TSh", flag: "🇹🇿", rate: 2510 },
+        { code: "UG", name: "Uganda", ccy: "UGX", symbol: "USh", flag: "🇺🇬", rate: 3720 },
+        { code: "CM", name: "Cameroon", ccy: "XAF", symbol: "FCFA", flag: "🇨🇲", rate: 605 },
+        { code: "SN", name: "Senegal", ccy: "XOF", symbol: "CFA", flag: "🇸🇳", rate: 605 },
+        { code: "EG", name: "Egypt", ccy: "EGP", symbol: "E£", flag: "🇪🇬", rate: 48.5 },
+        { code: "MA", name: "Morocco", ccy: "MAD", symbol: "MAD", flag: "🇲🇦", rate: 9.9 },
+        { code: "US", name: "United States", ccy: "USD", symbol: "$", flag: "🇺🇸", rate: 1 },
+        { code: "GB", name: "United Kingdom", ccy: "GBP", symbol: "£", flag: "🇬🇧", rate: 0.79 },
+        { code: "DE", name: "Germany", ccy: "EUR", symbol: "€", flag: "🇩🇪", rate: 0.92 },
+        { code: "FR", name: "France", ccy: "EUR", symbol: "€", flag: "🇫🇷", rate: 0.92 },
+        { code: "ES", name: "Spain", ccy: "EUR", symbol: "€", flag: "🇪🇸", rate: 0.92 },
+        { code: "IT", name: "Italy", ccy: "EUR", symbol: "€", flag: "🇮🇹", rate: 0.92 },
+        { code: "NL", name: "Netherlands", ccy: "EUR", symbol: "€", flag: "🇳🇱", rate: 0.92 },
+        { code: "CA", name: "Canada", ccy: "CAD", symbol: "C$", flag: "🇨🇦", rate: 1.36 },
+        { code: "AE", name: "United Arab Emirates", ccy: "AED", symbol: "AED", flag: "🇦🇪", rate: 3.67 },
+        { code: "SA", name: "Saudi Arabia", ccy: "SAR", symbol: "SAR", flag: "🇸🇦", rate: 3.75 },
+        { code: "IN", name: "India", ccy: "INR", symbol: "₹", flag: "🇮🇳", rate: 83.5 },
+        { code: "PK", name: "Pakistan", ccy: "PKR", symbol: "Rs", flag: "🇵🇰", rate: 278 },
+        { code: "BD", name: "Bangladesh", ccy: "BDT", symbol: "৳", flag: "🇧🇩", rate: 110 },
+        { code: "PH", name: "Philippines", ccy: "PHP", symbol: "₱", flag: "🇵🇭", rate: 58.5 },
+        { code: "ID", name: "Indonesia", ccy: "IDR", symbol: "Rp", flag: "🇮🇩", rate: 15600 },
+        { code: "CN", name: "China", ccy: "CNY", symbol: "¥", flag: "🇨🇳", rate: 7.25 },
+        { code: "JP", name: "Japan", ccy: "JPY", symbol: "¥", flag: "🇯🇵", rate: 151 },
+        { code: "BR", name: "Brazil", ccy: "BRL", symbol: "R$", flag: "🇧🇷", rate: 5.5 },
+        { code: "MX", name: "Mexico", ccy: "MXN", symbol: "Mex$", flag: "🇲🇽", rate: 17.2 },
+        { code: "TR", name: "Turkey", ccy: "TRY", symbol: "₺", flag: "🇹🇷", rate: 32.5 },
+        { code: "AU", name: "Australia", ccy: "AUD", symbol: "A$", flag: "🇦🇺", rate: 1.52 }
+      ];
+      function countryOf(code){
+        code = String(code || "").toUpperCase();
+        for (var ci = 0; ci < COUNTRIES.length; ci++) if (COUNTRIES[ci].code === code) return COUNTRIES[ci];
+        return null;
+      }
+      /* Fill the signup Country select from COUNTRIES (the single source
+         of truth), alphabetical by name, Nigeria preselected. */
+      (function(){
+        var sel = document.getElementById("suCountry");
+        if (!sel) return;
+        var sorted = COUNTRIES.slice().sort(function(a, b){ return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0); });
+        sorted.forEach(function(c){
+          var o = document.createElement("option");
+          o.value = c.code;
+          o.textContent = c.flag + " " + c.name;
+          sel.appendChild(o);
+        });
+        sel.value = "NG";
+      })();
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
       var REFERRAL_REWARD = 3;
@@ -2964,7 +3027,7 @@
           refCode: "—", referrals: [], referralEarned: 0,
           wagering: 0, refBonuses: [],
           adminRequests: [],
-          profile: { name: "Trader", email: "", avatar: 0, username: "", dob: "", photo: "" },
+          profile: { name: "Trader", email: "", avatar: 0, username: "", dob: "", photo: "", country: "" },
           paymentMethods: [],
           lastTick: Date.now()
         };
@@ -3425,7 +3488,8 @@
             avatar: keep.avatar || 0,
             username: profileRow.username || "",
             dob: profileRow.date_of_birth || "",
-            photo: profileRow.avatar_url || ""
+            photo: profileRow.avatar_url || "",
+            country: profileRow.country || ""
           };
           // Wagering volume lives on the profile row; if the column
           // isn't there yet, tracking and the withdrawal gate stay off.
@@ -4209,7 +4273,8 @@
         var amt = parseFloat($("sheetAmount").value);
         var ok = isFinite(amt) && amt > 0;
         $("bankAmt").textContent = ok ? fmtUSD(amt) : "$0.00";
-        $("cryptoAmt").textContent = ok ? fmtUSD(amt) : "$0.00";
+        $("cryptoAmt").textContent = ok ? fmtUSD(amt).slice(1) + " USDT" : "0.00 USDT";
+        var cryptoExactEl = $("cryptoExact"); if (cryptoExactEl) cryptoExactEl.textContent = ok ? fmtUSD(amt).slice(1) + " USDT" : "0.00 USDT";
         $("bankNgn").textContent = ok ? fmtNGN(amt * BLACK_MARKET_RATE) : "₦0";
       }
       /* ---- Bank-transfer receipt upload (Supabase Storage: tn-receipts) ---- */
@@ -5648,6 +5713,24 @@
         sb.from("tn_login_sessions").insert({ user_id: userId, device: ua || null })
           .then(function(){}, function(){});
       }
+      /* tn_profiles.country (tn-country.sql) may not exist yet: the
+         first insert carries it, and if the database rejects the
+         unknown column we retry without it and remember for the
+         session — signup must never break over a pending migration. */
+      var countryColumnKnown = null; // null = untested, true = present, false = absent
+      function insertProfileWithCountry(profile, countryCode){
+        var withCountry = {};
+        for (var k in profile) withCountry[k] = profile[k];
+        withCountry.country = countryCode;
+        return sb.from("tn_profiles").insert(withCountry).then(function(pr){
+          if (pr.error && countryColumnKnown !== true){
+            countryColumnKnown = false;
+            return sb.from("tn_profiles").insert(profile);
+          }
+          if (!pr.error) countryColumnKnown = true;
+          return pr;
+        });
+      }
       $("signupForm").addEventListener("submit", function(e){
         e.preventDefault();
         if (!sb){ authError("suErr", "Couldn't reach the server — check your connection and try again."); return; }
@@ -5658,6 +5741,8 @@
         var dobEl = $("suDob");
         var dob = dobEl ? dobEl.value : "";
         var ref = $("suRef").value.trim();
+        var suCountryEl = $("suCountry");
+        var countryCode = suCountryEl && suCountryEl.value ? String(suCountryEl.value).toUpperCase() : "NG";
         if (!name){ authError("suErr", "Enter your full name."); return; }
         if (!/^[A-Za-z0-9_]{3,20}$/.test(username)){ authError("suErr", "Username needs 3–20 characters: letters, numbers, or underscores only."); return; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ authError("suErr", "That email doesn't look right — check it and try again."); return; }
@@ -5698,7 +5783,7 @@
               date_of_birth: dob || null, avatar_url: null,
               referral_code: refCode, referred_by: referredBy
             };
-            return sb.from("tn_profiles").insert(profile).then(function(pr){
+            return insertProfileWithCountry(profile, countryCode).then(function(pr){
               if (pr.error){ fail("Your login was created but the profile couldn't be saved — try logging in."); return null; }
               return sb.from("tn_wallets").insert({
                 user_id: user.id, main_balance: WELCOME_BONUS, savings_interest: 0, traded_volume: 0, bonus_locked: true
@@ -8284,6 +8369,25 @@ s0.parentNode.insertBefore(s1,s0);
       function coinsNow(){ return (typeof earnCoinBal === "number") ? earnCoinBal : 0; }
       function coinRate(){ return (typeof TRYBCOIN_RATE === "number" && TRYBCOIN_RATE > 0) ? TRYBCOIN_RATE : 1000; }
       function ngnRate(){ return (typeof BLACK_MARKET_RATE === "number") ? BLACK_MARKET_RATE : 1380; }
+      /* The signed-in user's country (defaults to Nigeria when unset or
+         unknown); drives the balance toggle currency and flag, and the
+         Nigeria-only bank-deposit gate. */
+      function userCountry(){
+        var code = "";
+        try {
+          if (typeof state !== "undefined" && state.profile && state.profile.country) code = state.profile.country;
+          else if (typeof profileRow !== "undefined" && profileRow && profileRow.country) code = profileRow.country;
+        } catch(e){}
+        var c = (typeof countryOf === "function") ? countryOf(code) : null;
+        if (!c && typeof countryOf === "function") c = countryOf("NG");
+        return c || { code: "NG", name: "Nigeria", ccy: "NGN", symbol: "₦", flag: "🇳🇬", rate: ngnRate() };
+      }
+      function fmtLocal(usd){
+        var c = userCountry();
+        var v = (Number(usd) || 0) * c.rate;
+        if (c.rate >= 100) return c.symbol + Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return c.symbol + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
       function totalUSD(){
         var m = (typeof state !== "undefined") ? state.miner : null;
         var main = (typeof state !== "undefined") ? (state.main || 0) : 0;
@@ -8375,9 +8479,17 @@ s0.parentNode.insertBefore(s1,s0);
           var amtEl = $("v2TotalAmount"), subEl = $("v2TotalSub");
           if (amtEl){
             if (v2.hidden){ amtEl.textContent = "••••••"; if (subEl) subEl.textContent = ""; }
-            else if (v2.ngn){ amtEl.textContent = fmtNGN(t * ngnRate()); if (subEl) subEl.textContent = "≈ " + fmtUSD(t); }
-            else { amtEl.textContent = fmtUSD(t); if (subEl) subEl.textContent = "≈ " + fmtNGN(t * ngnRate()); }
+            else if (v2.ngn){ amtEl.textContent = fmtLocal(t); if (subEl) subEl.textContent = "≈ " + fmtUSD(t); }
+            else { amtEl.textContent = fmtUSD(t); if (subEl) subEl.textContent = "≈ " + fmtLocal(t); }
             fitAmt(amtEl, 50, 24);
+          }
+          var flagsEl = document.querySelector("#v2TotalPill .v2-flags");
+          if (flagsEl){
+            var ucf = userCountry().flag;
+            if (flagsEl.getAttribute("data-flag") !== ucf){
+              flagsEl.textContent = ucf;
+              flagsEl.setAttribute("data-flag", ucf);
+            }
           }
           var foot = $("v2MinerFoot");
           if (foot && typeof state !== "undefined"){
@@ -8541,22 +8653,60 @@ s0.parentNode.insertBefore(s1,s0);
         }
         fsSetStep("choose");
       }
+      function fsDepEnter(){
+        /* Bank-transfer deposits are Nigeria-only (for now): other
+           countries see just the USDT option. */
+        var ng = userCountry().code === "NG";
+        var rb = $("depRowBank"); if (rb) rb.style.display = ng ? "" : "none";
+        var mb = $("methodBank"); if (mb) mb.style.display = ng ? "" : "none";
+        fsSetStep("choose");
+      }
       function fsEnter(mode){
         if (mode === "withdraw") fsWdEnter();
-        else fsSetStep("choose");
+        else fsDepEnter();
       }
       if (typeof openSheet === "function" && !window.__fsOpenSheet){
         var _fsOpenSheet = openSheet;
         window.__fsOpenSheet = _fsOpenSheet;
         window.openSheet = function(mode){
           _fsOpenSheet(mode);
-          try { fsEnter(mode); } catch(e){}
+          try { fsEnter(mode); fsSyncAmtUnit(); } catch(e){}
         };
       }
-      bind("depRowBank", function(){ var b = $("methodBank"); if (b) b.click(); fsSetStep("form"); });
-      bind("depRowCrypto", function(){ var b = $("methodCrypto"); if (b) b.click(); fsSetStep("form"); });
+      bind("depRowBank", function(){
+        if (userCountry().code !== "NG"){ var c = $("methodCrypto"); if (c) c.click(); fsSetStep("form"); fsSyncAmtUnit(); return; }
+        var b = $("methodBank"); if (b) b.click(); fsSetStep("form"); fsSyncAmtUnit();
+      });
+      bind("depRowCrypto", function(){ var b = $("methodCrypto"); if (b) b.click(); fsSetStep("form"); fsSyncAmtUnit(); });
       bind("depBackBtn", function(){ fsSetStep("choose"); });
       bind("depCloseBtn", function(){ if (typeof closeSheet === "function") closeSheet(); });
+      /* The sheet amount unit follows the visible deposit panel:
+         "USDT" while the crypto panel is up, "$" everywhere else. */
+      function fsSyncAmtUnit(){
+        var wrap = document.querySelector("#sheetOverlay .amt-wrap");
+        if (!wrap) return;
+        var cd = $("cryptoDetails");
+        var crypto = !!(cd && cd.classList.contains("show"));
+        wrap.classList.toggle("usdt", crypto);
+        var sp = wrap.querySelector("span");
+        if (sp) sp.textContent = crypto ? "USDT" : "$";
+      }
+      bind("methodBank", fsSyncAmtUnit);
+      bind("methodCrypto", fsSyncAmtUnit);
+      /* Bank-transfer deposits are Nigeria-only: if a non-Nigerian
+         somehow triggers the bank method, reroute them to the crypto
+         panel instead. Capture phase on document runs before the
+         seg button's own click handler. */
+      document.addEventListener("click", function(e){
+        var t = e.target;
+        if (!t || !t.closest || !t.closest("#methodBank")) return;
+        if (userCountry().code === "NG") return;
+        e.stopPropagation();
+        e.preventDefault();
+        var c = $("methodCrypto"); if (c) c.click();
+        fsSetStep("form");
+        fsSyncAmtUnit();
+      }, true);
       bind("wdRowBank", function(){ var b = $("wdDestBank"); if (b) b.click(); fsSetStep("form"); });
       bind("wdRowUsdt", function(){ var b = $("wdDestUsdt"); if (b) b.click(); fsSetStep("form"); });
       bind("wdBackBtn", function(){ fsWdEnter(); });
