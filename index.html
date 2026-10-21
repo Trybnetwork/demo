@@ -1002,6 +1002,23 @@
       .v2-sheet h3{ color:#0B1132; }
       .v2-sheet .sheet-sub{ color:#6B7086 !important; }
       .v2-opt-row{ display:flex; align-items:center; gap:14px; width:100%; text-align:left; border:1.5px solid #E6E7EE; border-radius:16px; padding:15px 16px; margin-bottom:11px; background:#fff; cursor:pointer; font-family:inherit; color:#0B1132; }
+      /* ---------- Fixed Investment (Grow-style page) ---------- */
+      .fi-total-label{ font-size:12px; font-weight:700; letter-spacing:1.6px; color:#8A8FA8; text-transform:uppercase; margin:24px 16px 6px; }
+      .fi-total{ font-size:44px; font-weight:800; color:#0B1132; margin:0 16px; line-height:1.05; }
+      .fi-total-sub{ color:#6B7086; font-size:13.5px; margin:8px 16px 0; }
+      .fi-activity-pill{ display:block; width:fit-content; margin:24px auto 0; background:#fff; border-radius:99px; padding:9px 22px; color:#6B7086; font-size:13.5px; font-weight:600; box-shadow:0 1px 4px rgba(11,17,50,.06); }
+      .fi-card{ background:#fff; border:1px solid #E6E7EE; border-radius:22px; padding:22px 18px; margin:22px 16px 30px; }
+      .fi-card h3{ margin:0; font-size:21px; color:#0B1132; }
+      .fi-card-sub{ color:#6B7086; font-size:14px; margin:5px 0 0; }
+      .fi-dash{ border:1.6px dashed #D8DAE6; border-radius:16px; margin-top:18px; padding:26px 18px 22px; text-align:center; }
+      .fi-badge{ width:58px; height:58px; border-radius:50%; background:#F4F1E6; color:#C9A24B; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; margin:0 auto 14px; }
+      .fi-dash p{ color:#454A63; font-size:14.5px; line-height:1.55; margin:0 auto 18px; max-width:330px; }
+      .fi-cta{ background:#0B1132; color:#fff; border:1px solid #C9A24B; border-radius:99px; font-family:inherit; font-size:15.5px; font-weight:700; padding:14px 34px; cursor:pointer; }
+      .fi-lot{ display:flex; justify-content:space-between; gap:12px; background:#fff; border:1px solid #E6E7EE; border-radius:16px; padding:15px 16px; margin:11px 16px 0; }
+      .fi-lot-amt{ font-weight:800; color:#0B1132; font-size:16px; }
+      .fi-lot-meta{ color:#6B7086; font-size:12.5px; margin-top:3px; line-height:1.5; }
+      .fi-lot-right{ text-align:right; }
+      .fi-lot-earn{ color:#1E9E57; font-weight:700; font-size:14.5px; }
       .v2-opt-row .v2-tx-ic{ background:#F2F3F8; }
       .v2-opt-main{ flex:1; min-width:0; }
       .v2-opt-title{ font-size:16px; font-weight:800; }
@@ -2335,6 +2352,29 @@
       </div>
     </div>
 
+    <div class="overlay" id="investOverlay">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="investTitle">
+        <h3 id="investTitle">Fixed Investment</h3>
+        <p class="sheet-sub">Lock an amount from your <b>Main Balance</b> for a fixed term. At maturity, your principal plus the earnings land back in your Main Balance automatically. Locked funds can't be withdrawn early. Minimum lock is <b>$5</b>.</p>
+        <div id="fiTiers"></div>
+        <div class="pack-form" id="fiForm" style="display:none;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label for="fiAmount" id="fiAmountLabel">Amount to lock</label>
+            <div class="amt-wrap"><span>$</span><input id="fiAmount" class="num" type="number" inputmode="decimal" min="0" step="1" placeholder="0"></div>
+          </div>
+          <div class="pack-preview">
+            <span id="fiAvail"></span>
+            <span class="pp-profit num" id="fiSummary"></span>
+          </div>
+        </div>
+        <div class="sheet-err" id="fiErr"></div>
+        <div class="sheet-btns">
+          <button class="btn ghost" id="fiClose" type="button">Cancel</button>
+          <button class="btn" id="fiConfirm" type="button" style="display:none;">Lock investment</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Hamburger drawer -->
     <div class="drawer-backdrop" id="drawerBackdrop"></div>
     <aside class="drawer" id="drawer" aria-label="Menu" aria-hidden="true">
@@ -2530,6 +2570,10 @@
             <div class="faq-a">Buy a miner from the Mining card — put in any amount from <b>$5 to $50,000</b> and it earns <b>2% of it every 24 hours</b>. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. A miner contract lasts <b>5 months</b> from purchase — when it expires, the miner stops earning and you'll need to buy a new one to keep mining; profits already earned stay yours to cash out. Profits unlock for cashout <b>7 days</b> after purchase, then <b>weekly</b> after each cashout. Buying a miner is a straight purchase — the amount you put in is spent on the rig and isn't returned. Cashout moves your mining profits into Main Balance and never closes your miner.</div>
           </div>
           <div class="faq-item">
+            <button class="faq-q" type="button">How does Fixed Investment work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Find it under <b>Explore → Fixed Investment</b>. Lock any amount from <b>$5</b> out of your Main Balance for a fixed term: <b>1 month at 2% APY, 3 months at 5% APY, 5 months at 12% APY, or 365 days at 26% APY</b>. The earnings shown when you lock are worked out on the term — for example, $100 locked for 365 days earns $26. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
+          </div>
+          <div class="faq-item">
             <button class="faq-q" type="button">Where do mining returns come from?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
             <div class="faq-a">Mining returns are generated from trading activity. <b>Principal carries risk and returns are not guaranteed.</b></div>
           </div>
@@ -2599,6 +2643,27 @@
         <div class="coin-pop-sub" style="margin-top:8px;">Use TrybCoin to trade, play games, or buy miners. Profits land in your Main Balance.</div>
         <a class="coin-pop-earn" id="coinPopEarn" href="#">Earn more TrybCoin →</a>
         <button class="btn ghost" id="coinPopClose" type="button" style="width:100%;margin-top:10px;">Close</button>
+      </div>
+    </div>
+
+    <div id="investView" style="display:none;">
+      <div class="view-head">
+        <button class="back-btn" data-go="app" type="button" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="view-title">Fixed Investment</div>
+      </div>
+      <div class="fi-total-label">Total Invested</div>
+      <div class="fi-total num" id="fiTotal">$0.00</div>
+      <p class="fi-total-sub" id="fiTotalSub">No active investments</p>
+      <div id="fiList"></div>
+      <span class="fi-activity-pill" id="fiEmptyPill">No activity yet</span>
+      <div class="fi-card">
+        <h3>Fixed Investment</h3>
+        <p class="fi-card-sub">Lock funds for a term &amp; earn fixed returns</p>
+        <div class="fi-dash">
+          <div class="fi-badge">%</div>
+          <p>Start a fixed investment and set money aside to grow — terms from 1 month to 365 days, up to <b>26% APY</b>. Your principal and earnings return to your Main Balance at maturity.</p>
+          <button class="fi-cta" id="fiStartBtn" type="button">Start Investing</button>
+        </div>
       </div>
     </div>
 
@@ -3052,7 +3117,7 @@
 
       function blankState(){
         return {
-          main: 0, miner: null,
+          main: 0, miner: null, investments: [],
           trades: [], txs: [], bids: [],
           mgOn: false, mgStep: 0,
           stakeSource: "main",
@@ -3420,6 +3485,83 @@
         });
       }
 
+      /* ================= Fixed Investment =================
+         A separate package (Explore → Fixed Investment). A lock is a row
+         in tn_savings_lots: amount = principal, unlock_at = maturity.
+         The term (and its APY) is recovered from unlock_at − created_at,
+         so no extra columns are needed. Interest is simple: principal ×
+         APY × days/365, paid with the principal at maturity. Settlement
+         claims the row by deleting it — only the client whose delete
+         returns the row pays out, so two devices can't double-credit. */
+      var INVEST_TIERS = [
+        { days: 365, apy: 26, label: "365 Days" },
+        { days: 150, apy: 12, label: "5 Months" },
+        { days: 90, apy: 5, label: "3 Months" },
+        { days: 30, apy: 2, label: "1 Month" }
+      ];
+      var INVEST_MIN = 5;
+      function investYield(amount, tier){ return Math.round(amount * (tier.apy / 100) * (tier.days / 365) * 100) / 100; }
+      function investTierForDays(days){
+        var best = INVEST_TIERS[INVEST_TIERS.length - 1], bd = Infinity;
+        INVEST_TIERS.forEach(function(t){ var d = Math.abs(t.days - days); if (d < bd){ bd = d; best = t; } });
+        return best;
+      }
+      function mapInvestment(r){
+        var created = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+        var unlock = r.unlock_at ? new Date(r.unlock_at).getTime() : created;
+        var days = Math.max(1, Math.round((unlock - created) / 86400000));
+        var tier = investTierForDays(days);
+        var amt = Number(r.amount) || 0;
+        return { id: r.id, amount: amt, createdAt: created, unlockAt: unlock, days: days, tier: tier, yieldAmt: investYield(amt, tier) };
+      }
+      var investSettling = false;
+      function settleInvestments(){
+        if (!sb || !currentUser || investSettling) return;
+        var due = (state.investments || []).filter(function(l){ return l.unlockAt <= Date.now(); });
+        if (!due.length) return;
+        investSettling = true;
+        var chain = Promise.resolve();
+        due.forEach(function(lot){
+          chain = chain.then(function(){
+            return sb.from("tn_savings_lots").delete().eq("id", lot.id).select("id").then(function(res){
+              if (res.error || !res.data || !res.data.length) return; // another device settled it
+              var back = Math.round((lot.amount + lot.yieldAmt) * 100) / 100;
+              state.main = Math.round((state.main + back) * 100) / 100;
+              state.investments = state.investments.filter(function(x){ return x.id !== lot.id; });
+              return persistWallet().then(function(){
+                toast("Investment matured", fmtUSD(lot.amount) + " + " + fmtUSD(lot.yieldAmt) + " earnings returned to your Main Balance.");
+                renderWallets();
+                renderInvestments();
+              });
+            }).catch(function(){});
+          });
+        });
+        chain.then(function(){ investSettling = false; });
+      }
+      function renderInvestments(){
+        var totalEl = $("fiTotal");
+        if (!totalEl) return;
+        var lots = state.investments || [];
+        var total = 0, exp = 0;
+        lots.forEach(function(l){ total += l.amount; exp += l.yieldAmt; });
+        totalEl.textContent = fmtUSD(total);
+        var sub = $("fiTotalSub");
+        if (sub) sub.textContent = lots.length
+          ? lots.length + (lots.length === 1 ? " active investment" : " active investments") + " · " + fmtUSD(exp) + " expected earnings at maturity"
+          : "No active investments";
+        var pill = $("fiEmptyPill");
+        if (pill) pill.style.display = lots.length ? "none" : "";
+        var box = $("fiList");
+        if (!box) return;
+        box.innerHTML = lots.slice().sort(function(a, b){ return a.unlockAt - b.unlockAt; }).map(function(l){
+          var daysLeft = Math.max(0, Math.ceil((l.unlockAt - Date.now()) / 86400000));
+          return '<div class="fi-lot"><div><div class="fi-lot-amt num">' + fmtUSD(l.amount) + '</div>' +
+            '<div class="fi-lot-meta">' + l.tier.label + ' · ' + l.tier.apy + '% APY · locked ' + fmtContractDate(l.createdAt) + '</div></div>' +
+            '<div class="fi-lot-right"><div class="fi-lot-earn num">+' + fmtUSD(l.yieldAmt) + '</div>' +
+            '<div class="fi-lot-meta">' + (daysLeft > 0 ? daysLeft + (daysLeft === 1 ? " day" : " days") + " left · unlocks " : "Unlocks ") + fmtContractDate(l.unlockAt) + '</div></div></div>';
+        }).join("");
+      }
+
       /* Persist the wallet row. Returns success. */
       function persistWallet(){
         if (!sb || !currentUser) return Promise.resolve(false);
@@ -3500,9 +3642,10 @@
           sb.from("tn_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
           sb.from("tn_bids").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
           sb.from("tn_referrals").select("*").eq("referrer_id", userId).order("created_at", { ascending: false }),
-          sb.from("tn_referral_bonuses").select("*").eq("referrer_id", userId).order("created_at", { ascending: false })
+          sb.from("tn_referral_bonuses").select("*").eq("referrer_id", userId).order("created_at", { ascending: false }),
+          sb.from("tn_savings_lots").select("*").eq("user_id", userId).order("created_at", { ascending: false })
         ]).then(function(res){
-          var prof = res[0], wal = res[1], min = res[2], reqs = res[3], bids = res[4], refs = res[5], bons = res[6];
+          var prof = res[0], wal = res[1], min = res[2], reqs = res[3], bids = res[4], refs = res[5], bons = res[6], lots = res[7];
           if (prof.error || wal.error){ if (!opts.silent) netErrorToast("Loading your account"); return false; }
           profileRow = prof.data;
           walletRow = wal.data;
@@ -3515,6 +3658,7 @@
           fresh.mgOn = keep.mgOn; fresh.mgStep = keep.mgStep; fresh.paymentMethods = keep.paymentMethods; fresh.stakeSource = keep.stakeSource;
           fresh.main = walletRow ? Number(walletRow.main_balance) || 0 : 0;
           fresh.miner = mapMiner(min.data);
+          fresh.investments = (!lots.error && lots.data) ? lots.data.map(mapInvestment) : [];
           fresh.bonusTraded = walletRow ? Number(walletRow.traded_volume) || 0 : 0;
           fresh.bonusLocked = walletRow ? !!walletRow.bonus_locked : true;
           fresh.adminRequests = mapRequests(reqs.data);
@@ -3569,6 +3713,8 @@
           state.txs.sort(function(a, b){ return b.time - a.time; });
           state.lastTick = Date.now();
           checkMinerCycle();
+          settleInvestments();
+          renderInvestments();
           if (refRows.length){
             var ids = refRows.map(function(r){ return r.referred_id; });
             return sb.from("tn_profiles").select("id, full_name, username, created_at").in("id", ids).then(function(pr){
@@ -4706,6 +4852,86 @@
         renderMinerTiers();
         updatePackPreview();
       }
+      var fiTierIdx = -1;
+      var fiBusy = false;
+      function fiError(msg){ var e = $("fiErr"); e.textContent = msg; e.className = "sheet-err show"; }
+      function renderFiTiers(){
+        $("fiTiers").innerHTML = INVEST_TIERS.map(function(t, i){
+          var sel = i === fiTierIdx;
+          return '<div class="tier-row' + (sel ? " selected" : "") + '"><div class="tier-main">' +
+            '<div class="tier-name">' + t.label + '</div>' +
+            '<div class="tier-sub"><b style="color:var(--green);">' + t.apy + '%</b> APY · earn ' + fmtUSD(investYield(100, t)) + ' per $100</div></div>' +
+            '<div class="tier-price num">+' + (Math.round(t.apy * t.days / 365 * 100) / 100) + '%</div>' +
+            '<button class="buy-btn" type="button" data-fitier="' + i + '"' + (fiBusy ? " disabled" : "") + '>' + (sel ? "Selected" : "Select") + '</button></div>';
+        }).join("");
+      }
+      function updateFiPreview(){
+        var t = INVEST_TIERS[fiTierIdx];
+        $("fiAvail").textContent = "Available in Main Balance: " + fmtUSD(movableMain());
+        var amt = parseFloat($("fiAmount").value);
+        if (!t || !(amt > 0)){ $("fiSummary").textContent = ""; return; }
+        var y = investYield(amt, t);
+        $("fiSummary").textContent = "You earn " + fmtUSD(y) + " · " + fmtUSD(Math.round((amt + y) * 100) / 100) + " back on " + fmtContractDate(Date.now() + t.days * 86400000);
+      }
+      function selectFiTier(idx){
+        if (fiBusy) return;
+        fiTierIdx = idx;
+        $("fiErr").className = "sheet-err";
+        $("fiForm").style.display = "";
+        $("fiConfirm").style.display = "";
+        var t = INVEST_TIERS[idx];
+        $("fiAmountLabel").textContent = "Amount to lock (" + t.label + " · " + t.apy + "% APY)";
+        renderFiTiers();
+        updateFiPreview();
+      }
+      function openInvestSheet(){
+        $("fiErr").className = "sheet-err";
+        $("investOverlay").className = "overlay show";
+        if (fiTierIdx < 0) selectFiTier(0);
+        else { renderFiTiers(); updateFiPreview(); }
+      }
+      function closeInvestSheet(){ $("investOverlay").className = "overlay"; }
+      function createInvestment(){
+        if (fiBusy) return;
+        var t = INVEST_TIERS[fiTierIdx];
+        if (!t){ fiError("Pick a term first."); return; }
+        if (!sb || !currentUser){ toast("Not signed in", "Log in again to invest."); return; }
+        var amt = parseFloat($("fiAmount").value);
+        if (!(amt > 0)){ fiError("Enter an amount to lock."); return; }
+        amt = Math.floor(amt * 100) / 100;
+        if (amt < INVEST_MIN){ fiError("The minimum lock is " + fmtUSD(INVEST_MIN) + "."); return; }
+        if (amt > movableMain()){ fiError("That is more than your available Main Balance (" + fmtUSD(movableMain()) + ")."); return; }
+        fiBusy = true;
+        renderFiTiers();
+        var prevMain = state.main;
+        state.main = Math.round((state.main - amt) * 100) / 100;
+        var unlockAt = Date.now() + t.days * 86400000;
+        sb.from("tn_savings_lots").insert({ user_id: currentUser.id, amount: amt, unlock_at: new Date(unlockAt).toISOString() }).select().single().then(function(res){
+          if (res.error) throw res.error;
+          state.investments.unshift(mapInvestment(res.data));
+          return persistWallet();
+        }).then(function(){
+          fiBusy = false;
+          renderWallets();
+          renderInvestments();
+          closeInvestSheet();
+          toast("Investment locked", fmtUSD(amt) + " locked for " + t.label.toLowerCase() + " at " + t.apy + "% APY — " + fmtUSD(Math.round((amt + investYield(amt, t)) * 100) / 100) + " returns to your Main Balance on " + fmtContractDate(unlockAt) + ".");
+        }).catch(function(){
+          fiBusy = false;
+          state.main = prevMain;
+          renderFiTiers();
+          renderWallets();
+          fiError("Couldn't start the investment — check your connection and try again.");
+        });
+      }
+      $("fiStartBtn").addEventListener("click", openInvestSheet);
+      $("fiClose").addEventListener("click", closeInvestSheet);
+      $("fiConfirm").addEventListener("click", createInvestment);
+      $("fiAmount").addEventListener("input", updateFiPreview);
+      $("fiTiers").addEventListener("click", function(e){
+        var b = e.target.closest ? e.target.closest("[data-fitier]") : null;
+        if (b) selectFiTier(parseInt(b.getAttribute("data-fitier"), 10));
+      });
       function openMinerSheet(){
         $("minerErr").className = "sheet-err";
         $("minerOverlay").className = "overlay show";
@@ -5482,7 +5708,7 @@
          Entering a non-dashboard view pushes a history entry so the
          device back button returns to the dashboard; the on-screen
          Back buttons go through the same history step. */
-      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView", ayo: "ayoView", earn: "earnView" };
+      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView", ayo: "ayoView", earn: "earnView", invest: "investView" };
       var viewPushed = false;
       function setView(v, skipPush){
         if (!VIEW_IDS[v]) v = "app";
@@ -5492,6 +5718,7 @@
         if (v === "binary" && (tvPending || !$("tvChart").querySelector("iframe"))) loadTvChart();
         if (v === "whot" && typeof whotRender === "function") whotRender(); // re-fit card rows now visibleif (v === "whot" && typeof whotRender === "function") whotRender(); // re-fit card rows now visible
         if (v === "ayo" && typeof ayoRender === "function") ayoRender();
+        if (v === "invest") renderInvestments();
         // Re-enter an active duel after navigating away: rebuild from the seed + move log.
         if (typeof duelReenter === "function") duelReenter(v);
         window.scrollTo(0, 0);
@@ -5936,6 +6163,7 @@
         state.lastTick = now;
         if (!currentUser) return;
         checkMinerCycle(now);
+        settleInvestments();
         renderWallets();
         renderOpenTrades();
         if (now - lastAutoSettleCheck >= AUTO_SETTLE_CHECK_MS){
@@ -8379,7 +8607,7 @@ s0.parentNode.insertBefore(s1,s0);
     <div class="overlay" id="v2ExploreOverlay">
       <div class="sheet v2-sheet" role="dialog" aria-modal="true" aria-labelledby="v2ExploreTitle">
         <h3 id="v2ExploreTitle">Explore</h3>
-        <p class="sheet-sub">Four ways to grow your money on TrybNetwork.</p>
+        <p class="sheet-sub">Five ways to grow your money on TrybNetwork.</p>
         <button class="v2-opt-row" id="v2GoTrade" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3v3M6 14v3M18 5v3M18 16v2"/><rect x="4" y="6" width="4" height="8" rx="0.8"/><rect x="16" y="8" width="4" height="8" rx="0.8"/><path d="M11 8v10M9.5 10.5h3v5h-3z"/></svg></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Trade</span><div class="v2-opt-sub">Binary trading with 90% payout on winning bids</div></span>
@@ -8399,6 +8627,11 @@ s0.parentNode.insertBefore(s1,s0);
           <span class="v2-tx-ic"><img src="./trybcoin.png" alt="" style="width:30px;height:30px;border-radius:50%;"></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Earn TrybCoin</span><div class="v2-opt-sub">Complete simple tasks and earn TN Coin</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <button class="v2-opt-row" id="v2GoInvest" type="button">
+          <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-6M9 20V6M14 20v-9M19 20V3M2 20h20"/></svg></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">Fixed Investment</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% APY</div></span>
+          <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
         <button class="v2-sheet-close" type="button" data-v2close="v2ExploreOverlay">Close</button>
       </div>
@@ -8643,6 +8876,7 @@ s0.parentNode.insertBefore(s1,s0);
       bind("v2GoMine", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("app", true); setTimeout(scrollToMiner, 60); });
       bind("v2GoPlay", function(){ closeScreen("v2ExploreOverlay"); if (typeof openScreen === "function") openScreen("v2GamesOverlay"); });
       bind("v2GoEarn", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("earn"); if (typeof renderEarn === "function") renderEarn(); });
+      bind("v2GoInvest", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("invest"); });
       bind("v2TabHome", function(){ if (typeof setView === "function") setView("app", true); window.scrollTo(0, 0); });
       bind("v2TabTrade", function(){ if (typeof setView === "function") setView("binary"); });
       bind("v2TabGames", function(){ if (typeof openScreen === "function") openScreen("v2GamesOverlay"); });
