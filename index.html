@@ -901,9 +901,10 @@
       body { top:0 !important; }
       .skiptranslate iframe { display:none !important; }
       #google_translate_element { position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden; }
-      .lang-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
-      .lang-item { display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid var(--line); border-radius:12px; background:#fff; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; text-align:left; width:100%; }
-      .lang-item .lang-check { color:var(--gold-d); font-weight:800; visibility:hidden; }
+      .lang-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; max-height:55vh; overflow-y:auto; }
+      .lang-item { display:flex; align-items:center; justify-content:space-between; padding:13px 14px; border:1px solid #D8DCE6; border-radius:12px; background:#fff; font-size:15px; font-weight:700; color:#10142B; cursor:pointer; text-align:left; width:100%; }
+      .lang-item span { color:#10142B; }
+      .lang-item .lang-check { color:#9A7B24; font-weight:800; visibility:hidden; }
       .lang-item.active .lang-check { visibility:visible; }
     </style>
   </head>
