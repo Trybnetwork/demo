@@ -1019,6 +1019,29 @@
       .fi-lot-meta{ color:#6B7086; font-size:12.5px; margin-top:3px; line-height:1.5; }
       .fi-lot-right{ text-align:right; }
       .fi-lot-earn{ color:#1E9E57; font-weight:700; font-size:14.5px; }
+      #investView{ padding-bottom:120px; }
+      #investView .view-title{ flex:1; font-family:"Manrope",sans-serif; font-size:26px; font-weight:800; color:#0B1132; }
+      /* Fixed Investment sheet — global (light) sheet language, same as the fund sheet */
+      #investOverlay{ background:rgba(5,7,26,.55); }
+      #investOverlay .sheet{ background:#FFFFFF; color:#0B1132; border:1.5px solid #E6E7EE; border-bottom:0; border-radius:26px 26px 0 0; padding:12px 22px calc(26px + env(safe-area-inset-bottom)); max-height:88dvh; overflow-y:auto; box-shadow:0 18px 50px rgba(11,17,50,.16); max-width:430px; }
+      @media (min-width:640px){ #investOverlay .sheet{ border-radius:26px; border-bottom:1.5px solid #E6E7EE; } }
+      #investOverlay .sheet::before{ content:""; display:block; width:44px; height:5px; border-radius:99px; background:#E6E7EE; margin:2px auto 16px; }
+      #investOverlay .sheet h3{ font-family:"Manrope",sans-serif; font-size:21px; font-weight:800; color:#0B1132; margin:0 0 4px; }
+      #investOverlay .sheet .sheet-sub{ font-size:14.5px; color:#6B7086; font-weight:600; line-height:1.5; margin:0 0 18px; }
+      #investOverlay .sheet .sheet-sub b{ color:#0B1132; }
+      #investOverlay .btn{ background:#0B1132; color:#FFFFFF; border:1.5px solid #0B1132; border-radius:13px; font-family:"Manrope",sans-serif; font-weight:800; }
+      #investOverlay .btn.ghost{ background:#F2F3F8; color:#0B1132; border-color:#E6E7EE; }
+      #investOverlay .tier-row{ background:#FFFFFF; border:1.5px solid #E6E7EE; color:#0B1132; }
+      #investOverlay .tier-row.selected{ border-color:#C9A24B; background:#FDFBF4; }
+      #investOverlay .tier-name{ color:#0B1132; }
+      #investOverlay .tier-sub{ color:#6B7086; }
+      #investOverlay .tier-price{ color:#0B1132; }
+      #investOverlay .tier-row .buy-btn{ background:#0B1132; color:#FFFFFF; border:1px solid #C9A24B; }
+      #investOverlay .form-field label{ color:#6B7086; }
+      #investOverlay .amt-wrap{ background:#FFFFFF; border:1.5px solid #E6E7EE; color:#0B1132; }
+      #investOverlay .amt-wrap input{ color:#0B1132; background:transparent; }
+      #investOverlay .pack-preview{ color:#6B7086; }
+      #investOverlay .sheet-err{ background:#FDECEA; color:#B3261E; }
       .v2-opt-row .v2-tx-ic{ background:#F2F3F8; }
       .v2-opt-main{ flex:1; min-width:0; }
       .v2-opt-title{ font-size:16px; font-weight:800; }
@@ -2571,7 +2594,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Fixed Investment work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Find it under <b>Explore → Fixed Investment</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>1 month at 2% APY, 3 months at 5% APY, 5 months at 12% APY, or 365 days at 26% APY</b>. The earnings shown when you lock are worked out on the term — for example, $100 locked for 365 days earns $26. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
+            <div class="faq-a">Find it under <b>Explore → Fixed Investment</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>1 month earns 2%, 3 months earns 5%, 5 months earns 12%, and 365 days earns 26%</b> — the percentage is the total return over the whole term, so $100 locked for 5 months earns $12. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">Where do mining returns come from?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -2654,17 +2677,17 @@
       <div class="fi-total-label">Total Invested</div>
       <div class="fi-total num" id="fiTotal">$0.00</div>
       <p class="fi-total-sub" id="fiTotalSub">No active investments</p>
-      <div id="fiList"></div>
-      <span class="fi-activity-pill" id="fiEmptyPill">No activity yet</span>
       <div class="fi-card">
         <h3>Fixed Investment</h3>
         <p class="fi-card-sub">Lock funds for a term &amp; earn fixed returns</p>
         <div class="fi-dash">
           <div class="fi-badge">%</div>
-          <p>Start a fixed investment and set money aside to grow — terms from 1 month to 365 days, up to <b>26% APY</b>. Your principal and earnings return to your Main Balance at maturity.</p>
+          <p>Start a fixed investment and set money aside to grow — terms from 1 month to 365 days, up to <b>26% returns</b>. Your principal and earnings return to your Main Balance at maturity.</p>
           <button class="fi-cta" id="fiStartBtn" type="button">Start Investing</button>
         </div>
       </div>
+      <div id="fiList"></div>
+      <span class="fi-activity-pill" id="fiEmptyPill">No activity yet</span>
     </div>
 
     <div class="toasts" id="toasts"></div>
@@ -3488,19 +3511,21 @@
       /* ================= Fixed Investment =================
          A separate package (Explore → Fixed Investment). A lock is a row
          in tn_savings_lots: amount = principal, unlock_at = maturity.
-         The term (and its APY) is recovered from unlock_at − created_at,
-         so no extra columns are needed. Interest is simple: principal ×
-         APY × days/365, paid with the principal at maturity. Settlement
+         The term (and its rate) is recovered from unlock_at − created_at,
+         so no extra columns are needed. The rate is a TERM return — the
+         total earned over the whole lock (26% for 365 days, 12% for
+         5 months, 5% for 3 months, 2% for 1 month) — paid with the
+         principal at maturity. Settlement
          claims the row by deleting it — only the client whose delete
          returns the row pays out, so two devices can't double-credit. */
       var INVEST_TIERS = [
-        { days: 365, apy: 26, label: "365 Days" },
-        { days: 150, apy: 12, label: "5 Months" },
-        { days: 90, apy: 5, label: "3 Months" },
-        { days: 30, apy: 2, label: "1 Month" }
+        { days: 365, rate: 26, label: "365 Days" },
+        { days: 150, rate: 12, label: "5 Months" },
+        { days: 90, rate: 5, label: "3 Months" },
+        { days: 30, rate: 2, label: "1 Month" }
       ];
       var INVEST_MIN = 10;
-      function investYield(amount, tier){ return Math.round(amount * (tier.apy / 100) * (tier.days / 365) * 100) / 100; }
+      function investYield(amount, tier){ return Math.round(amount * (tier.rate / 100) * 100) / 100; }
       function investTierForDays(days){
         var best = INVEST_TIERS[INVEST_TIERS.length - 1], bd = Infinity;
         INVEST_TIERS.forEach(function(t){ var d = Math.abs(t.days - days); if (d < bd){ bd = d; best = t; } });
@@ -3556,7 +3581,7 @@
         box.innerHTML = lots.slice().sort(function(a, b){ return a.unlockAt - b.unlockAt; }).map(function(l){
           var daysLeft = Math.max(0, Math.ceil((l.unlockAt - Date.now()) / 86400000));
           return '<div class="fi-lot"><div><div class="fi-lot-amt num">' + fmtUSD(l.amount) + '</div>' +
-            '<div class="fi-lot-meta">' + l.tier.label + ' · ' + l.tier.apy + '% APY · locked ' + fmtContractDate(l.createdAt) + '</div></div>' +
+            '<div class="fi-lot-meta">' + l.tier.label + ' · ' + l.tier.rate + '% return · locked ' + fmtContractDate(l.createdAt) + '</div></div>' +
             '<div class="fi-lot-right"><div class="fi-lot-earn num">+' + fmtUSD(l.yieldAmt) + '</div>' +
             '<div class="fi-lot-meta">' + (daysLeft > 0 ? daysLeft + (daysLeft === 1 ? " day" : " days") + " left · unlocks " : "Unlocks ") + fmtContractDate(l.unlockAt) + '</div></div></div>';
         }).join("");
@@ -4860,8 +4885,8 @@
           var sel = i === fiTierIdx;
           return '<div class="tier-row' + (sel ? " selected" : "") + '"><div class="tier-main">' +
             '<div class="tier-name">' + t.label + '</div>' +
-            '<div class="tier-sub"><b style="color:var(--green);">' + t.apy + '%</b> APY · earn ' + fmtUSD(investYield(100, t)) + ' per $100</div></div>' +
-            '<div class="tier-price num">+' + (Math.round(t.apy * t.days / 365 * 100) / 100) + '%</div>' +
+            '<div class="tier-sub"><b style="color:var(--green);">' + t.rate + '%</b> return · earn ' + fmtUSD(investYield(100, t)) + ' per $100</div></div>' +
+            '<div class="tier-price num">+' + t.rate + '%</div>' +
             '<button class="buy-btn" type="button" data-fitier="' + i + '"' + (fiBusy ? " disabled" : "") + '>' + (sel ? "Selected" : "Select") + '</button></div>';
         }).join("");
       }
@@ -4880,7 +4905,7 @@
         $("fiForm").style.display = "";
         $("fiConfirm").style.display = "";
         var t = INVEST_TIERS[idx];
-        $("fiAmountLabel").textContent = "Amount to lock (" + t.label + " · " + t.apy + "% APY)";
+        $("fiAmountLabel").textContent = "Amount to lock (" + t.label + " · " + t.rate + "% return)";
         renderFiTiers();
         updateFiPreview();
       }
@@ -4915,7 +4940,7 @@
           renderWallets();
           renderInvestments();
           closeInvestSheet();
-          toast("Investment locked", fmtUSD(amt) + " locked for " + t.label.toLowerCase() + " at " + t.apy + "% APY — " + fmtUSD(Math.round((amt + investYield(amt, t)) * 100) / 100) + " returns to your Main Balance on " + fmtContractDate(unlockAt) + ".");
+          toast("Investment locked", fmtUSD(amt) + " locked for " + t.label.toLowerCase() + " at " + t.rate + "% return — " + fmtUSD(Math.round((amt + investYield(amt, t)) * 100) / 100) + " returns to your Main Balance on " + fmtContractDate(unlockAt) + ".");
         }).catch(function(){
           fiBusy = false;
           state.main = prevMain;
@@ -8630,7 +8655,7 @@ s0.parentNode.insertBefore(s1,s0);
         </button>
         <button class="v2-opt-row" id="v2GoInvest" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-6M9 20V6M14 20v-9M19 20V3M2 20h20"/></svg></span>
-          <span class="v2-opt-main"><span class="v2-opt-title">Fixed Investment</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% APY</div></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">Fixed Investment</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% returns</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
         <button class="v2-sheet-close" type="button" data-v2close="v2ExploreOverlay">Close</button>
