@@ -4797,7 +4797,7 @@
             done();
             if (!ok) return;
             toast("Deposit requested", fmtUSD(amt) + " via " + (depositMethod === "crypto" ? "Crypto" : "Bank Transfer") + " is pending approval — the funds land as soon as it's approved.");
-            renderWallets(); closeSheet();
+            renderWallets(); closeSheet(); setView("app");
           });
         } else if (sheetMode === "withdraw"){
           if (withdrawalsFrozen){ done(); sheetError(WITHDRAWALS_FROZEN_TEXT); return; }
