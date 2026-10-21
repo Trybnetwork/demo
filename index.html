@@ -2355,7 +2355,7 @@
     <div class="overlay" id="investOverlay">
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="investTitle">
         <h3 id="investTitle">Fixed Investment</h3>
-        <p class="sheet-sub">Lock an amount from your <b>Main Balance</b> for a fixed term. At maturity, your principal plus the earnings land back in your Main Balance automatically. Locked funds can't be withdrawn early. Minimum lock is <b>$5</b>.</p>
+        <p class="sheet-sub">Lock an amount from your <b>Main Balance</b> for a fixed term. At maturity, your principal plus the earnings land back in your Main Balance automatically. Locked funds can't be withdrawn early. Minimum lock is <b>$10</b>.</p>
         <div id="fiTiers"></div>
         <div class="pack-form" id="fiForm" style="display:none;">
           <div class="form-field" style="margin-bottom:0;">
@@ -2571,7 +2571,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Fixed Investment work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Find it under <b>Explore → Fixed Investment</b>. Lock any amount from <b>$5</b> out of your Main Balance for a fixed term: <b>1 month at 2% APY, 3 months at 5% APY, 5 months at 12% APY, or 365 days at 26% APY</b>. The earnings shown when you lock are worked out on the term — for example, $100 locked for 365 days earns $26. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
+            <div class="faq-a">Find it under <b>Explore → Fixed Investment</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>1 month at 2% APY, 3 months at 5% APY, 5 months at 12% APY, or 365 days at 26% APY</b>. The earnings shown when you lock are worked out on the term — for example, $100 locked for 365 days earns $26. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">Where do mining returns come from?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -3499,7 +3499,7 @@
         { days: 90, apy: 5, label: "3 Months" },
         { days: 30, apy: 2, label: "1 Month" }
       ];
-      var INVEST_MIN = 5;
+      var INVEST_MIN = 10;
       function investYield(amount, tier){ return Math.round(amount * (tier.apy / 100) * (tier.days / 365) * 100) / 100; }
       function investTierForDays(days){
         var best = INVEST_TIERS[INVEST_TIERS.length - 1], bd = Infinity;
