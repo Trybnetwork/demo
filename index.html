@@ -1515,6 +1515,10 @@
       }
       /* Country support (2026-10-21): pill flag emoji */
       #v2TotalPill .v2-flags{ font-size:17px; line-height:1; }
+    
+      /* TrybCoin card: balance up top, faded Buy button at the bottom (2026-10-21) */
+      #v2CoinCard .v2-wc-amount{ margin-top:0; }
+      #v2CoinCard .v2-coin-soon-row{ margin-top:auto; padding-top:12px; }
     </style>
   </head>
   <body>
@@ -1768,6 +1772,9 @@
           </div>
           <div class="v2-wc-amount" id="v2CoinAmount"><span id="trybcoinChipBal">0</span> TN</div>
           <div class="v2-wc-foot" id="v2CoinUsd">≈ $0.00</div>
+          <div class="v2-card-btns v2-coin-soon-row">
+            <button class="btn ghost" id="v2CoinSoon" type="button" disabled style="color:#0B1132;border-color:#D8DCE6;">Buy TrybCoin - coming soon!</button>
+          </div>
         </article>
       </section>
 
