@@ -1513,9 +1513,8 @@
         margin:6px 0 12px !important;
         box-shadow:0 30px 50px -18px rgba(11,17,50,.38), 0 14px 24px -12px rgba(11,17,50,.24), 0 3px 6px rgba(11,17,50,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(11,17,50,.05) !important;
       }
-      /* Country support (2026-10-21): pill flag emoji + USDT amount unit on the fund sheet */
+      /* Country support (2026-10-21): pill flag emoji */
       #v2TotalPill .v2-flags{ font-size:17px; line-height:1; }
-      #sheetOverlay .amt-wrap.usdt span{ font-size:14px; letter-spacing:.5px; }
     </style>
   </head>
   <body>
@@ -2290,9 +2289,10 @@
           <div class="pay-details" id="cryptoDetails">
             <div class="pd-row"><span class="pd-label">Coin</span><span class="pd-value">USDT (TRC-20)</span><button class="copy-btn" type="button" data-copy="USDT (TRC-20)" data-copy-label="Coin">Copy</button></div>
             <div class="pd-row"><span class="pd-label">Wallet address</span><span class="pd-value addr num" id="cryptoAddr"></span><button class="copy-btn" type="button" id="copyCryptoAddr" data-copy="" data-copy-label="Wallet address">Copy</button></div>
+            <div class="pd-row"><span class="pd-label">Processing fee</span><span class="pd-value num">1.00 USDT</span></div>
             <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="cryptoAmt">0.00 USDT</span><button class="copy-btn" type="button" id="copyCryptoAmt">Copy</button></div>
             <img class="pd-qr" id="cryptoQr" alt="QR code for your USDT (TRC-20) deposit wallet address" />
-            <p class="pd-note">Send exactly <span class="num" id="cryptoExact">0.00 USDT</span> — scan the QR code or copy the address above. The wallet address changes with each deposit, so always use the one shown here. Send USDT on the TRC-20 network only, then tap “I've sent it” below.</p>
+            <p class="pd-note">Send exactly <span class="num" id="cryptoExact">0.00 USDT</span> (including the 1 USDT processing fee) — scan the QR code or copy the address above. The wallet address changes with each deposit, so always use the one shown here. Send USDT on the TRC-20 network only, then tap “I've sent it” below.</p>
           </div>
         </div>
         <div class="sheet-err" id="sheetErr"></div>
@@ -2897,6 +2897,11 @@
       var USDT_TRC20_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
       var CONFIRM_WINDOW_MIN = 30;
       var DEPOSIT_POLL_MS = 30 * 1000;
+      /* USDT (crypto) deposits carry a flat processing fee: the user
+         enters a dollar amount and sends amount + fee in USDT (USDT is
+         1:1 with the dollar here). Only the entered amount is requested
+         and credited — the fee is paid on top, never credited. */
+      var CRYPTO_DEPOSIT_FEE_USDT = 1;
       /* Automatic bid settlement (when tn_settings bid_settlement_mode is
          'auto'): a bid still pending this long settles on a coin flip
          weighted to lose — AUTO_WIN_RATE chance of a win. */
@@ -4273,8 +4278,11 @@
         var amt = parseFloat($("sheetAmount").value);
         var ok = isFinite(amt) && amt > 0;
         $("bankAmt").textContent = ok ? fmtUSD(amt) : "$0.00";
-        $("cryptoAmt").textContent = ok ? fmtUSD(amt).slice(1) + " USDT" : "0.00 USDT";
-        var cryptoExactEl = $("cryptoExact"); if (cryptoExactEl) cryptoExactEl.textContent = ok ? fmtUSD(amt).slice(1) + " USDT" : "0.00 USDT";
+        // The crypto send figure is the entered dollar amount plus the
+        // flat 1 USDT processing fee, denominated in USDT.
+        var cryptoSend = ok ? fmtUSD(amt + CRYPTO_DEPOSIT_FEE_USDT).slice(1) + " USDT" : "0.00 USDT";
+        $("cryptoAmt").textContent = cryptoSend;
+        var cryptoExactEl = $("cryptoExact"); if (cryptoExactEl) cryptoExactEl.textContent = cryptoSend;
         $("bankNgn").textContent = ok ? fmtNGN(amt * BLACK_MARKET_RATE) : "₦0";
       }
       /* ---- Bank-transfer receipt upload (Supabase Storage: tn-receipts) ---- */
@@ -4553,7 +4561,12 @@
           lists.forEach(function(l){ txs = txs.concat(l); });
           if (!txs.length) return null;
           return usedTxHashes().then(function(used){
-            var expected = req.amount;
+            // The transfer must cover the request amount PLUS the flat
+            // processing fee — that fee-inclusive total is what the
+            // user was told to send. Tightened 2026-10-21: underpayments
+            // get only $0.50 of room, so a fee-skipped send ($1.00 short)
+            // never auto-confirms; overpayments keep max($1, 1%).
+            var expected = req.amount + CRYPTO_DEPOSIT_FEE_USDT;
             var tol = Math.max(1, expected * 0.01);
             for (var i = 0; i < txs.length; i++){
               var t = txs[i];
@@ -4561,7 +4574,7 @@
               var ts = Number(t.block_timestamp) || 0;
               if (ts < created || ts > deadline) continue;
               var amt = (Number(t.value) || 0) / 1e6;
-              if (Math.abs(amt - expected) > tol) continue;
+              if ((expected - amt) > 0.5 || (amt - expected) > tol) continue;
               if (t.transaction_id && used[t.transaction_id]) continue;
               return t;
             }
@@ -4758,6 +4771,11 @@
         btn.disabled = true;
         function done(){ updateSheetConfirmState(); }
         if (sheetMode === "deposit"){
+          if (amt < 12){
+            done();
+            sheetError("Minimum deposit is $12 — enter at least $12 to deposit.");
+            return;
+          }
           if (!depositMethod){
             done();
             sheetError("Choose a deposit method — Bank Transfer or Crypto — and send to the details shown first.");
@@ -5399,8 +5417,9 @@
         copyDetail(isFinite(amt) && amt > 0 ? amt.toFixed(2) : "0.00", "Amount");
       });
       $("copyCryptoAmt").addEventListener("click", function(){
+        // Copy the amount the user must actually send: entered + fee.
         var amt = parseFloat($("sheetAmount").value);
-        copyDetail(isFinite(amt) && amt > 0 ? amt.toFixed(2) : "0.00", "Amount");
+        copyDetail(isFinite(amt) && amt > 0 ? (amt + CRYPTO_DEPOSIT_FEE_USDT).toFixed(2) : "0.00", "Amount");
       });
       /* Dashboard History tabs removed — content moved to the Transaction History page. */
       /* ---------- View router ----------
@@ -8680,16 +8699,17 @@ s0.parentNode.insertBefore(s1,s0);
       bind("depRowCrypto", function(){ var b = $("methodCrypto"); if (b) b.click(); fsSetStep("form"); fsSyncAmtUnit(); });
       bind("depBackBtn", function(){ fsSetStep("choose"); });
       bind("depCloseBtn", function(){ if (typeof closeSheet === "function") closeSheet(); });
-      /* The sheet amount unit follows the visible deposit panel:
-         "USDT" while the crypto panel is up, "$" everywhere else. */
+      /* The sheet amount is always entered in dollars, for every
+         method: USDT deposits present their fee-inclusive send total
+         inside the crypto panel itself, so the unit prefix stays "$"
+         (it previously swapped to "USDT" while the crypto panel was
+         up — the entered amount is dollars again). */
       function fsSyncAmtUnit(){
         var wrap = document.querySelector("#sheetOverlay .amt-wrap");
         if (!wrap) return;
-        var cd = $("cryptoDetails");
-        var crypto = !!(cd && cd.classList.contains("show"));
-        wrap.classList.toggle("usdt", crypto);
+        wrap.classList.remove("usdt");
         var sp = wrap.querySelector("span");
-        if (sp) sp.textContent = crypto ? "USDT" : "$";
+        if (sp) sp.textContent = "$";
       }
       bind("methodBank", fsSyncAmtUnit);
       bind("methodCrypto", fsSyncAmtUnit);
