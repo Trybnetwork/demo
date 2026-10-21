@@ -1019,6 +1019,25 @@
       .v2-sheet .ref-item{ border-color:#E6E7EE; }
       .v2-sheet .empty{ color:#6B7086; }
       @media (max-width:360px){ .v2-card{ padding:14px; } .v2-actions{ gap:30px; } }
+    
+      /* --- v2 fixes 2026-10-21: white background end-to-end, fit-to-screen compaction, miner chip row --- */
+      body{ background:#FFFFFF !important; }
+      #appView{ background:#FFFFFF; border-radius:0; box-shadow:none; margin-top:0; padding:14px 16px 112px; }
+      .v2-chat-btn{ color:#0B1132; background:#F2F3F8; border-color:#E6E7EE; }
+      .v2-balance-amount{ font-size:44px; }
+      .v2-actions{ margin-top:10px; gap:40px; }
+      .v2-action .v2-bubble{ width:60px; height:60px; }
+      .v2-cards{ margin-top:12px; gap:12px; }
+      .v2-card{ padding:14px; min-height:0; }
+      .v2-wc-head{ flex-wrap:wrap; }
+      #minerChip{ order:3; flex-basis:100%; width:max-content; margin-top:8px; }
+      .v2-wc-amount{ padding-top:8px; }
+      #v2MinerCard .v2-status-line{ display:none; }
+      .v2-card-btns{ margin-top:10px; }
+      .v2-card-btns .btn{ padding:8px 6px; font-size:12.5px; }
+      .v2-setup{ margin-top:12px; padding:16px; }
+      .v2-tx-head{ margin-top:20px; }
+      .tawk-min-container{ bottom:94px !important; }
     </style>
   </head>
   <body>
@@ -4264,6 +4283,7 @@
 
       /* ================= Referrals ================= */
       function renderReferrals(){
+        if (!$("refCode") || !$("refList")) return;
         $("refCode").textContent = state.refCode;
         $("refLink").textContent = "https://app.trybnetwork.com/?ref=" + state.refCode;
         var qualified = state.referrals.filter(function(r){ return r.status === "qualified"; }).length;
@@ -4890,8 +4910,8 @@
           toast("Referrals are live", "Share your code " + state.refCode + " — anyone who enters it when they sign up is recorded under Refer & Earn automatically, on every device.");
         });
       }
-      $("refList").addEventListener("click", function(){});
-      $("copyRefBtn").addEventListener("click", function(){
+      var _rfl = $("refList"); if (_rfl) _rfl.addEventListener("click", function(){});
+      var _crb = $("copyRefBtn"); if (_crb) _crb.addEventListener("click", function(){
         var code = state.refCode;
         function done(){ toast("Referral code copied", code + " — share it and earn 3 USDT per qualifying referral."); }
         if (navigator.clipboard && navigator.clipboard.writeText){
@@ -7919,6 +7939,20 @@ s0.parentNode.insertBefore(s1,s0);
         if (card && card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "center" });
       }
       function bind(id, fn){ var el = $(id); if (el) el.addEventListener("click", fn); }
+      bind("copyRefBtn", function(){
+        var code = state.refCode;
+        function done(){ toast("Referral code copied", code + " \u2014 share it and earn 3 USDT per qualifying referral."); }
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(code).then(done, function(){ toast("Your referral code", code); });
+        } else { toast("Your referral code", code); }
+      });
+      var _simRef = $("simRefBtn");
+      if (_simRef){
+        _simRef.textContent = "How referrals work";
+        _simRef.addEventListener("click", function(){
+          toast("Referrals are live", "Share your code " + state.refCode + " \u2014 anyone who enters it when they sign up is recorded under Refer & Earn automatically, on every device.");
+        });
+      }
       bind("v2EyeBtn", function(){
         v2.hidden = !v2.hidden;
         $("v2EyeOpen").style.display = v2.hidden ? "none" : "";
