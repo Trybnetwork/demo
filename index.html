@@ -1038,6 +1038,150 @@
       .v2-setup{ margin-top:12px; padding:16px; }
       .v2-tx-head{ margin-top:20px; }
       .tawk-min-container{ bottom:94px !important; }
+
+      /* ============ Pass 2 (2026-10-21): money screens in the artifact design language ============
+         Scoped to the fund sheet, Payment Method, Edit Profile and Transaction History only.
+         Mirrors the artifact sheets: white surface, grab handle, 26px radii, 21px titles,
+         #EEF0FA tint boxes, 1.5px #E6E7EE borders, navy primary buttons, soft ghost buttons. */
+      #sheetOverlay, #profileOverlay, #paymentOverlay{ background:rgba(5,7,26,.55); }
+
+      /* --- shared sheet chrome (fund / profile / payment) --- */
+      #sheetOverlay .sheet, #profileOverlay .sheet, #paymentOverlay .sheet{
+        background:#FFFFFF; color:#0B1132; border:1.5px solid #E6E7EE; border-bottom:0;
+        border-radius:26px 26px 0 0; padding:12px 22px calc(26px + env(safe-area-inset-bottom));
+        max-height:88dvh; overflow-y:auto; box-shadow:0 18px 50px rgba(11,17,50,.16);
+      }
+      #sheetOverlay .sheet{ max-width:430px; }
+      @media (min-width:640px){
+        #sheetOverlay .sheet, #profileOverlay .sheet, #paymentOverlay .sheet{ border-radius:26px; border-bottom:1.5px solid #E6E7EE; }
+      }
+      #sheetOverlay .sheet::before, #profileOverlay .sheet::before, #paymentOverlay .sheet::before{
+        content:""; display:block; width:44px; height:5px; border-radius:99px; background:#E6E7EE; margin:2px auto 16px;
+      }
+      #sheetOverlay .sheet h3, #profileOverlay .sheet h3, #paymentOverlay .sheet h3{
+        font-family:"Manrope",sans-serif; font-size:21px; font-weight:800; color:#0B1132; margin:0 0 4px;
+      }
+      #sheetOverlay .sheet .sheet-sub, #profileOverlay .sheet .sheet-sub, #paymentOverlay .sheet .sheet-sub{
+        font-size:14.5px; color:#6B7086; font-weight:600; line-height:1.5; margin:0 0 18px;
+      }
+
+      /* --- buttons: navy primary / soft ghost (artifact sheet language) --- */
+      #sheetOverlay .btn, #profileOverlay .btn, #paymentOverlay .btn, #txHistoryView .btn{
+        background:#0B1132; color:#FFFFFF; border:1.5px solid #0B1132; border-radius:13px;
+        font-family:"Manrope",sans-serif; font-weight:800;
+      }
+      #sheetOverlay .btn.ghost, #profileOverlay .btn.ghost, #paymentOverlay .btn.ghost, #txHistoryView .btn.ghost{
+        background:#F2F3F8; color:#0B1132; border-color:#E6E7EE;
+      }
+      #sheetOverlay .btn:disabled, #profileOverlay .btn:disabled, #paymentOverlay .btn:disabled{ opacity:.45; }
+
+      /* --- form fields & inputs --- */
+      #sheetOverlay .form-field label, #profileOverlay .form-field label, #paymentOverlay .form-field label,
+      #sheetOverlay .receipt-block label{ color:#6B7086; }
+      #sheetOverlay .text-input, #profileOverlay .text-input, #paymentOverlay .text-input, #txHistoryView .text-input{
+        background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:12px; color:#0B1132;
+        font-family:"Manrope",sans-serif;
+      }
+      #sheetOverlay .text-input:focus, #profileOverlay .text-input:focus, #paymentOverlay .text-input:focus, #txHistoryView .text-input:focus{
+        border-color:#C9A24B; box-shadow:0 0 0 3px rgba(201,162,75,.22); outline:0;
+      }
+      #sheetOverlay .text-input::placeholder, #profileOverlay .text-input::placeholder, #paymentOverlay .text-input::placeholder{ color:#9AA0BD; }
+      #profileOverlay input[type="date"]{ color-scheme:light; }
+      #sheetOverlay .seg, #paymentOverlay .seg{ background:#F2F3F8; border:1.5px solid #E6E7EE; border-radius:14px; padding:4px; gap:4px; }
+      #sheetOverlay .seg button, #paymentOverlay .seg button{ color:#6B7086; border-radius:10px; font-family:"Manrope",sans-serif; }
+      #sheetOverlay .seg button.active, #paymentOverlay .seg button.active{ background:#0B1132; color:#FFFFFF; }
+      #sheetOverlay .sheet-err, #profileOverlay .sheet-err, #paymentOverlay .sheet-err{ color:#B3261E; }
+
+      /* --- fund sheet: amount, max row, wagering bar --- */
+      #sheetOverlay .amt-wrap{ background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:16px; }
+      #sheetOverlay .amt-wrap span{ color:#0B1132; }
+      #sheetOverlay .amt-wrap input{ color:#0B1132; font-family:"Manrope",sans-serif; font-size:24px; }
+      #sheetOverlay .amt-wrap input::placeholder{ color:#9AA0BD; }
+      #sheetOverlay .max-row{ color:#6B7086; }
+      #sheetOverlay .max-btn{ background:#FFFFFF; border:1.5px solid #E6E7EE; color:#9A7B2D; border-radius:9px; }
+      #sheetOverlay .wager-bar{ background:#E9EBF2; }
+      #sheetOverlay .wager-bar-text{ color:#6B7086; }
+
+      /* --- fund sheet: method panels & detail rows --- */
+      #sheetOverlay .pay-details{ background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:16px; padding:16px; }
+      #sheetOverlay .pd-row{ border-bottom:1px solid #E6E7EE; }
+      #sheetOverlay .pd-row:last-child{ border-bottom:0; }
+      #sheetOverlay .pd-label{ color:#6B7086; }
+      #sheetOverlay .pd-value{ color:#0B1132; }
+      #sheetOverlay .copy-btn{ background:#0B1132; color:#FFFFFF; border:1px solid #0B1132; border-radius:9px; }
+      #sheetOverlay .pd-ngn{ color:#6B7086; }
+      #sheetOverlay .pd-ngn .pd-ngn-amt{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #sheetOverlay .pd-rate{ color:#6B7086; }
+      #sheetOverlay .pd-note{ color:#6B7086; }
+      #sheetOverlay .pd-qr{ border:1.5px solid #E6E7EE; border-radius:14px; }
+      #sheetOverlay .wd-dest-card{ background:#EEF0FA; border:1.5px solid #DDE1F2; border-radius:14px; padding:14px 16px; }
+      #sheetOverlay .wd-dest-title{ color:#0B1132; }
+      #sheetOverlay .wd-dest-sub{ color:#6B7086; }
+      #sheetOverlay .wd-dest-note{ color:#6B7086; }
+      #sheetOverlay .wd-none-msg{ color:#0B1132; }
+
+      /* --- fund sheet: receipt upload --- */
+      #sheetOverlay .receipt-block{ border-top:1px solid #E6E7EE; }
+      #sheetOverlay .receipt-input{ background:#F8F9FC; border:1.5px dashed rgba(201,162,75,.55); border-radius:14px; color:#6B7086; }
+      #sheetOverlay .receipt-input::file-selector-button{ background:#0B1132; color:#FFFFFF; border:0; border-radius:9px; }
+      #sheetOverlay .receipt-status{ color:#6B7086; }
+      #sheetOverlay .receipt-status.ok{ color:#1D9D63; }
+      #sheetOverlay .receipt-status.err{ color:#B3261E; }
+      #sheetOverlay .receipt-bar{ background:#E9EBF2; }
+      #sheetOverlay .receipt-thumb{ border:1px solid #E6E7EE; background:#F2F3F8; border-radius:12px; }
+
+      /* --- Payment Method screen --- */
+      #paymentOverlay .pay-item{ background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:16px; padding:14px 16px; }
+      #paymentOverlay .pay-item .pi-title{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #paymentOverlay .pay-item .pi-sub{ color:#6B7086; }
+      #paymentOverlay .default-tag{ background:#E3F5EC; color:#14714A; }
+      #paymentOverlay .pay-item .pi-btns button{ background:#F2F3F8; border:1.5px solid #E6E7EE; color:#0B1132; border-radius:9px; }
+      #paymentOverlay .pay-item .pi-btns button.danger{ background:#FFFFFF; color:#B3261E; border-color:#F0C4C0; }
+      #paymentOverlay .pay-pin, #paymentOverlay .pay-form{ border-top:1px solid #E6E7EE; }
+      #paymentOverlay .pay-pin h4, #paymentOverlay .pay-form h4{ font-family:"Manrope",sans-serif; font-size:16px; font-weight:800; color:#0B1132; }
+      #paymentOverlay .pin-sub{ color:#6B7086; font-size:13px; }
+      #paymentOverlay .pin-opt{ color:#9A7B2D; }
+      #paymentOverlay .linklike{ color:#9A7B2D; font-weight:800; text-decoration:none; }
+
+      /* --- Edit Profile screen --- */
+      #profileOverlay .profile-head{ background:#EEF0FA; border:1.5px solid #DDE1F2; border-radius:16px; padding:14px 16px; }
+      #profileOverlay .profile-head .ph-name{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #profileOverlay .profile-head .ph-email{ color:#6B7086; }
+      #profileOverlay .upload-btn{ background:#0B1132; color:#FFFFFF; border:1px solid #0B1132; border-radius:12px; }
+      #profileOverlay .photo-remove{ background:#FFFFFF; color:#B3261E; border:1px solid #F0C4C0; border-radius:12px; }
+      #profileOverlay .photo-note{ color:#6B7086; }
+      #profileOverlay .user-wrap{ background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:12px; }
+      #profileOverlay .user-wrap span{ color:#9A7B2D; }
+      #profileOverlay .user-wrap input{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #profileOverlay .user-wrap:focus-within{ border-color:#C9A24B; box-shadow:0 0 0 3px rgba(201,162,75,.22); }
+      #profileOverlay .avatar-pick.active{ box-shadow:0 0 0 2px #FFFFFF, 0 0 0 4.5px #C9A24B; }
+
+      /* --- Transaction History view --- */
+      #txHistoryView{ color:#0B1132; }
+      #txHistoryView .txh-head h2{ font-family:"Manrope",sans-serif; color:#0B1132; }
+      #txHistoryView .txh-head p{ color:#6B7086; font-size:13px; }
+      #txHistoryView .stat{ background:#EEF0FA; border:1.5px solid #DDE1F2; border-radius:16px; padding:14px 8px; }
+      #txHistoryView .stat .v{ font-family:"Manrope",sans-serif; font-size:20px; color:#0B1132; }
+      #txHistoryView .stat .k{ color:#6B7086; }
+      #txHistoryView .filter-chip{ background:#FFFFFF; border:1.5px solid #E6E7EE; color:#6B7086; }
+      #txHistoryView .filter-chip.active{ background:#0B1132; color:#FFFFFF; border-color:#0B1132; }
+      #txHistoryView .txh-period{
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7086' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat:no-repeat; background-position:right 12px center; background-size:15px; padding-right:34px;
+      }
+      #txHistoryView .panel{ background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:18px; padding:8px 16px; box-shadow:none; }
+      #txHistoryView .hist-item{ padding:14px 0; border-bottom:1px solid #E6E7EE; align-items:center; }
+      #txHistoryView .hist-item:last-child{ border-bottom:0; }
+      #txHistoryView .tx-ico{ width:44px; height:44px; border-radius:50%; background:#F2F3F8; border:0; color:#0B1132; }
+      #txHistoryView .hi-title{ color:#0B1132; font-size:15px; }
+      #txHistoryView .hi-sub{ color:#6B7086; font-size:12.5px; }
+      #txHistoryView .hi-amt{ font-family:"Manrope",sans-serif; font-size:15.5px; }
+      #txHistoryView .pos{ color:#1D9D63; } #txHistoryView .neg{ color:#D64545; } #txHistoryView .neu{ color:#6B7086; }
+      #txHistoryView .res-tag.won, #txHistoryView .dir-tag.higher{ background:#E3F5EC; color:#14714A; }
+      #txHistoryView .res-tag.lost, #txHistoryView .dir-tag.lower{ background:#FDECEC; color:#B3261E; }
+      #txHistoryView .res-tag.tie{ background:#EEF0FA; color:#6B7086; }
+      #txHistoryView .res-tag.await{ background:#FBF3DC; color:#9A7B2D; }
+      #txHistoryView .empty{ color:#6B7086; }
     </style>
   </head>
   <body>
