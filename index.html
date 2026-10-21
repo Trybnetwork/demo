@@ -1237,6 +1237,230 @@
       /* Global primary buttons (2026-10-21): navy background + white text, replacing the gold style */
       .btn:not(.ghost){ background:#0B1132 !important; color:#FFFFFF !important; border-color:rgba(201,162,75,.55) !important; }
       #v2MinerCard{ cursor:pointer; }
+
+      /* ============ Pass 3 (2026-10-21): Trade arena, games, Mining sheet & Earn in the artifact design language ============
+         Chrome only — game art deliberately untouched: the TradingView widget (.chart-box / #tvChart),
+         the Aviator sky + plane, the Spin wheel SVG + hub, the Whot felt-table photo, card faces and
+         deep-red backs, the suit picker on the table, and the whole Ayo wooden board (table, topbar,
+         turn banner, pits, seeds). Buttons that are plain .btn already follow the global navy rule. */
+      #binaryView, #aviatorView, #spinView, #whotView, #ayoView, #earnView{ color:#0B1132; }
+
+      /* --- view headers (back row, title, mute) --- */
+      #binaryView .txh-head h2, #aviatorView .txh-head h2, #spinView .txh-head h2, #whotView .txh-head h2{
+        font-family:"Manrope",sans-serif; color:#0B1132;
+      }
+      #binaryView .txh-head p, #aviatorView .txh-head p, #spinView .txh-head p{ color:#6B7086; }
+      #binaryView .txh-head .btn.ghost, #aviatorView .txh-head .btn.ghost,
+      #spinView .txh-head .btn.ghost, #whotView .txh-head .btn.ghost{
+        background:#F2F3F8; color:#0B1132; border-color:#E6E7EE;
+      }
+      #binaryView .sound-btn, #aviatorView .sound-btn, #spinView .sound-btn, #whotView .sound-btn{
+        background:#F2F3F8; border:1px solid #E6E7EE;
+      }
+
+      /* --- panels & section titles --- */
+      #binaryView .panel, #aviatorView .panel, #spinView .panel{
+        background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:18px; box-shadow:none;
+      }
+      #binaryView .panel h2.sec, #aviatorView .panel h2.sec, #spinView .panel h2.sec{
+        font-family:"Manrope",sans-serif; color:#0B1132;
+      }
+      #whotView h2.sec, #ayoView h2.sec{
+        font-family:"Manrope",sans-serif; font-size:16px; font-weight:700; color:#0B1132;
+        display:flex; align-items:center; gap:8px; margin:0 0 4px;
+      }
+      #whotView h2.sec .info-btn, #ayoView h2.sec .info-btn{ margin-left:auto; }
+      #binaryView .sec-sub, #aviatorView .sec-sub, #spinView .sec-sub,
+      #whotView .sec-sub, #ayoView .sec-sub{ color:#6B7086; }
+
+      /* --- info (i) buttons --- */
+      #binaryView .info-btn, #aviatorView .info-btn, #spinView .info-btn, #whotView .info-btn,
+      #ayoView .info-btn, #earnView .info-btn, #minerOverlay .info-btn, #duelOverlay .info-btn{
+        border-color:#E6E7EE; color:#6B7086; background:#FFFFFF;
+      }
+      #binaryView .info-btn[aria-expanded="true"], #aviatorView .info-btn[aria-expanded="true"],
+      #spinView .info-btn[aria-expanded="true"], #whotView .info-btn[aria-expanded="true"],
+      #ayoView .info-btn[aria-expanded="true"], #earnView .info-btn[aria-expanded="true"]{
+        background:#EEF0FA; color:#0B1132; border-color:#DDE1F2;
+      }
+
+      /* --- stake fields (all games + duel dialogs) --- */
+      #binaryView .field label, #aviatorView .field label, #spinView .field label,
+      #whotView .field label, #ayoView .field label, #duelOverlay .field label{ color:#6B7086; }
+      #binaryView .stake-wrap, #aviatorView .stake-wrap, #spinView .stake-wrap,
+      #whotView .stake-wrap, #ayoView .stake-wrap, #duelOverlay .stake-wrap{
+        background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:12px;
+      }
+      #binaryView .stake-wrap span, #aviatorView .stake-wrap span, #spinView .stake-wrap span,
+      #whotView .stake-wrap span, #ayoView .stake-wrap span, #duelOverlay .stake-wrap span{ color:#0B1132; }
+      #binaryView .stake-wrap input, #aviatorView .stake-wrap input, #spinView .stake-wrap input,
+      #whotView .stake-wrap input, #ayoView .stake-wrap input, #duelOverlay .stake-wrap input{ color:#0B1132; }
+      #binaryView .stake-wrap:focus-within, #aviatorView .stake-wrap:focus-within, #spinView .stake-wrap:focus-within,
+      #whotView .stake-wrap:focus-within, #ayoView .stake-wrap:focus-within, #duelOverlay .stake-wrap:focus-within{
+        border-color:#C9A24B; box-shadow:0 0 0 3px rgba(201,162,75,.22);
+      }
+
+      /* --- Pay-with toggle: soft track + navy active (fund-sheet seg language) --- */
+      #binaryView .pay-src, #aviatorView .pay-src, #spinView .pay-src, #whotView .pay-src,
+      #ayoView .pay-src, #minerOverlay .pay-src{
+        background:#F2F3F8; border:1.5px solid #E6E7EE; border-radius:14px; padding:4px; gap:4px;
+      }
+      #binaryView .pay-src button, #aviatorView .pay-src button, #spinView .pay-src button,
+      #whotView .pay-src button, #ayoView .pay-src button, #minerOverlay .pay-src button{
+        background:transparent; border-color:transparent; color:#6B7086; border-radius:10px;
+      }
+      #binaryView .pay-src button.on, #aviatorView .pay-src button.on, #spinView .pay-src button.on,
+      #whotView .pay-src button.on, #ayoView .pay-src button.on, #minerOverlay .pay-src button.on{
+        background:#0B1132; color:#FFFFFF; border-color:transparent;
+      }
+      #binaryView .pay-src button .sub, #aviatorView .pay-src button .sub, #spinView .pay-src button .sub,
+      #whotView .pay-src button .sub, #ayoView .pay-src button .sub, #minerOverlay .pay-src button .sub{ color:#9AA0BD; }
+      #binaryView .pay-src button.on .sub, #aviatorView .pay-src button.on .sub, #spinView .pay-src button.on .sub,
+      #whotView .pay-src button.on .sub, #ayoView .pay-src button.on .sub, #minerOverlay .pay-src button.on .sub{
+        color:rgba(255,255,255,.65);
+      }
+
+      /* --- Binary arena specifics --- */
+      #binaryView .asset-btn{ background:#FFFFFF; border:1.5px solid #E6E7EE; color:#6B7086; }
+      #binaryView .asset-btn.active{ background:#0B1132; color:#FFFFFF; border-color:#0B1132; }
+      #binaryView .feed-note{ color:#6B7086; }
+      #binaryView .payout-line{ color:#6B7086; }
+      #binaryView .payout-line b{ color:#0B1132; }
+      #binaryView .payout-line .win-amt{ color:#1D9D63; }
+      #binaryView .martingale{ background:rgba(201,162,75,.05); }
+      #binaryView .mg-status{ color:#6B7086; }
+      #binaryView .mg-status b{ color:#9A7B2D; }
+      #binaryView .mg-risk{ color:#B3261E; }
+      #binaryView .switch{ background:#E9EBF2; border-color:#E6E7EE; }
+      #binaryView .switch::after{ background:#FFFFFF; box-shadow:0 1px 3px rgba(11,17,50,.25); }
+      #binaryView .switch[aria-checked="true"]{ background:#0B1132; border-color:#0B1132; }
+      #binaryView .switch[aria-checked="true"]::after{ background:#E7CB7E; }
+      #binaryView .open-trades h3{ color:#6B7086; }
+      #binaryView .open-trade{ background:#F8F9FC; border:1.5px solid #E6E7EE; }
+      #binaryView .open-trade .ot-main{ color:#0B1132; }
+      #binaryView .open-trade .ot-sub{ color:#6B7086; }
+      #binaryView .ot-timer .t{ color:#9A7B2D; font-family:"Manrope",sans-serif; }
+      #binaryView .ot-timer .bar{ background:#E9EBF2; }
+      #binaryView .empty{ color:#6B7086; }
+
+      /* --- result/direction tags (binary + recent-round strips in every game) --- */
+      #binaryView .dir-tag.higher, #binaryView .res-tag.won, #aviatorView .res-tag.won,
+      #spinView .res-tag.won, #whotView .res-tag.won, #ayoView .res-tag.won{ background:#E3F5EC; color:#14714A; }
+      #binaryView .dir-tag.lower, #binaryView .res-tag.lost, #aviatorView .res-tag.lost,
+      #spinView .res-tag.lost, #whotView .res-tag.lost, #ayoView .res-tag.lost{ background:#FDECEC; color:#B3261E; }
+      #binaryView .res-tag.tie, #aviatorView .res-tag.tie, #spinView .res-tag.tie,
+      #whotView .res-tag.tie, #ayoView .res-tag.tie{ background:#EEF0FA; color:#6B7086; }
+      #binaryView .res-tag.await, #aviatorView .res-tag.await, #spinView .res-tag.await,
+      #whotView .res-tag.await, #ayoView .res-tag.await{ background:#FBF3DC; color:#9A7B2D; }
+
+      /* --- shared game chrome: notes, banners, recent rounds, winners feeds --- */
+      #aviatorView .recent-label, #spinView .recent-label, #whotView .recent-label, #ayoView .recent-label,
+      #binaryView .recent-label{ color:#6B7086; }
+      #aviatorView .recent-none, #spinView .recent-none, #whotView .recent-none, #ayoView .recent-none{ color:#6B7086; }
+      #aviatorView .game-note, #spinView .game-note{ color:#6B7086; }
+      #aviatorView .game-banner, #spinView .game-banner{
+        background:#F8F9FC; border:1.5px solid #E6E7EE; color:#0B1132;
+      }
+      #aviatorView .game-banner.win, #spinView .game-banner.win{ background:#E3F5EC; border-color:#BFE6D2; color:#14714A; }
+      #aviatorView .game-banner.lose, #spinView .game-banner.lose{ background:#FDECEC; border-color:#F3C6C2; color:#B3261E; }
+      #binaryView .av-winners, #aviatorView .av-winners, #spinView .av-winners,
+      #whotView .av-winners, #ayoView .av-winners{ border-top-color:#E6E7EE; }
+      #binaryView .av-win-row, #aviatorView .av-win-row, #spinView .av-win-row,
+      #whotView .av-win-row, #ayoView .av-win-row{ background:#F8F9FC; border:1.5px solid #E6E7EE; }
+      #binaryView .av-win-name, #aviatorView .av-win-name, #spinView .av-win-name,
+      #whotView .av-win-name, #ayoView .av-win-name{ color:#0B1132; }
+      #binaryView .av-win-amt, #aviatorView .av-win-amt, #spinView .av-win-amt,
+      #whotView .av-win-amt, #ayoView .av-win-amt{ color:#1D9D63; }
+
+      /* --- Whot/Ayo in-game dialogs + PvP duel dialogs: light sheet cards --- */
+      .wt-overlay{ background:rgba(5,7,26,.55); }
+      .duel-overlay{ background:rgba(5,7,26,.55); }
+      .wt-card{
+        background:#FFFFFF; color:#0B1132; border:1.5px solid #E6E7EE; border-radius:18px;
+        box-shadow:0 24px 60px rgba(11,17,50,.30);
+      }
+      .wt-card h3{ color:#0B1132; font-family:"Manrope",sans-serif; font-weight:800; }
+      .wt-card p{ color:#6B7086; }
+      .wt-card .card-info{ color:#6B7086; }
+      .wt-card .menu-btn{ background:#F2F3F8; border:1.5px solid #E6E7EE; color:#0B1132; border-radius:12px; }
+      .wt-card .menu-btn.primary{ background:#0B1132; color:#FFFFFF; border:1.5px solid #0B1132; }
+      .wt-result{ color:#0B1132; }
+      .wt-result.win{ color:#1D9D63; }
+      .wt-result.lose{ color:#D64545; }
+      .wt-result.draw{ color:#9A7B2D; }
+      .wt-howto{ color:#6B7086; background:#F8F9FC; border:1px solid #E6E7EE; }
+      .duel-link{ background:#F8F9FC; border:1.5px solid #E6E7EE; color:#0B1132; }
+      .duel-note{ color:#6B7086; }
+      .duel-count{ color:#9A7B2D; }
+
+      /* --- Mining: Buy-a-Miner sheet (full pass-2 sheet treatment) --- */
+      #minerOverlay{ background:rgba(5,7,26,.55); }
+      #minerOverlay .sheet{
+        background:#FFFFFF; color:#0B1132; border:1.5px solid #E6E7EE; border-bottom:0;
+        border-radius:26px 26px 0 0; padding:12px 22px calc(26px + env(safe-area-inset-bottom));
+        max-width:430px; max-height:88dvh; overflow-y:auto; box-shadow:0 18px 50px rgba(11,17,50,.16);
+      }
+      @media (min-width:640px){
+        #minerOverlay .sheet{ border-radius:26px; border-bottom:1.5px solid #E6E7EE; }
+      }
+      #minerOverlay .sheet::before{
+        content:""; display:block; width:44px; height:5px; border-radius:99px; background:#E6E7EE; margin:2px auto 16px;
+      }
+      #minerOverlay .sheet h3{ font-family:"Manrope",sans-serif; font-size:21px; font-weight:800; color:#0B1132; margin:0 0 4px; }
+      #minerOverlay .sheet .sheet-sub{ font-size:14.5px; color:#6B7086; font-weight:600; line-height:1.5; margin:0 0 18px; }
+      #minerOverlay .btn.ghost{ background:#F2F3F8; color:#0B1132; border-color:#E6E7EE; }
+      #minerOverlay .form-field label{ color:#6B7086; }
+      #minerOverlay .amt-wrap{ background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:16px; }
+      #minerOverlay .amt-wrap span{ color:#0B1132; }
+      #minerOverlay .amt-wrap input{ color:#0B1132; font-family:"Manrope",sans-serif; font-size:24px; }
+      #minerOverlay .amt-wrap input::placeholder{ color:#9AA0BD; }
+      #minerOverlay .amt-wrap:focus-within{ border-color:#C9A24B; box-shadow:0 0 0 3px rgba(201,162,75,.22); }
+      #minerOverlay .pack-form{ border-top:1px solid #E6E7EE; }
+      #minerOverlay .pack-preview{ color:#6B7086; }
+      #minerOverlay .pack-preview .pp-profit{ color:#1D9D63; }
+      #minerOverlay .sheet-err{ color:#B3261E; }
+      #minerOverlay .tier-row{ background:#F8F9FC; border:1.5px solid #E6E7EE; }
+      #minerOverlay .tier-row .tier-name{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #minerOverlay .tier-row .tier-sub{ color:#6B7086; }
+      #minerOverlay .tier-row .tier-price{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #minerOverlay .tier-row .buy-btn{ background:#0B1132; color:#FFFFFF; border:1px solid #0B1132; }
+      #minerOverlay .tier-row.selected{ border-color:#C9A24B; background:#FFF8E7; }
+      #minerOverlay .owned-tag{ background:#E3F5EC; color:#14714A; }
+
+      /* --- Earn TrybCoin view --- */
+      #earnView .view-head{ display:flex; align-items:center; gap:12px; margin-top:18px; }
+      #earnView .back-btn{
+        width:44px; height:44px; flex:0 0 auto; display:grid; place-items:center; padding:0;
+        background:#F2F3F8; border:1.5px solid #E6E7EE; border-radius:12px; color:#0B1132; cursor:pointer;
+      }
+      #earnView .view-title{ flex:1; font-family:"Manrope",sans-serif; font-size:20px; font-weight:800; color:#0B1132; }
+      #earnView .info-pop{
+        background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:14px; padding:12px 14px;
+        color:#6B7086; font-size:13px; line-height:1.55; margin:12px 16px 0;
+      }
+      #earnView .earn-balance{
+        background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:18px; color:#0B1132; box-shadow:none;
+      }
+      #earnView .earn-bal-num{ color:#0B1132; font-family:"Manrope",sans-serif; }
+      #earnView .earn-bal-num small{ color:#6B7086; }
+      #earnView .earn-bal-sub{ color:#6B7086; }
+      #earnView .earn-note{ color:#6B7086; font-size:13px; line-height:1.5; margin-top:10px; }
+      #earnView .earn-threshold{ color:#9A7B2D; font-weight:700; }
+      #earnView .earn-task{ background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:16px; }
+      #earnView .earn-task-title{ color:#0B1132; }
+      #earnView .earn-task-sub{ color:#6B7086; }
+      #earnView .earn-task-reward{ color:#9A7B2D; }
+
+      /* --- TrybCoin popups (balance pop + proof pop): light popup cards --- */
+      .coin-pop{ background:rgba(5,7,26,.55); }
+      .coin-pop-card{
+        background:#FFFFFF; border:1.5px solid #E6E7EE; color:#0B1132;
+        box-shadow:0 24px 60px rgba(11,17,50,.30);
+      }
+      .coin-pop-bal{ color:#0B1132; }
+      .coin-pop-sub{ color:#6B7086; }
+      .coin-pop-earn{ color:#9A7B2D; }
+      .coin-pop .btn.ghost{ background:#F2F3F8; color:#0B1132; border-color:#E6E7EE; }
     </style>
   </head>
   <body>
