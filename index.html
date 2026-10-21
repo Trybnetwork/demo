@@ -4209,6 +4209,7 @@
 
       /* ================= Fund sheet ================= */
       var sheetMode = "deposit";
+      var sheetSubmitting = false;  // true while a fund-sheet submit is in flight — blocks duplicate requests from repeat clicks
       var depositMethod = null; // "bank" | "crypto" | null (deposit flow only)
       /* ---- Withdrawal destination (from the saved Payment Method) ----
          Payout destinations live in the Payment Method menu: the user
@@ -4303,8 +4304,9 @@
         var btn = $("sheetConfirm");
         var frozen = sheetMode === "withdraw" && withdrawalsFrozen;
         var noDest = sheetMode === "withdraw" && !savedPayoutDestination();
-        btn.disabled = (receiptNeeded() && (receiptUploading || !receiptUrl)) || frozen || noDest;
-        btn.textContent = receiptNeeded() && receiptUploading ? "Uploading receipt…"
+        btn.disabled = sheetSubmitting || (receiptNeeded() && (receiptUploading || !receiptUrl)) || frozen || noDest;
+        btn.textContent = sheetSubmitting ? "Sending…"
+          : receiptNeeded() && receiptUploading ? "Uploading receipt…"
           : sheetMode === "deposit" ? "I've sent it"
           : frozen ? WITHDRAWALS_FROZEN_TEXT : "Request withdrawal";
       }
@@ -4774,9 +4776,12 @@
         if (!(amt > 0)){ sheetError("Enter an amount above $0."); return; }
         amt = Math.floor(amt * 100) / 100;
         var now = Date.now();
+        if (sheetSubmitting) return;
+        sheetSubmitting = true;
         var btn = $("sheetConfirm");
         btn.disabled = true;
-        function done(){ updateSheetConfirmState(); }
+        function done(){ sheetSubmitting = false; updateSheetConfirmState(); }
+        updateSheetConfirmState();
         if (sheetMode === "deposit"){
           if (amt < 12){
             done();
@@ -4797,7 +4802,7 @@
             done();
             if (!ok) return;
             toast("Deposit requested", fmtUSD(amt) + " via " + (depositMethod === "crypto" ? "Crypto" : "Bank Transfer") + " is pending approval — the funds land as soon as it's approved.");
-            renderWallets(); closeSheet(); setView("app");
+            closeSheet(); setView("app"); renderWallets();
           });
         } else if (sheetMode === "withdraw"){
           if (withdrawalsFrozen){ done(); sheetError(WITHDRAWALS_FROZEN_TEXT); return; }
