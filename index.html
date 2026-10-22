@@ -2002,7 +2002,7 @@
           <div class="controls">
             <div class="field">
               <label for="stakeInput">Stake (from Main Balance)</label>
-              <div class="stake-wrap"><span>$</span><input id="stakeInput" class="num" type="number" inputmode="decimal" min="1" step="1" value="1" /></div><div class="pay-src-slot"></div>
+              <div class="stake-wrap"><span>$</span><input id="stakeInput" class="num" type="number" inputmode="decimal" min="1" step="1" value="1" /></div>
             </div>
             <div class="payout-line">
               <span>Potential return on a win: <b class="num" id="payoutInfo">—</b></span>
@@ -2708,7 +2708,7 @@
         <div class="earn-coin"><img src="./trybcoin.png" alt="TrybCoin" style="width:64px;height:64px;border-radius:50%;"></div>
         <div class="earn-bal-num"><span id="trybcoinBal">0</span> <small>TrybCoin</small></div>
         <div class="earn-bal-sub">≈ $<span id="trybcoinUsd">0.00</span></div>
-        <div class="earn-note">Use TrybCoin to trade, play games, or buy miners — profits land in your Main Balance.</div>
+        <div class="earn-note">Use TrybCoin to play games or buy miners — profits land in your Main Balance.</div>
         <div class="earn-threshold" id="convertHint">Reach 1,000 TrybCoin to convert.</div>
       </div>
       <div class="earn-tasks" id="earnTasks"></div>
@@ -4169,7 +4169,7 @@
         if (!sb || !currentUser){ toast("Not signed in", "Log in again to place a bid."); return; }
         var stake = effectiveStake();
         if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a bid."); return; }
-        var dd = deductStake(stake);
+        var dd = deductStake(stake, "main"); // Binary trading is Main Balance only — TrybCoin can't stake bids.
         if (!dd.ok) return;
         bidBusy = true;
         $("btnHigher").disabled = true; $("btnLower").disabled = true;
@@ -4437,7 +4437,7 @@
           earnCoinBal = (r.data && r.data.trybcoin) || 0;
           $("trybcoinBal").textContent = earnCoinBal.toLocaleString();
           $("trybcoinUsd").textContent = (earnCoinBal / TRYBCOIN_RATE).toFixed(2);
-          $("convertHint").textContent = "Spend TrybCoin on trades, games and miners — profits land in your Main Balance.";
+          $("convertHint").textContent = "Spend TrybCoin on games and miners — profits land in your Main Balance.";
         });
       }
       // Back buttons: [data-go="view"] navigates to that view
@@ -4504,7 +4504,7 @@
       // convertTrybcoinAmount retired — TrybCoin is spend-only now.
 
       /* ============ TrybCoin as stake source ============
-         Users can pay stakes with TrybCoin (trade, games, mining).
+         Users can pay stakes with TrybCoin (games, mining). Binary trading and PvP duels are Main Balance only.
          Coin-funded wins pay PROFIT ONLY to Main Balance — the coin
          stake itself is consumed (it was bonus credit, not cash). */
       function coinCostForUsd(usd){ return Math.round(usd * TRYBCOIN_RATE); }
@@ -4515,9 +4515,9 @@
       }
       // Deduct a USD-denominated stake from the selected source.
       // Returns {ok, coins} — coins is the TrybCoin spent (0 for Main).
-      function deductStake(usd){
+      function deductStake(usd, forceSrc){
         usd = round2(usd);
-        if ((state.stakeSource || "main") === "trybcoin"){
+        if ((forceSrc || state.stakeSource || "main") === "trybcoin"){
           var coins = coinCostForUsd(usd);
           if (coins > earnCoinBal){
             toast("Insufficient TrybCoin", "You need " + coins.toLocaleString() + " TrybCoin for a " + fmtUSD(usd) + " stake.");
