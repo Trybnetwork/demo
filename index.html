@@ -1031,6 +1031,7 @@
       .fi-lot-meta{ color:#6B7086; font-size:12.5px; margin-top:3px; line-height:1.5; }
       .fi-lot-right{ text-align:right; }
       .fi-lot-earn{ color:#1E9E57; font-weight:700; font-size:14.5px; }
+      .fi-countdown{ font-weight:800; color:#0B1132; white-space:nowrap; }
       #investView{ padding-bottom:120px; }
       #investView .view-title{ flex:1; font-family:"Manrope",sans-serif; font-size:26px; font-weight:800; color:#0B1132; }
       /* Fixed Investment sheet — global (light) sheet language, same as the fund sheet */
@@ -3579,6 +3580,24 @@
         });
         chain.then(function(){ investSettling = false; });
       }
+      /* Live countdown to maturity on each active investment card —
+         text like "364d 23h 59m 12s left", ticked by the 1s loop. */
+      function fiCountdownText(ms){
+        if (ms <= 0) return "Maturing\u2026";
+        var s = Math.floor(ms / 1000);
+        var d = Math.floor(s / 86400); s -= d * 86400;
+        var h = Math.floor(s / 3600); s -= h * 3600;
+        var m = Math.floor(s / 60); s -= m * 60;
+        function p2(n){ return (n < 10 ? "0" : "") + n; }
+        return (d > 0 ? d + "d " : "") + p2(h) + "h " + p2(m) + "m " + p2(s) + "s left";
+      }
+      function tickInvestCountdowns(){
+        var nodes = document.querySelectorAll(".fi-countdown");
+        for (var i = 0; i < nodes.length; i++){
+          var u = Number(nodes[i].getAttribute("data-unlock") || 0);
+          if (u) nodes[i].textContent = fiCountdownText(u - Date.now());
+        }
+      }
       function renderInvestments(){
         var totalEl = $("fiTotal");
         if (!totalEl) return;
@@ -3595,11 +3614,10 @@
         var box = $("fiList");
         if (!box) return;
         box.innerHTML = lots.slice().sort(function(a, b){ return a.unlockAt - b.unlockAt; }).map(function(l){
-          var daysLeft = Math.max(0, Math.ceil((l.unlockAt - Date.now()) / 86400000));
           return '<div class="fi-lot"><div><div class="fi-lot-amt num">' + fmtUSD(l.amount) + '</div>' +
             '<div class="fi-lot-meta">' + l.tier.label + ' · ' + l.tier.rate + '% return · locked ' + fmtContractDate(l.createdAt) + '</div></div>' +
             '<div class="fi-lot-right"><div class="fi-lot-earn num">+' + fmtUSD(l.yieldAmt) + '</div>' +
-            '<div class="fi-lot-meta">' + (daysLeft > 0 ? daysLeft + (daysLeft === 1 ? " day" : " days") + " left · unlocks " : "Unlocks ") + fmtContractDate(l.unlockAt) + '</div></div></div>';
+            '<div class="fi-lot-meta"><span class="fi-countdown" data-unlock="' + l.unlockAt + '">' + fiCountdownText(l.unlockAt - Date.now()) + '</span> · unlocks ' + fmtContractDate(l.unlockAt) + '</div></div></div>';
         }).join("");
       }
 
@@ -6212,6 +6230,7 @@
         if (!currentUser) return;
         checkMinerCycle(now);
         settleInvestments();
+        tickInvestCountdowns();
         renderWallets();
         renderOpenTrades();
         if (now - lastAutoSettleCheck >= AUTO_SETTLE_CHECK_MS){
