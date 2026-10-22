@@ -8124,7 +8124,17 @@
       }
       // ---- create ----
       var duelCreating = false;
+      // PvP is Main Balance only: if TrybCoin is the selected Pay-with
+      // option, block with an error — no duel, no link, until they switch.
+      function duelCoinBlocked(){
+        if ((state.stakeSource || "main") === "trybcoin"){
+          toast("TrybCoin can't be used for PvP", "Duels run on Main Balance only — switch Pay-with to Main Balance and try again.", "lose");
+          return true;
+        }
+        return false;
+      }
       function duelCreate(game){
+        if (duelCoinBlocked()) return;
         if (duel){ toast("Duel in progress", "Finish or cancel your current duel first."); return; }
         if (duelCreating) return; // block double-taps while the first create is in flight
         if (!sb || !currentUser){ toast("Not signed in", "Log in again to duel."); return; }
@@ -8191,6 +8201,7 @@
       function duelAcceptFlow(row){
         if (!sb || !currentUser) return;
         if (row.player1_id === currentUser.id){ duelShowShare(); return; } // my own link
+        if (duelCoinBlocked()) return;
         duelDailyOk(row.game).then(function(ok){
           if (!ok){ toast("Daily duel used", "You can play two duels per day per game — come back tomorrow."); return; }
           var stake = Number(row.stake);
