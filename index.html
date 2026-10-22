@@ -9341,6 +9341,7 @@ s0.parentNode.insertBefore(s1,s0);
   .tcw-msg{ max-width:80%; padding:9px 12px; border-radius:18px; font-size:14px; line-height:1.45; word-wrap:break-word; white-space:pre-wrap; font-family:"Inter",system-ui,sans-serif; }
   .tcw-msg.them{ background:#EFF0F5; align-self:flex-start; border-bottom-left-radius:5px; }
   .tcw-msg.me{ background:#0B1132; color:#fff; align-self:flex-end; border-bottom-right-radius:5px; }
+  .tcw-msg a{ color:inherit; text-decoration:underline; text-underline-offset:2px; font-weight:600; overflow-wrap:anywhere; }
   .tcw-msg .tcw-mt{ display:block; font-size:9.5px; opacity:.55; margin-top:3px; text-align:right; }
   .tcw-msg .tcw-ms{ display:block; font-size:10.5px; font-weight:700; color:#9A7B2D; margin-bottom:2px; }
   .tcw-msg img.tcw-photo{ display:block; max-width:190px; width:100%; border-radius:9px; margin:2px 0 3px; background:#E9ECF5; }
@@ -9385,6 +9386,21 @@ s0.parentNode.insertBefore(s1,s0);
   var W = { user: null, chats: [], cur: null, msgs: [], chan: null, media: {}, profiles: {}, audio: null, audioPath: null, booted: false };
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function richText(s){
+    var str = String(s == null ? "" : s);
+    var re = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+    var out = "", last = 0, mt;
+    while ((mt = re.exec(str)) !== null){
+      out += esc(str.slice(last, mt.index));
+      var raw = mt[0], trail = "";
+      while (raw.length > 1 && /[.,!?;:)]$/.test(raw)){ trail = raw.slice(-1) + trail; raw = raw.slice(0, -1); }
+      var href = raw.toLowerCase().indexOf("www.") === 0 ? "https://" + raw : raw;
+      out += '<a href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(raw) + "</a>" + esc(trail);
+      last = mt.index + mt[0].length;
+    }
+    out += esc(str.slice(last));
+    return out;
+  }
   function initials(n){ var p = String(n || "?").trim().split(/\s+/); return ((p[0] || "?").charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : "")).toUpperCase(); }
   function fmtClock(ts){ var d = new Date(ts); var h = d.getHours(), m = d.getMinutes(); var ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return h + ":" + (m < 10 ? "0" : "") + m + " " + ap; }
   function fmtTime(ts){ var d = new Date(ts), now = new Date(); if (d.toDateString() === now.toDateString()) return fmtClock(ts); var y = new Date(now); y.setDate(now.getDate() - 1); if (d.toDateString() === y.toDateString()) return "Yesterday"; return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
@@ -9521,7 +9537,7 @@ s0.parentNode.insertBefore(s1,s0);
       var playing = W.audioPath === m.media_path && W.audio && !W.audio.paused;
       content += '<span class="tcw-voice"><button class="tcw-vplay" type="button" data-tcwvoice="' + esc(m.media_path) + '">' + (playing ? "❚❚" : "▶") + '</button><span style="font-size:12.5px;font-weight:700;">' + esc(fmtDur(m.media_duration)) + "</span></span>";
     }
-    if (m.body) content += esc(m.body);
+    if (m.body) content += richText(m.body);
     var sender = "";
     if (!mine && W.cur && W.cur.kind === "group"){
       var p = W.profiles[m.sender_id];
