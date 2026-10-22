@@ -2615,7 +2615,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Fixed Savings work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Find it under <b>Explore → Fixed Savings</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>1 month earns 2%, 3 months earns 5%, 5 months earns 12%, and 365 days earns 26%</b> — the percentage is the total return over the whole term, so $100 locked for 5 months earns $12. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
+            <div class="faq-a">Find it under <b>Explore → Fixed Savings</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>30 days earns 2%, 90 days earns 5%, 150 days earns 12%, and 365 days earns 26%</b> — the percentage is the total return over the whole term, so $100 locked for 150 days earns $12. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">Where do mining returns come from?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -2702,7 +2702,7 @@
           <button class="fi-cta" id="fiStartBtn" type="button">Save</button>
         </div>
       </div>
-      <div class="info-pop" id="fiInfo" hidden>Lock funds for a term &amp; earn fixed returns. Start a fixed savings and set money aside to grow — terms from 1 month to 365 days, up to <b>26% returns</b>. Your principal and earnings return to your Main Balance at maturity.</div>
+      <div class="info-pop" id="fiInfo" hidden>Lock funds for a term &amp; earn fixed returns. Start a fixed savings and set money aside to grow — terms from 30 days to 365 days, up to <b>26% returns</b>. Your principal and earnings return to your Main Balance at maturity.</div>
       <p class="fi-total-sub" id="fiTotalSub">No active savings</p>
       <div id="fiList"></div>
       <span class="fi-activity-pill" id="fiEmptyPill">No activity yet</span>
@@ -3543,9 +3543,9 @@
          returns the row pays out, so two devices can't double-credit. */
       var INVEST_TIERS = [
         { days: 365, rate: 26, label: "365 Days" },
-        { days: 150, rate: 12, label: "5 Months" },
-        { days: 90, rate: 5, label: "3 Months" },
-        { days: 30, rate: 2, label: "1 Month" }
+        { days: 150, rate: 12, label: "150 Days" },
+        { days: 90, rate: 5, label: "90 Days" },
+        { days: 30, rate: 2, label: "30 Days" }
       ];
       var INVEST_MIN = 10;
       function investYield(amount, tier){ return Math.round(amount * (tier.rate / 100) * 100) / 100; }
@@ -8704,15 +8704,15 @@ s0.parentNode.insertBefore(s1,s0);
           <span class="v2-opt-main"><span class="v2-opt-title">Play</span><div class="v2-opt-sub">Lots of reward games where your skill pays</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
         </button>
-        <button class="v2-opt-row" id="v2GoEarn" type="button">
-          <span class="v2-tx-ic"><img src="./trybcoin.png" alt="" style="width:30px;height:30px;border-radius:50%;"></span>
-          <span class="v2-opt-main"><span class="v2-opt-title">Earn TrybCoin</span><div class="v2-opt-sub">Complete simple tasks and earn TN Coin</div></span>
-          <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
-        </button>
         <button class="v2-opt-row" id="v2GoInvest" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-6M9 20V6M14 20v-9M19 20V3M2 20h20"/></svg></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Fixed Savings</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% returns</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="v2-opt-row" id="v2GoEarn" type="button">
+          <span class="v2-tx-ic"><img src="./trybcoin.png" alt="" style="width:30px;height:30px;border-radius:50%;"></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">Earn TrybCoin</span><div class="v2-opt-sub">Complete simple tasks and earn TN Coin</div></span>
+          <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
         </button>
         <button class="v2-sheet-close" type="button" data-v2close="v2ExploreOverlay">Close</button>
       </div>
