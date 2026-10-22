@@ -8798,7 +8798,7 @@ s0.parentNode.insertBefore(s1,s0);
         <p class="sheet-sub" style="margin-bottom:10px;">Chat, connect &amp; earn TrybCoin.</p>
         <p class="tc-info-lines">TrybChat is the TrybNetwork chat app — message friends, join the community, and <b>earn TrybCoin for every message you send</b>. Your coin lands in the same TrybCoin balance you already use here.</p>
         <p class="tc-info-lines"><b>First month free</b> with full access. After that, a <b>$12 premium membership every 6 months</b> keeps TrybChat open — your TrybCoin is always yours.</p>
-        <button class="btn" id="v2OpenTrybChat" type="button" style="width:100%;">Open TrybChat</button>
+        <a class="btn" id="v2OpenTrybChat" href="https://chat.trybnetwork.com/" target="_blank" rel="noopener" style="width:100%;display:block;text-align:center;text-decoration:none;">Open TrybChat</a>
         <button class="v2-sheet-close" type="button" data-v2close="v2TrybChatOverlay">Close</button>
       </div>
     </div>
@@ -9043,7 +9043,7 @@ s0.parentNode.insertBefore(s1,s0);
       bind("v2GoPlay", function(){ closeScreen("v2ExploreOverlay"); if (typeof openScreen === "function") openScreen("v2GamesOverlay"); });
       bind("v2GoEarn", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("earn"); if (typeof renderEarn === "function") renderEarn(); });
       bind("v2GoTrybChat", function(){ closeScreen("v2ExploreOverlay"); if (typeof openScreen === "function") openScreen("v2TrybChatOverlay"); });
-      bind("v2OpenTrybChat", function(){ closeScreen("v2TrybChatOverlay"); if (typeof tcShowList === "function") tcShowList(); if (typeof setView === "function") setView("trybchat"); });
+      /* "Open TrybChat" is a plain link to https://chat.trybnetwork.com/ (no JS binding). */
       bind("v2GoInvest", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("invest"); });
       bind("v2TabHome", function(){ if (typeof setView === "function") setView("app", true); window.scrollTo(0, 0); });
       bind("v2TabTrade", function(){ if (typeof setView === "function") setView("binary"); });
