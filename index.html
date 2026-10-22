@@ -3079,18 +3079,23 @@
         return null;
       }
       /* Fill the signup Country select from COUNTRIES (the single source
-         of truth), alphabetical by name, Nigeria preselected. */
+         of truth): United States pinned first and preselected, the rest
+         alphabetical by name. */
       (function(){
         var sel = document.getElementById("suCountry");
         if (!sel) return;
-        var sorted = COUNTRIES.slice().sort(function(a, b){ return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0); });
+        var sorted = COUNTRIES.slice().sort(function(a, b){
+          if (a.code === "US") return -1;
+          if (b.code === "US") return 1;
+          return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+        });
         sorted.forEach(function(c){
           var o = document.createElement("option");
           o.value = c.code;
           o.textContent = c.flag + " " + c.name;
           sel.appendChild(o);
         });
-        sel.value = "NG";
+        sel.value = "US";
       })();
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
