@@ -9309,5 +9309,293 @@ s0.parentNode.insertBefore(s1,s0);
       window.renderDashV2();
     })();
     </script>
+<!-- ================= TrybChat floating widget ================= -->
+<style>
+  #tcwBtn{ position:fixed; right:14px; bottom:96px; width:56px; height:56px; border-radius:50%; border:none; padding:0; background:#0B1132; box-shadow:0 10px 26px rgba(11,17,50,.38); z-index:300; display:none; cursor:pointer; }
+  #tcwBtn.on{ display:block; }
+  #tcwBtn img{ width:100%; height:100%; border-radius:50%; display:block; }
+  #tcwBtn .tcw-bdg{ position:absolute; top:-4px; right:-4px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:#F02849; color:#fff; font-size:11px; font-weight:800; display:grid; place-items:center; border:2px solid #fff; font-family:"Manrope",sans-serif; }
+  #tcwPanel{ position:fixed; left:10px; right:10px; bottom:86px; height:min(74dvh,640px); background:#fff; border-radius:22px; box-shadow:0 24px 60px rgba(11,17,50,.35); z-index:310; display:none; flex-direction:column; overflow:hidden; border:1px solid #E6E7EE; font-family:"Manrope",system-ui,sans-serif; color:#0B1132; }
+  #tcwPanel.on{ display:flex; }
+  @media (min-width:560px){ #tcwPanel{ left:auto; width:384px; right:20px; bottom:96px; } #tcwBtn{ right:20px; } }
+  .tcw-head{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #EFF0F5; background:#fff; flex:none; }
+  .tcw-logo{ width:36px; height:36px; border-radius:10px; display:block; flex:none; }
+  .tcw-head-main{ flex:1; min-width:0; }
+  .tcw-title{ font-weight:800; font-size:16.5px; color:#0B1132; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tcw-sub{ font-size:12px; color:#6B7086; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tcw-hbtn{ width:36px; height:36px; flex:none; border-radius:50%; border:1.5px solid #E6E7EE; background:#F2F3F8; color:#0B1132; display:grid; place-items:center; cursor:pointer; }
+  .tcw-body{ flex:1; overflow-y:auto; min-height:0; display:flex; flex-direction:column; }
+  .tcw-row{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:#fff; border:none; padding:12px 14px; cursor:pointer; font-family:inherit; color:inherit; }
+  .tcw-row:active{ background:#F8F9FC; }
+  .tcw-av{ width:48px; height:48px; border-radius:50%; background:#0B1132; color:#C9A24B; display:grid; place-items:center; font-weight:800; font-size:16px; flex:none; overflow:hidden; }
+  .tcw-av img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .tcw-main{ flex:1; min-width:0; }
+  .tcw-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .tcw-name{ font-weight:800; font-size:15px; color:#0B1132; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tcw-time{ font-size:11px; color:#9AA0BD; font-weight:600; flex:none; }
+  .tcw-last{ font-size:13px; color:#6B7086; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; display:flex; align-items:center; gap:6px; }
+  .tcw-row.unread .tcw-last{ color:#0B1132; font-weight:600; }
+  .tcw-unread{ margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:#0B1132; color:#fff; font-size:11.5px; font-weight:800; display:grid; place-items:center; flex:none; }
+  .tcw-empty{ text-align:center; color:#6B7086; font-size:13.5px; padding:30px 26px; line-height:1.6; }
+  .tcw-msgs{ flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:7px; }
+  .tcw-msg{ max-width:80%; padding:9px 12px; border-radius:18px; font-size:14px; line-height:1.45; word-wrap:break-word; white-space:pre-wrap; font-family:"Inter",system-ui,sans-serif; }
+  .tcw-msg.them{ background:#EFF0F5; align-self:flex-start; border-bottom-left-radius:5px; }
+  .tcw-msg.me{ background:#0B1132; color:#fff; align-self:flex-end; border-bottom-right-radius:5px; }
+  .tcw-msg .tcw-mt{ display:block; font-size:9.5px; opacity:.55; margin-top:3px; text-align:right; }
+  .tcw-msg .tcw-ms{ display:block; font-size:10.5px; font-weight:700; color:#9A7B2D; margin-bottom:2px; }
+  .tcw-msg img.tcw-photo{ display:block; max-width:190px; width:100%; border-radius:9px; margin:2px 0 3px; background:#E9ECF5; }
+  .tcw-voice{ display:inline-flex; align-items:center; gap:8px; }
+  .tcw-vplay{ width:30px; height:30px; flex:none; border-radius:50%; border:none; background:#C9A24B; color:#0B1132; font-size:12px; display:grid; place-items:center; cursor:pointer; }
+  .tcw-msg.them .tcw-vplay{ background:#0B1132; color:#C9A24B; }
+  .tcw-composer{ display:flex; gap:9px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid #EFF0F5; background:#fff; flex:none; align-items:center; }
+  .tcw-composer input{ flex:1; background:#EFF0F5; border:1.5px solid transparent; border-radius:999px; padding:11px 15px; font-size:14px; outline:none; color:#0B1132; font-family:inherit; min-width:0; }
+  .tcw-send{ width:43px; height:43px; flex:none; border-radius:50%; background:#0B1132; border:none; color:#fff; display:grid; place-items:center; cursor:pointer; }
+  .tcw-access{ padding:26px 22px; text-align:center; }
+  .tcw-access h4{ margin:0 0 8px; font-size:17px; }
+  .tcw-access p{ margin:0 0 16px; font-size:13.5px; color:#6B7086; line-height:1.6; }
+  .tcw-access a{ display:block; background:#0B1132; color:#fff; text-decoration:none; border-radius:13px; padding:13px; font-weight:800; font-size:14.5px; }
+</style>
+<button id="tcwBtn" type="button" aria-label="Open TrybChat"><img src="https://chat.trybnetwork.com/icon-192.png" alt=""><span class="tcw-bdg" id="tcwBadge" style="display:none;">0</span></button>
+<div id="tcwPanel" role="dialog" aria-label="TrybChat conversations">
+  <div class="tcw-head" id="tcwHeadList">
+    <img class="tcw-logo" src="https://chat.trybnetwork.com/icon-192.png" alt="">
+    <div class="tcw-head-main"><div class="tcw-title">TrybChat</div><div class="tcw-sub">Your conversations</div></div>
+    <button class="tcw-hbtn" id="tcwOpenApp" type="button" aria-label="Open the full TrybChat app"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></button>
+    <button class="tcw-hbtn" id="tcwClose" type="button" aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="tcw-head" id="tcwHeadThread" style="display:none;">
+    <button class="tcw-hbtn" id="tcwBack" type="button" aria-label="Back to conversations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <span class="tcw-av" id="tcwThreadAv" style="width:36px;height:36px;font-size:13px;">?</span>
+    <div class="tcw-head-main"><div class="tcw-title" id="tcwThreadName">Chat</div><div class="tcw-sub" id="tcwThreadSub"></div></div>
+    <button class="tcw-hbtn" id="tcwClose2" type="button" aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="tcw-body" id="tcwListView"><div id="tcwList"></div></div>
+  <div class="tcw-body" id="tcwThreadView" style="display:none;">
+    <div class="tcw-msgs" id="tcwMsgs"></div>
+    <div class="tcw-composer">
+      <input id="tcwInput" type="text" placeholder="Message…" autocomplete="off" maxlength="2000">
+      <button class="tcw-send" id="tcwSend" type="button" aria-label="Send"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21.8 12 3.4 3.6l-.01 6.53L14 12 3.39 13.87z"/></svg></button>
+    </div>
+  </div>
+  <div class="tcw-body" id="tcwAccessView" style="display:none;">
+    <div class="tcw-access">
+      <h4>TrybChat access</h4>
+      <p id="tcwAccessText">Your free month or membership has ended. Your TrybCoin stays in your wallet — renew in TrybChat to keep chatting.</p>
+      <a href="https://chat.trybnetwork.com" target="_blank" rel="noopener">Open TrybChat</a>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var LOGO = "https://chat.trybnetwork.com/icon-192.png";
+  var COMMUNITY = "00000000-0000-0000-0000-00000000c001";
+  var W = { user: null, chats: [], cur: null, msgs: [], chan: null, media: {}, profiles: {}, audio: null, audioPath: null, booted: false };
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function initials(n){ var p = String(n || "?").trim().split(/\s+/); return ((p[0] || "?").charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : "")).toUpperCase(); }
+  function fmtClock(ts){ var d = new Date(ts); var h = d.getHours(), m = d.getMinutes(); var ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return h + ":" + (m < 10 ? "0" : "") + m + " " + ap; }
+  function fmtTime(ts){ var d = new Date(ts), now = new Date(); if (d.toDateString() === now.toDateString()) return fmtClock(ts); var y = new Date(now); y.setDate(now.getDate() - 1); if (d.toDateString() === y.toDateString()) return "Yesterday"; return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
+  function fmtDur(s){ s = Math.max(0, Math.round(Number(s) || 0)); return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60); }
+  function ready(){ return typeof sb !== "undefined" && sb && sb.auth && W.user; }
+
+  function boot(){
+    if (typeof sb === "undefined" || !sb || !sb.auth){ setTimeout(boot, 1200); return; }
+    sb.auth.getUser().then(function(r){
+      if (r && r.data && r.data.user){
+        W.user = r.data.user;
+        if (!W.booted){ W.booted = true; $("tcwBtn").classList.add("on"); refreshBadge(); setInterval(refreshBadge, 45000); }
+      } else setTimeout(boot, 2500);
+    }).catch(function(){ setTimeout(boot, 2500); });
+  }
+  function display(c){
+    if (c.kind === "group"){
+      if (c.chat_id === COMMUNITY) return { name: c.title || "TrybNetwork Community", sub: "Community group", avName: "TN", avUrl: LOGO };
+      return { name: c.title || "Group", sub: (c.member_count || 0) + " members", avName: c.title || "G", avUrl: null };
+    }
+    return { name: c.peer_name || "TrybChat user", sub: c.peer_username ? "@" + c.peer_username : "", avName: c.peer_name || "?", avUrl: c.peer_avatar };
+  }
+  function avHTML(d, cls){
+    return d.avUrl ? '<img src="' + esc(d.avUrl) + '" alt="">' : esc(initials(d.avName));
+  }
+  function loadChats(){
+    return sb.rpc("tc_my_chats").then(function(res){ W.chats = res.data || []; renderList(); paintBadge(); }).catch(function(){});
+  }
+  function paintBadge(){
+    var t = 0; W.chats.forEach(function(c){ t += c.unread || 0; });
+    var b = $("tcwBadge");
+    if (t > 0){ b.textContent = t; b.style.display = "grid"; } else b.style.display = "none";
+  }
+  function refreshBadge(){ if (ready()) loadChats(); }
+  function renderList(){
+    var host = $("tcwList"); if (!host) return;
+    if (!W.chats.length){ host.innerHTML = '<div class="tcw-empty">No conversations yet.<br>Open TrybChat to add friends and start chatting.</div>'; return; }
+    var html = "";
+    W.chats.forEach(function(c){
+      var d = display(c);
+      var last;
+      if (c.last_kind === "voice") last = (c.last_sender === W.user.id ? "You: " : "") + "🎤 Voice message";
+      else if (c.last_kind === "photo") last = (c.last_sender === W.user.id ? "You: " : "") + "📷 " + (c.last_body || "Photo");
+      else last = c.last_body ? ((c.last_sender === W.user.id ? "You: " : "") + c.last_body) : "Say hello 👋";
+      html += '<button class="tcw-row' + (c.unread > 0 ? " unread" : "") + '" type="button" data-tcwchat="' + c.chat_id + '"><span class="tcw-av">' + avHTML(d) + '</span><span class="tcw-main"><span class="tcw-top"><span class="tcw-name">' + esc(d.name) + '</span><span class="tcw-time">' + esc(c.last_at ? fmtTime(c.last_at) : "") + '</span></span><span class="tcw-last"><span style="overflow:hidden;text-overflow:ellipsis;">' + esc(last) + "</span>" + (c.unread > 0 ? '<span class="tcw-unread">' + c.unread + "</span>" : "") + "</span></span></button>";
+    });
+    host.innerHTML = html;
+  }
+  function showView(v){
+    $("tcwListView").style.display = v === "list" ? "" : "none";
+    $("tcwThreadView").style.display = v === "thread" ? "" : "none";
+    $("tcwAccessView").style.display = v === "access" ? "" : "none";
+    $("tcwHeadList").style.display = v === "thread" ? "none" : "";
+    $("tcwHeadThread").style.display = v === "thread" ? "" : "none";
+  }
+  function openPanel(){
+    if (!ready()) return;
+    $("tcwPanel").classList.add("on");
+    $("tcwBtn").style.display = "none";
+    sb.rpc("tc_ensure_profile").then(function(){
+      return sb.rpc("tc_access");
+    }).then(function(res){
+      var a = res && res.data;
+      if (!a || !a.has_access){ showView("access"); return; }
+      showView("list");
+      loadChats();
+    }).catch(function(){ showView("list"); loadChats(); });
+  }
+  function closePanel(){
+    $("tcwPanel").classList.remove("on");
+    $("tcwBtn").style.display = "";
+    leaveThread();
+    showView("list");
+    refreshBadge();
+  }
+  function openThread(c){
+    W.cur = c; W.msgs = [];
+    var d = display(c);
+    $("tcwThreadAv").innerHTML = avHTML(d);
+    $("tcwThreadName").textContent = d.name;
+    $("tcwThreadSub").textContent = d.sub || "";
+    showView("thread");
+    loadMsgs(c.chat_id);
+    subscribe(c.chat_id);
+    sb.rpc("tc_mark_read", { p_chat: c.chat_id }).then(function(){ loadChats(); }).catch(function(){});
+  }
+  function leaveThread(){
+    if (W.chan){ try { sb.removeChannel(W.chan); } catch (e) {} W.chan = null; }
+    if (W.audio){ try { W.audio.pause(); } catch (e) {} W.audio = null; W.audioPath = null; }
+    W.cur = null;
+  }
+  function senderProfile(id){
+    if (W.profiles[id]) return Promise.resolve(W.profiles[id]);
+    return sb.from("tn_profiles").select("id, full_name, avatar_url").eq("id", id).maybeSingle().then(function(r){
+      W.profiles[id] = r.data || { full_name: "Member" };
+      return W.profiles[id];
+    }).catch(function(){ return { full_name: "Member" }; });
+  }
+  function loadMsgs(chatId){
+    sb.from("tc_messages").select("id, chat_id, sender_id, body, kind, media_path, media_duration, created_at").eq("chat_id", chatId).order("created_at", { ascending: true }).limit(300).then(function(res){
+      W.msgs = res.data || [];
+      var ids = {};
+      W.msgs.forEach(function(m){ if (m.sender_id !== W.user.id) ids[m.sender_id] = true; });
+      Promise.all(Object.keys(ids).map(senderProfile)).then(function(){ renderMsgs(); ensureMedia(); });
+    }).catch(function(){});
+  }
+  function subscribe(chatId){
+    leaveThreadChan();
+    try {
+      W.chan = sb.channel("tcw-rt-" + chatId).on("postgres_changes", { event: "INSERT", schema: "public", table: "tc_messages", filter: "chat_id=eq." + chatId }, function(pl){
+        var m = pl.new;
+        if (!m || !W.cur || W.cur.chat_id !== chatId) return;
+        if (W.msgs.some(function(x){ return x.id === m.id; })) return;
+        W.msgs.push(m);
+        senderProfile(m.sender_id).then(function(){ renderMsgs(); ensureMedia(); });
+        sb.rpc("tc_mark_read", { p_chat: chat_id }).catch(function(){});
+      }).subscribe();
+    } catch (e) { W.chan = null; }
+  }
+  function leaveThreadChan(){ if (W.chan){ try { sb.removeChannel(W.chan); } catch (e) {} W.chan = null; } }
+  function ensureMedia(){
+    var need = [];
+    W.msgs.forEach(function(m){ if ((m.kind === "photo" || m.kind === "voice") && m.media_path && !W.media[m.media_path]) need.push(m.media_path); });
+    if (!need.length) return;
+    sb.storage.from("tc-media").createSignedUrls(need, 3600).then(function(res){
+      (res.data || []).forEach(function(s, i){ if (s && s.signedUrl) W.media[need[i]] = s.signedUrl; });
+      renderMsgs();
+    }).catch(function(){});
+  }
+  function msgHTML(m){
+    var mine = m.sender_id === W.user.id;
+    var content = "";
+    if (m.kind === "photo" && m.media_path){
+      var u = W.media[m.media_path];
+      content += '<img class="tcw-photo" src="' + (u ? esc(u) : "") + '" alt="Photo">';
+    }
+    if (m.kind === "voice" && m.media_path){
+      var playing = W.audioPath === m.media_path && W.audio && !W.audio.paused;
+      content += '<span class="tcw-voice"><button class="tcw-vplay" type="button" data-tcwvoice="' + esc(m.media_path) + '">' + (playing ? "❚❚" : "▶") + '</button><span style="font-size:12.5px;font-weight:700;">' + esc(fmtDur(m.media_duration)) + "</span></span>";
+    }
+    if (m.body) content += esc(m.body);
+    var sender = "";
+    if (!mine && W.cur && W.cur.kind === "group"){
+      var p = W.profiles[m.sender_id];
+      sender = '<span class="tcw-ms">' + esc(p ? p.full_name : "Member") + "</span>";
+    }
+    return '<div class="tcw-msg ' + (mine ? "me" : "them") + '">' + sender + content + '<span class="tcw-mt">' + esc(fmtClock(m.created_at)) + "</span></div>";
+  }
+  function renderMsgs(){
+    var host = $("tcwMsgs"); if (!host) return;
+    host.innerHTML = W.msgs.map(msgHTML).join("");
+    host.scrollTop = host.scrollHeight;
+  }
+  function send(){
+    var inp = $("tcwInput");
+    var body = inp.value.trim();
+    if (!body || !W.cur) return;
+    var chatId = W.cur.chat_id;
+    inp.value = "";
+    sb.rpc("tc_send_message", { p_chat: chatId, p_body: body }).then(function(res){
+      var d = res.data;
+      if (!d || !d.ok){
+        if (d && d.error === "no_access"){ showView("access"); return; }
+        inp.value = body;
+        return;
+      }
+      if (!W.msgs.some(function(x){ return x.id === d.message_id; })){
+        W.msgs.push({ id: d.message_id, chat_id: chatId, sender_id: W.user.id, body: body, kind: "text", created_at: new Date().toISOString() });
+        renderMsgs();
+      }
+      loadChats();
+    }).catch(function(){ inp.value = body; });
+  }
+  $("tcwBtn").addEventListener("click", openPanel);
+  $("tcwClose").addEventListener("click", closePanel);
+  $("tcwClose2").addEventListener("click", closePanel);
+  $("tcwOpenApp").addEventListener("click", function(){ window.open("https://chat.trybnetwork.com", "_blank"); });
+  $("tcwBack").addEventListener("click", function(){ leaveThread(); showView("list"); loadChats(); });
+  $("tcwList").addEventListener("click", function(e){
+    var b = e.target.closest ? e.target.closest("[data-tcwchat]") : null;
+    if (!b) return;
+    var c = W.chats.find(function(x){ return x.chat_id === b.getAttribute("data-tcwchat"); });
+    if (c) openThread(c);
+  });
+  $("tcwMsgs").addEventListener("click", function(e){
+    var vb = e.target.closest ? e.target.closest("[data-tcwvoice]") : null;
+    if (!vb) return;
+    var path = vb.getAttribute("data-tcwvoice");
+    var url = W.media[path];
+    if (!url){ ensureMedia(); return; }
+    if (!W.audio) W.audio = new Audio();
+    if (W.audioPath === path && !W.audio.paused){ W.audio.pause(); renderMsgs(); return; }
+    if (W.audioPath !== path){ W.audio.src = url; W.audioPath = path; }
+    W.audio.onended = function(){ renderMsgs(); };
+    W.audio.onpause = function(){ renderMsgs(); };
+    W.audio.onplay = function(){ renderMsgs(); };
+    W.audio.play().catch(function(){});
+  });
+  $("tcwSend").addEventListener("click", send);
+  $("tcwInput").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); send(); } });
+  boot();
+})();
+</script>
+<!-- =============== /TrybChat floating widget =============== -->
+
 </body>
 </html>
