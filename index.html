@@ -8088,6 +8088,7 @@
                        channel: null, tickTimer: null, claimed: false, resultShown: false, syncing: false };
               duelShowShare();
               duelSubscribe();
+              duelStartWaitPoll();
             });
           });
         });
@@ -8095,7 +8096,15 @@
       function duelCancel(){
         if (!duel || duel.status !== "open" || duel.iAm !== "p1") return;
         var stake = duel.stake, id = duel.id;
-        sb.from("tn_duels").update({ status: "expired" }).eq("id", id).then(function(){
+        // Guarded: only expire if the row is STILL open in the database.
+        // If an opponent already joined (and this client missed the event),
+        // cancelling must never kill a live duel or strand their stake.
+        sb.from("tn_duels").update({ status: "expired" }).eq("id", id).eq("status", "open").select("id").then(function(up){
+          if (!up.data || !up.data.length){
+            toast("Opponent already joined", "This duel is live — it can't be cancelled now.");
+            duelRecheck();
+            return;
+          }
           state.main = round2(state.main + stake);
           persistWallet(); renderWallets();
           duelCleanup();
@@ -8224,6 +8233,10 @@
         } else if (row.status === "expired" && duel.status === "open"){
           duelCleanup(); closeDuelOverlay();
           toast("Duel expired", "The invite was cancelled.");
+        } else if (row.status === "expired" && duel.status === "active"){
+          duelCleanup(); closeDuelOverlay();
+          if (typeof refreshFromServer === "function") refreshFromServer();
+          toast("Duel ended", "This duel was closed — stakes returned. Check your Main Balance.");
         }
       }
       // ---- timeout (5 min, no move → forfeit) ----
@@ -8232,6 +8245,7 @@
         if (!duel) return;
         duel.tickTimer = setInterval(function(){
           if (!duel || duel.status !== "active") return;
+          duelSyncMoves(); // heal any move events missed while backgrounded
           var myTurn = duel.game === "ayo" ? ayoDuelIsMyTurn() : whotDuelIsMyTurn();
           if (!myTurn && !duel.claimed && Date.now() - duel.lastMoveAt > DUEL_MOVE_TIMEOUT_MS){
             duel.claimed = true;
@@ -8464,6 +8478,7 @@
                  channel: null, tickTimer: null, claimed: false, resultShown: false, syncing: false };
         duelShowShare();
         duelSubscribe();
+        duelStartWaitPoll();
       }
       function duelCheckOpen(){
         // on boot: if I created a duel that's still waiting, re-open the share
@@ -8493,9 +8508,38 @@
       }
       function duelCleanup(){
         duelStopTick();
+        duelStopWaitPoll();
         duelUnsubscribe();
         duel = null;
       }
+      // ---- waiting-state safety net ----
+      // Realtime updates fired while the app is backgrounded (e.g. the
+      // creator is in WhatsApp sharing the link) are lost — no replay.
+      // Poll the duel row while waiting so an accept is never missed,
+      // and re-check the moment the app comes back to the foreground.
+      function duelStartWaitPoll(){
+        duelStopWaitPoll();
+        if (!duel) return;
+        duel.waitTimer = setInterval(function(){
+          if (!duel || duel.status !== "open"){ duelStopWaitPoll(); return; }
+          duelRecheck();
+        }, 3500);
+      }
+      function duelStopWaitPoll(){
+        if (duel && duel.waitTimer){ clearInterval(duel.waitTimer); duel.waitTimer = null; }
+      }
+      function duelRecheck(){
+        if (!duel || !sb) return;
+        var id = duel.id;
+        sb.from("tn_duels").select("*").eq("id", id).maybeSingle().then(function(r){
+          if (!duel || duel.id !== id || !r.data) return;
+          if (r.data.status !== duel.status) duelOnDuelUpdate(r.data);
+          else if (duel.status === "active") duelSyncMoves();
+        }).catch(function(){});
+      }
+      document.addEventListener("visibilitychange", function(){
+        if (!document.hidden) duelRecheck();
+      });
       function initGames(){
         buildWheel();
         loadRecentPlays();
@@ -9338,6 +9382,8 @@ s0.parentNode.insertBefore(s1,s0);
   .tcw-unread{ margin-left:auto; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:#0B1132; color:#fff; font-size:11.5px; font-weight:800; display:grid; place-items:center; flex:none; }
   .tcw-empty{ text-align:center; color:#6B7086; font-size:13.5px; padding:30px 26px; line-height:1.6; }
   .tcw-msgs{ flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:7px; }
+  #tcwThreadView{ position:relative; }
+  .tcw-down{ position:absolute; right:12px; bottom:76px; width:36px; height:36px; border-radius:50%; border:1px solid #E6E7EE; background:#fff; color:#0B1132; box-shadow:0 6px 18px rgba(11,17,50,.18); display:grid; place-items:center; cursor:pointer; z-index:5; }
   .tcw-msg{ max-width:80%; padding:9px 12px; border-radius:18px; font-size:14px; line-height:1.45; word-wrap:break-word; white-space:pre-wrap; font-family:"Inter",system-ui,sans-serif; }
   .tcw-msg.them{ background:#EFF0F5; align-self:flex-start; border-bottom-left-radius:5px; }
   .tcw-msg.me{ background:#0B1132; color:#fff; align-self:flex-end; border-bottom-right-radius:5px; }
@@ -9373,6 +9419,7 @@ s0.parentNode.insertBefore(s1,s0);
   <div class="tcw-body" id="tcwListView"><div id="tcwList"></div></div>
   <div class="tcw-body" id="tcwThreadView" style="display:none;">
     <div class="tcw-msgs" id="tcwMsgs"></div>
+    <button class="tcw-down" id="tcwDown" type="button" style="display:none;" aria-label="Jump to latest message"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
     <div class="tcw-composer">
       <input id="tcwInput" type="text" placeholder="Message…" autocomplete="off" maxlength="2000">
       <button class="tcw-send" id="tcwSend" type="button" aria-label="Send"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21.8 12 3.4 3.6l-.01 6.53L14 12 3.39 13.87z"/></svg></button>
@@ -9547,8 +9594,17 @@ s0.parentNode.insertBefore(s1,s0);
   }
   function renderMsgs(){
     var host = $("tcwMsgs"); if (!host) return;
+    var stick = host.scrollHeight - host.scrollTop - host.clientHeight < 220 ||
+      (W.msgs.length && W.msgs[W.msgs.length - 1].sender_id === W.user.id);
     host.innerHTML = W.msgs.map(msgHTML).join("");
-    host.scrollTop = host.scrollHeight;
+    if (stick) host.scrollTop = host.scrollHeight;
+    paintTcwDown();
+  }
+  function paintTcwDown(){
+    var host = $("tcwMsgs"), btn = $("tcwDown");
+    if (!host || !btn) return;
+    var gap = host.scrollHeight - host.scrollTop - host.clientHeight;
+    btn.style.display = gap >= 220 && W.cur ? "grid" : "none";
   }
   function send(){
     var inp = $("tcwInput");
@@ -9593,6 +9649,12 @@ s0.parentNode.insertBefore(s1,s0);
     W.audio.onpause = function(){ renderMsgs(); };
     W.audio.onplay = function(){ renderMsgs(); };
     W.audio.play().catch(function(){});
+  });
+  $("tcwMsgs").addEventListener("scroll", paintTcwDown);
+  $("tcwDown").addEventListener("click", function(){
+    var host = $("tcwMsgs");
+    host.scrollTo({ top: host.scrollHeight, behavior: "smooth" });
+    setTimeout(paintTcwDown, 380);
   });
   $("tcwSend").addEventListener("click", send);
   $("tcwInput").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); send(); } });
