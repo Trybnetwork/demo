@@ -4476,8 +4476,8 @@
       window.addEventListener("focus", attemptEarnClaim);
       document.addEventListener("visibilitychange", function(){ if (!document.hidden) attemptEarnClaim(); });
       $("earnCompletedBtn").addEventListener("click", function(){
-        $("proofShareBtn").href = ADMIN_TG_DM;
-        $("proofPop").hidden = false;
+        // Promo submit: record the request, then take them straight to Telegram.
+        window.open(ADMIN_TG_DM, "_blank", "noopener");
         if (sb && currentUser){
           // Promo video only (500 TN) — the other tasks now credit automatically.
           // One pending request per user — the unique index rejects duplicates.
