@@ -6282,10 +6282,11 @@
           }).catch(function(){ fail("Couldn't reach the server — check your connection and try again."); });
         }
         if (idv.indexOf("@") > -1){ doSignIn(idv); return; }
-        // Username login: resolve the account's email first.
-        sb.from("tn_profiles").select("email").eq("username", idv.replace(/^@+/, "")).maybeSingle().then(function(res){
-          if (!res.data || !res.data.email){ fail("Wrong username/email or password — check your details and try again."); return; }
-          doSignIn(res.data.email);
+        // Username login: resolve the account's email first (via the
+        // tn_email_for_username RPC — anonymous table reads are locked down).
+        sb.rpc("tn_email_for_username", { p_username: idv.replace(/^@+/, "") }).then(function(res){
+          if (res.error || !res.data){ fail("Wrong username/email or password — check your details and try again."); return; }
+          doSignIn(res.data);
         }).catch(function(){ fail("Couldn't reach the server — check your connection and try again."); });
       });
       $("menuLogout").addEventListener("click", function(){
