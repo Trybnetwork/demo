@@ -447,6 +447,10 @@
       a.earn-task .earn-task-sub{color:#6B7280}
       .earn-task-sub{font-size:13px;color:var(--muted);margin-top:2px}
       .earn-task-reward{font-weight:800;color:#C9A24B;font-size:15px;white-space:nowrap}
+      .earn-task.done{opacity:.55}
+      .earn-task.done .earn-task-reward{color:#2FBF71}
+      .earn-task .earn-manual-tag{font-size:10.5px;font-weight:800;letter-spacing:.4px;color:#8A6D1F;background:rgba(201,162,75,.16);border:1px solid rgba(201,162,75,.45);padding:2px 7px;border-radius:99px;margin-left:8px;white-space:nowrap;vertical-align:2px}
+      .earn-promo-note{margin:18px 16px 0;font-size:13px;color:var(--muted);text-align:center;line-height:1.55}
       .coin-chip{cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:rgba(201,162,75,.12);border:1px solid rgba(201,162,75,.45);color:#C9A24B;font-weight:800}
       .coin-chip:active{transform:scale(.95)}
       .coin-3d{width:20px;height:20px;border-radius:50%;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
@@ -2699,7 +2703,7 @@
         <div class="view-title">Earn TrybCoin</div>
         <button class="info-btn" data-info="earnInfo" type="button" aria-label="Info">?</button>
       </div>
-      <div class="info-pop" id="earnInfo" hidden>Complete tasks, send proof on Telegram, and earn TrybCoin. 1,000 TrybCoin = $1.00 — convert to your Main Balance once you reach 1,000.</div>
+      <div class="info-pop" id="earnInfo" hidden>Tap a task to open it — when you come back, your TrybCoin credits automatically. Each task pays once per account. The promo video is reviewed manually. 1,000 TrybCoin = $1.00 of spending power inside the app.</div>
       <div class="earn-balance">
         <div class="earn-coin"><img src="./trybcoin.png" alt="TrybCoin" style="width:64px;height:64px;border-radius:50%;"></div>
         <div class="earn-bal-num"><span id="trybcoinBal">0</span> <small>TrybCoin</small></div>
@@ -2708,12 +2712,13 @@
         <div class="earn-threshold" id="convertHint">Reach 1,000 TrybCoin to convert.</div>
       </div>
       <div class="earn-tasks" id="earnTasks"></div>
-      <button class="btn btn-gold" id="earnCompletedBtn" type="button" style="margin:16px auto;display:block;width:calc(100% - 32px);max-width:420px;padding:15px;font-size:16px;">Completed</button>
+      <div class="earn-promo-note">The <b>promo video (500 TN)</b> is the only manual task: post your video, submit it here, then share proof with the admin.</div>
+      <button class="btn btn-gold" id="earnCompletedBtn" type="button" style="margin:12px auto 16px;display:block;width:calc(100% - 32px);max-width:420px;padding:15px;font-size:16px;">Submit promo video for review</button>
       <div class="coin-pop" id="proofPop" hidden>
         <div class="coin-pop-card">
           <div class="coin-pop-coin"><img src="./trybcoin.png" alt="TrybCoin" style="width:64px;height:64px;border-radius:50%;"></div>
-          <div class="coin-pop-bal" style="font-size:20px;">Tasks completed!</div>
-          <div class="coin-pop-sub">Send proof of completion (screenshots) to the admin on Telegram to receive your TrybCoin.</div>
+          <div class="coin-pop-bal" style="font-size:20px;">Promo submitted!</div>
+          <div class="coin-pop-sub">Send your promo video link (or screenshots) to the admin on Telegram. Once it's verified, 500 TrybCoin lands in your balance.</div>
           <a class="btn btn-gold" id="proofShareBtn" href="https://t.me/Trybnetwork" target="_blank" rel="noopener" style="width:100%;display:block;">Share proof</a>
           <button class="btn ghost" id="proofPopClose" type="button" style="width:100%;margin-top:10px;">Close</button>
         </div>
@@ -4352,33 +4357,79 @@
       var TRYBCOIN_RATE = 1000;      // 1000 TrybCoin = $1.00
       var TRYBCOIN_THRESHOLD = 1000; // min to convert
       var EARN_TASKS = [
-        { ico: '<img src="./icon-telegram.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Join our Telegram", sub: "Join the TrybNetwork Telegram group", reward: 50, link: "https://t.me/Trybnetwork" },
-        { ico: '<img src="./icon-facebook.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Follow on Facebook", sub: "Follow the TrybNetwork Facebook page", reward: 50, link: "https://www.facebook.com/share/19ULzKcKVm/?mibextid=wwXIfr" },
-        { ico: '<img src="./icon-tiktok.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Follow on TikTok", sub: "Follow @tryb.network on TikTok", reward: 50, link: "https://www.tiktok.com/@tryb.network" },
-        { ico: '<img src="./icon-tiktok.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Reshare TikTok post", sub: "Reshare a TrybNetwork TikTok post", reward: 50, link: "https://www.tiktok.com/@tryb.network" },
-        { ico: '<img src="./icon-facebook.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Reshare Facebook post", sub: "Share a TrybNetwork Facebook post", reward: 50, link: "https://www.facebook.com/share/19ULzKcKVm/?mibextid=wwXIfr" },
-        { ico: "\uD83D\uDD17", title: "Share link to 5+ friends", sub: "Share your referral link with at least 5 friends", reward: 100, link: null },
-        { ico: '<img src="./icon-x.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Follow us on X", sub: "Follow @trybnetwork on X", reward: 50, link: "https://x.com/trybnetwork" },
-        { ico: '<img src="./icon-whatsapp.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Join WhatsApp Channel", sub: "Follow the TrybNetwork WhatsApp channel", reward: 50, link: "https://whatsapp.com/channel/0029VbDTWprLdQefEmzMI73V" },
-        { ico: '<img src="./icon-youtube.png" alt="" style="width:38px;height:38px;border-radius:10px;">', title: "Subscribe on YouTube", sub: "Subscribe to the TrybNetwork YouTube channel", reward: 50, link: "https://youtube.com/@trybnetwork" },
-        { ico: "\uD83C\uDFA5", title: "Promo video", sub: "Record a video about TrybNetwork and post on TikTok or WhatsApp Status", reward: 500, link: null }
+        { ico: '<img src="./icon-telegram.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "telegram", title: "Join our Telegram", sub: "Join the TrybNetwork Telegram group", reward: 50, link: "https://t.me/Trybnetwork" },
+        { ico: '<img src="./icon-facebook.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "facebook", title: "Follow on Facebook", sub: "Follow the TrybNetwork Facebook page", reward: 50, link: "https://www.facebook.com/share/19ULzKcKVm/?mibextid=wwXIfr" },
+        { ico: '<img src="./icon-tiktok.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "tiktok", title: "Follow on TikTok", sub: "Follow @tryb.network on TikTok", reward: 50, link: "https://www.tiktok.com/@tryb.network" },
+        { ico: '<img src="./icon-tiktok.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "tiktok_reshare", title: "Reshare TikTok post", sub: "Reshare a TrybNetwork TikTok post", reward: 50, link: "https://www.tiktok.com/@tryb.network" },
+        { ico: '<img src="./icon-facebook.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "facebook_reshare", title: "Reshare Facebook post", sub: "Share a TrybNetwork Facebook post", reward: 50, link: "https://www.facebook.com/share/19ULzKcKVm/?mibextid=wwXIfr" },
+        { ico: "\uD83D\uDD17", id: "share_link", title: "Share link to 5+ friends", sub: "Share your referral link with at least 5 friends", reward: 100, link: null },
+        { ico: '<img src="./icon-x.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "x", title: "Follow us on X", sub: "Follow @trybnetwork on X", reward: 50, link: "https://x.com/trybnetwork" },
+        { ico: '<img src="./icon-whatsapp.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "whatsapp", title: "Join WhatsApp Channel", sub: "Follow the TrybNetwork WhatsApp channel", reward: 50, link: "https://whatsapp.com/channel/0029VbDTWprLdQefEmzMI73V" },
+        { ico: '<img src="./icon-youtube.png" alt="" style="width:38px;height:38px;border-radius:10px;">', id: "youtube", title: "Subscribe on YouTube", sub: "Subscribe to the TrybNetwork YouTube channel", reward: 50, link: "https://youtube.com/@trybnetwork" },
+        { ico: "\uD83C\uDFA5", id: "promo", manual: true, title: "Promo video", sub: "Record a video about TrybNetwork and post on TikTok or WhatsApp Status", reward: 500, link: null }
       ];
       var earnCoinBal = 0;
       var ADMIN_TG_DM = "https://t.me/Trybnetwork"; // admin DM for proof submissions
+      var earnClaimed = {};
+      var earnIpLocked = {};
+      function earnPendingGet(){ try { return JSON.parse(sessionStorage.getItem("tn_earn_pending") || "null"); } catch(e){ return null; } }
+      function earnPendingSet(id){ try { sessionStorage.setItem("tn_earn_pending", JSON.stringify({ id: id, at: Date.now() })); } catch(e){} }
+      function earnPendingClear(){ try { sessionStorage.removeItem("tn_earn_pending"); } catch(e){} }
+      function loadEarnClaims(){
+        if (!sb || !currentUser) return Promise.resolve();
+        return sb.from("tn_task_claims").select("task_id").eq("user_id", currentUser.id).then(function(r){
+          earnClaimed = {};
+          (r.data || []).forEach(function(row){ earnClaimed[row.task_id] = true; });
+        });
+      }
       function renderEarn(){
-        var html = "";
-        for (var i = 0; i < EARN_TASKS.length; i++){
-          var t = EARN_TASKS[i];
-          var inner = '<div class="earn-task-ico">' + t.ico + '</div>' +
-            '<div class="earn-task-body"><div class="earn-task-title">' + t.title + '</div>' +
-            '<div class="earn-task-sub">' + t.sub + '</div></div>' +
-            '<div class="earn-task-reward">+' + t.reward + '</div>';
-          html += t.link
-            ? '<a class="earn-task" href="' + t.link + '" target="_blank" rel="noopener">' + inner + '</a>'
-            : '<div class="earn-task">' + inner + '</div>';
-        }
-        $("earnTasks").innerHTML = html;
-        loadTrybcoin();
+        loadEarnClaims().then(function(){
+          var html = "";
+          for (var i = 0; i < EARN_TASKS.length; i++){
+            var t = EARN_TASKS[i];
+            var mine = !!earnClaimed[t.id];
+            var ipLocked = !mine && !!earnIpLocked[t.id];
+            var done = mine || ipLocked;
+            var reward = '<div class="earn-task-reward">' + (mine ? "✓ +" : "+") + t.reward + '</div>';
+            var tag = t.manual ? '<span class="earn-manual-tag">MANUAL REVIEW</span>' : '';
+            var sub = mine ? "Completed — reward credited." : ipLocked ? "Already claimed on this connection." : t.sub;
+            var inner = '<div class="earn-task-ico">' + t.ico + '</div>' +
+              '<div class="earn-task-body"><div class="earn-task-title">' + t.title + tag + '</div>' +
+              '<div class="earn-task-sub">' + sub + '</div></div>' + reward;
+            if (done || t.manual) html += '<div class="earn-task' + (done ? " done" : "") + '">' + inner + '</div>';
+            else if (t.link) html += '<a class="earn-task" data-task="' + t.id + '" href="' + t.link + '" target="_blank" rel="noopener">' + inner + '</a>';
+            else html += '<div class="earn-task" data-task="' + t.id + '" style="cursor:pointer;">' + inner + '</div>';
+          }
+          $("earnTasks").innerHTML = html;
+          loadTrybcoin();
+          attemptEarnClaim();
+        });
+      }
+      function attemptEarnClaim(){
+        var p = earnPendingGet();
+        if (!p || !sb || !currentUser) return;
+        if (Date.now() - p.at < 5000) return;
+        if (Date.now() - p.at > 30 * 60000){ earnPendingClear(); return; }
+        var id = p.id;
+        earnPendingClear();
+        sb.rpc("tn_claim_task", { p_task: id }).then(function(res){
+          var t = null;
+          for (var i = 0; i < EARN_TASKS.length; i++) if (EARN_TASKS[i].id === id) t = EARN_TASKS[i];
+          if (res.error){ toast("TrybCoin", "Could not verify that task just now — tap it and come back again."); return; }
+          var d = res.data || {};
+          if (d.status === "credited"){
+            earnClaimed[id] = true;
+            if (typeof d.balance === "number") earnCoinBal = d.balance;
+            toast("+" + d.reward + " TrybCoin", (t ? t.title : "Task") + " — credited automatically.");
+          } else if (d.status === "already_user"){
+            earnClaimed[id] = true;
+            toast("Already claimed", "Each task pays once per account.");
+          } else if (d.status === "already_ip"){
+            earnIpLocked[id] = true;
+            toast("Already claimed", "This task was already claimed on this connection.");
+          }
+          renderEarn();
+        });
       }
       function loadTrybcoin(){
         if (!sb || !currentUser) return;
@@ -4386,11 +4437,7 @@
           earnCoinBal = (r.data && r.data.trybcoin) || 0;
           $("trybcoinBal").textContent = earnCoinBal.toLocaleString();
           $("trybcoinUsd").textContent = (earnCoinBal / TRYBCOIN_RATE).toFixed(2);
-          var ok = earnCoinBal >= TRYBCOIN_THRESHOLD;
-
-          $("convertHint").textContent = ok
-            ? "You can convert " + earnCoinBal.toLocaleString() + " TrybCoin → $" + (earnCoinBal / TRYBCOIN_RATE).toFixed(2) + "."
-            : "Reach " + TRYBCOIN_THRESHOLD.toLocaleString() + " TrybCoin to convert (" + earnCoinBal.toLocaleString() + " so far).";
+          $("convertHint").textContent = "Spend TrybCoin on trades, games and miners — profits land in your Main Balance.";
         });
       }
       // Back buttons: [data-go="view"] navigates to that view
@@ -4414,13 +4461,27 @@
       $("coinPopClose").addEventListener("click", function(){ $("coinPop").hidden = true; });
       $("coinPop").addEventListener("click", function(e){ if (e.target === $("coinPop")) $("coinPop").hidden = true; });
 
+      $("earnTasks").addEventListener("click", function(e){
+        var row = e.target.closest("[data-task]");
+        if (!row) return;
+        var id = row.getAttribute("data-task");
+        earnPendingSet(id);
+        if (id === "share_link"){
+          var url = "https://app.trybnetwork.com/?ref=" + ((typeof state !== "undefined" && state.refCode && state.refCode !== "—") ? state.refCode : "");
+          if (navigator.share){ navigator.share({ title: "TrybNetwork", text: "Trade, mine, play and earn on TrybNetwork:", url: url }).catch(function(){}); }
+          else if (navigator.clipboard){ navigator.clipboard.writeText(url); toast("Link copied", "Share it with 5+ friends — your reward credits in a few seconds."); }
+          setTimeout(attemptEarnClaim, 6000);
+        }
+      });
+      window.addEventListener("focus", attemptEarnClaim);
+      document.addEventListener("visibilitychange", function(){ if (!document.hidden) attemptEarnClaim(); });
       $("earnCompletedBtn").addEventListener("click", function(){
         $("proofShareBtn").href = ADMIN_TG_DM;
         $("proofPop").hidden = false;
         if (sb && currentUser){
-          var total = EARN_TASKS.reduce(function(s, t){ return s + t.reward; }, 0);
+          // Promo video only (500 TN) — the other tasks now credit automatically.
           // One pending request per user — the unique index rejects duplicates.
-          sb.from("tn_coin_requests").insert({ user_id: currentUser.id, coins: total })
+          sb.from("tn_coin_requests").insert({ user_id: currentUser.id, coins: 500 })
             .then(function(res){
               if (res.error && !/duplicate|unique/i.test(res.error.message || "")){
                 toast("Notice", "Could not send your coin request — try again.");
