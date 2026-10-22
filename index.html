@@ -1014,7 +1014,7 @@
       .v2-sheet h3{ color:#0B1132; }
       .v2-sheet .sheet-sub{ color:#6B7086 !important; }
       .v2-opt-row{ display:flex; align-items:center; gap:14px; width:100%; text-align:left; border:1.5px solid #E6E7EE; border-radius:16px; padding:15px 16px; margin-bottom:11px; background:#fff; cursor:pointer; font-family:inherit; color:#0B1132; }
-      /* ---------- Fixed Investment (Grow-style page) ---------- */
+      /* ---------- Fixed Savings (Grow-style page) ---------- */
       .fi-total-label{ font-size:12px; font-weight:700; letter-spacing:1.6px; color:#8A8FA8; text-transform:uppercase; margin:24px 16px 6px; }
       .fi-total{ font-size:44px; font-weight:800; color:#0B1132; margin:0 16px; line-height:1.05; }
       .fi-total-sub{ color:#6B7086; font-size:13.5px; margin:8px 16px 0; }
@@ -1032,9 +1032,17 @@
       .fi-lot-right{ text-align:right; }
       .fi-lot-earn{ color:#1E9E57; font-weight:700; font-size:14.5px; }
       .fi-countdown{ font-weight:800; color:#0B1132; white-space:nowrap; }
+      .fi-total-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-right:16px; }
+      .fi-total-row .fi-total{ margin:0 0 0 16px; }
+      .fi-total-row .fi-cta{ flex:0 0 auto; white-space:nowrap; padding:12px 22px; font-size:14.5px; }
+      .fi-actions{ display:flex; flex-direction:column; align-items:flex-end; gap:7px; flex:0 0 auto; }
+      #investView .info-btn{ border-color:#E6E7EE; color:#6B7086; background:#FFFFFF; }
+      #investView .info-btn[aria-expanded="true"]{ background:#EEF0FA; color:#0B1132; border-color:#DDE1F2; }
+      #investView .info-pop{ background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:14px; padding:12px 14px; color:#6B7086; font-size:13px; line-height:1.55; margin:12px 16px 0; }
+      #investView .info-pop b{ color:#0B1132; }
       #investView{ padding-bottom:120px; }
       #investView .view-title{ flex:1; font-family:"Manrope",sans-serif; font-size:26px; font-weight:800; color:#0B1132; }
-      /* Fixed Investment sheet — global (light) sheet language, same as the fund sheet */
+      /* Fixed Savings sheet — global (light) sheet language, same as the fund sheet */
       #investOverlay{ background:rgba(5,7,26,.55); }
       #investOverlay .sheet{ background:#FFFFFF; color:#0B1132; border:1.5px solid #E6E7EE; border-bottom:0; border-radius:26px 26px 0 0; padding:12px 22px calc(26px + env(safe-area-inset-bottom)); max-height:88dvh; overflow-y:auto; box-shadow:0 18px 50px rgba(11,17,50,.16); max-width:430px; }
       @media (min-width:640px){ #investOverlay .sheet{ border-radius:26px; border-bottom:1.5px solid #E6E7EE; } }
@@ -2390,7 +2398,7 @@
 
     <div class="overlay" id="investOverlay">
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="investTitle">
-        <h3 id="investTitle">Fixed Investment</h3>
+        <h3 id="investTitle">Fixed Savings</h3>
         <p class="sheet-sub">Lock an amount from your <b>Main Balance</b> for a fixed term. At maturity, your principal plus the earnings land back in your Main Balance automatically. Locked funds can't be withdrawn early. Minimum lock is <b>$10</b>.</p>
         <div id="fiTiers"></div>
         <div class="pack-form" id="fiForm" style="display:none;">
@@ -2406,7 +2414,7 @@
         <div class="sheet-err" id="fiErr"></div>
         <div class="sheet-btns">
           <button class="btn ghost" id="fiClose" type="button">Cancel</button>
-          <button class="btn" id="fiConfirm" type="button" style="display:none;">Lock investment</button>
+          <button class="btn" id="fiConfirm" type="button" style="display:none;">Lock savings</button>
         </div>
       </div>
     </div>
@@ -2606,8 +2614,8 @@
             <div class="faq-a">Buy a miner from the Mining card — put in any amount from <b>$5 to $50,000</b> and it earns <b>2% of it every 24 hours</b>. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. A miner contract lasts <b>5 months</b> from purchase — when it expires, the miner stops earning and you'll need to buy a new one to keep mining; profits already earned stay yours to cash out. Profits unlock for cashout <b>7 days</b> after purchase, then <b>weekly</b> after each cashout. Buying a miner is a straight purchase — the amount you put in is spent on the rig and isn't returned. Cashout moves your mining profits into Main Balance and never closes your miner.</div>
           </div>
           <div class="faq-item">
-            <button class="faq-q" type="button">How does Fixed Investment work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Find it under <b>Explore → Fixed Investment</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>1 month earns 2%, 3 months earns 5%, 5 months earns 12%, and 365 days earns 26%</b> — the percentage is the total return over the whole term, so $100 locked for 5 months earns $12. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
+            <button class="faq-q" type="button">How does Fixed Savings work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+            <div class="faq-a">Find it under <b>Explore → Fixed Savings</b>. Lock any amount from <b>$10</b> out of your Main Balance for a fixed term: <b>1 month earns 2%, 3 months earns 5%, 5 months earns 12%, and 365 days earns 26%</b> — the percentage is the total return over the whole term, so $100 locked for 5 months earns $12. Locked funds can't be withdrawn early; at maturity your principal and earnings return to your Main Balance automatically.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">Where do mining returns come from?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -2684,20 +2692,18 @@
 
     <div id="investView" style="display:none;">
       <div class="view-head">
-        <div class="view-title">Fixed Investment</div>
+        <div class="view-title">Fixed Savings</div>
       </div>
-      <div class="fi-total-label">Total Invested</div>
-      <div class="fi-total num" id="fiTotal">$0.00</div>
-      <p class="fi-total-sub" id="fiTotalSub">No active investments</p>
-      <div class="fi-card">
-        <h3>Fixed Investment</h3>
-        <p class="fi-card-sub">Lock funds for a term &amp; earn fixed returns</p>
-        <div class="fi-dash">
-          <div class="fi-badge">%</div>
-          <p>Start a fixed investment and set money aside to grow — terms from 1 month to 365 days, up to <b>26% returns</b>. Your principal and earnings return to your Main Balance at maturity.</p>
-          <button class="fi-cta" id="fiStartBtn" type="button">Start Investing</button>
+      <div class="fi-total-label">Total Saved</div>
+      <div class="fi-total-row">
+        <div class="fi-total num" id="fiTotal">$0.00</div>
+        <div class="fi-actions">
+          <button class="info-btn" id="fiInfoBtn" type="button" aria-expanded="false" aria-controls="fiInfo" aria-label="About Fixed Savings">?</button>
+          <button class="fi-cta" id="fiStartBtn" type="button">Save</button>
         </div>
       </div>
+      <div class="info-pop" id="fiInfo" hidden>Lock funds for a term &amp; earn fixed returns. Start a fixed savings and set money aside to grow — terms from 1 month to 365 days, up to <b>26% returns</b>. Your principal and earnings return to your Main Balance at maturity.</div>
+      <p class="fi-total-sub" id="fiTotalSub">No active savings</p>
       <div id="fiList"></div>
       <span class="fi-activity-pill" id="fiEmptyPill">No activity yet</span>
     </div>
@@ -3525,8 +3531,8 @@
         });
       }
 
-      /* ================= Fixed Investment =================
-         A separate package (Explore → Fixed Investment). A lock is a row
+      /* ================= Fixed Savings =================
+         A separate package (Explore → Fixed Savings). A lock is a row
          in tn_savings_lots: amount = principal, unlock_at = maturity.
          The term (and its rate) is recovered from unlock_at − created_at,
          so no extra columns are needed. The rate is a TERM return — the
@@ -3571,7 +3577,7 @@
               state.main = Math.round((state.main + back) * 100) / 100;
               state.investments = state.investments.filter(function(x){ return x.id !== lot.id; });
               return persistWallet().then(function(){
-                toast("Investment matured", fmtUSD(lot.amount) + " + " + fmtUSD(lot.yieldAmt) + " earnings returned to your Main Balance.");
+                toast("Savings matured", fmtUSD(lot.amount) + " + " + fmtUSD(lot.yieldAmt) + " earnings returned to your Main Balance.");
                 renderWallets();
                 renderInvestments();
               });
@@ -3580,7 +3586,7 @@
         });
         chain.then(function(){ investSettling = false; });
       }
-      /* Live countdown to maturity on each active investment card —
+      /* Live countdown to maturity on each active savings card —
          text like "364d 23h 59m 12s left", ticked by the 1s loop. */
       function fiCountdownText(ms){
         if (ms <= 0) return "Maturing\u2026";
@@ -3607,8 +3613,8 @@
         totalEl.textContent = fmtUSD(total);
         var sub = $("fiTotalSub");
         if (sub) sub.textContent = lots.length
-          ? lots.length + (lots.length === 1 ? " active investment" : " active investments") + " · " + fmtUSD(exp) + " expected earnings at maturity"
-          : "No active investments";
+          ? lots.length + (lots.length === 1 ? " active savings" : " active savings") + " · " + fmtUSD(exp) + " expected earnings at maturity"
+          : "No active savings";
         var pill = $("fiEmptyPill");
         if (pill) pill.style.display = lots.length ? "none" : "";
         var box = $("fiList");
@@ -4974,7 +4980,7 @@
           renderWallets();
           renderInvestments();
           closeInvestSheet();
-          toast("Investment locked", fmtUSD(amt) + " locked for " + t.label.toLowerCase() + " at " + t.rate + "% return — " + fmtUSD(Math.round((amt + investYield(amt, t)) * 100) / 100) + " returns to your Main Balance on " + fmtContractDate(unlockAt) + ".");
+          toast("Savings locked", fmtUSD(amt) + " locked for " + t.label.toLowerCase() + " at " + t.rate + "% return — " + fmtUSD(Math.round((amt + investYield(amt, t)) * 100) / 100) + " returns to your Main Balance on " + fmtContractDate(unlockAt) + ".");
         }).catch(function(){
           fiBusy = false;
           state.main = prevMain;
@@ -4984,6 +4990,14 @@
         });
       }
       $("fiStartBtn").addEventListener("click", openInvestSheet);
+      var fiInfoBtn = $("fiInfoBtn");
+      if (fiInfoBtn) fiInfoBtn.addEventListener("click", function(){
+        var pop = $("fiInfo");
+        if (!pop) return;
+        var open = pop.hidden;
+        pop.hidden = !open;
+        fiInfoBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
       $("fiClose").addEventListener("click", closeInvestSheet);
       $("fiConfirm").addEventListener("click", createInvestment);
       $("fiAmount").addEventListener("input", updateFiPreview);
@@ -8697,7 +8711,7 @@ s0.parentNode.insertBefore(s1,s0);
         </button>
         <button class="v2-opt-row" id="v2GoInvest" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-6M9 20V6M14 20v-9M19 20V3M2 20h20"/></svg></span>
-          <span class="v2-opt-main"><span class="v2-opt-title">Fixed Investment</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% returns</div></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">Fixed Savings</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% returns</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
         <button class="v2-sheet-close" type="button" data-v2close="v2ExploreOverlay">Close</button>
