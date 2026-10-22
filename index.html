@@ -1291,7 +1291,7 @@
       /* --- Dock everywhere: the tabbar lives outside #appView now, so it floats over every view ---
          Clear its height (~84px incl. offset) at the bottom of each view so end-of-view controls
          (binary stake/High-Low, Aviator bet, Spin button, Whot/Ayo bottom bars, Earn tasks) stay reachable. */
-      #txHistoryView, #binaryView, #aviatorView, #spinView, #whotView, #ayoView, #earnView{ padding-bottom:110px; }
+      #txHistoryView, #binaryView, #aviatorView, #spinView, #whotView, #ayoView, #earnView, #trybchatView{ padding-bottom:110px; }
 
 
     
@@ -1304,7 +1304,7 @@
          the Aviator sky + plane, the Spin wheel SVG + hub, the Whot felt-table photo, card faces and
          deep-red backs, the suit picker on the table, and the whole Ayo wooden board (table, topbar,
          turn banner, pits, seeds). Buttons that are plain .btn already follow the global navy rule. */
-      #binaryView, #aviatorView, #spinView, #whotView, #ayoView, #earnView{ color:#0B1132; }
+      #binaryView, #aviatorView, #spinView, #whotView, #ayoView, #earnView, #trybchatView{ color:#0B1132; }
 
       /* --- view headers (back row, title, mute) --- */
       #binaryView .txh-head h2, #aviatorView .txh-head h2, #spinView .txh-head h2, #whotView .txh-head h2{
@@ -1511,6 +1511,39 @@
       #earnView .earn-task-title{ color:#0B1132; }
       #earnView .earn-task-sub{ color:#6B7086; }
       #earnView .earn-task-reward{ color:#9A7B2D; }
+
+      /* --- TrybChat preview view --- */
+      #trybchatView .view-head{ display:flex; align-items:center; gap:12px; margin-top:18px; }
+      #trybchatView .view-title{ flex:1; font-family:"Manrope",sans-serif; font-size:26px; font-weight:800; color:#0B1132; }
+      .tc-wrap{ padding:0 16px; }
+      .tc-banner{ background:#FFF8E7; border:1.5px solid #C9A24B; border-radius:16px; padding:14px 16px; margin-top:14px; color:#0B1132; }
+      .tc-banner b{ font-family:"Manrope",sans-serif; }
+      .tc-banner p{ margin:4px 0 10px; font-size:13px; line-height:1.5; color:#6B7086; }
+      .tc-unlock{ background:#0B1132; color:#fff; border:1px solid #C9A24B; border-radius:12px; padding:11px 16px; font-family:"Manrope",sans-serif; font-weight:800; font-size:14px; cursor:pointer; width:100%; }
+      .tc-chat{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:16px; padding:13px 14px; margin-top:10px; cursor:pointer; font-family:inherit; color:#0B1132; }
+      .tc-av{ width:46px; height:46px; border-radius:50%; background:#0B1132; color:#C9A24B; display:grid; place-items:center; font-family:"Manrope",sans-serif; font-weight:800; font-size:16px; flex:none; }
+      .tc-main{ flex:1; min-width:0; }
+      .tc-name{ font-family:"Manrope",sans-serif; font-weight:800; font-size:15px; display:flex; justify-content:space-between; gap:8px; }
+      .tc-time{ font-size:11px; color:#9AA0BD; font-weight:600; flex:none; }
+      .tc-last{ font-size:13px; color:#6B7086; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+      .tc-earn{ background:#FFFFFF; border:1.5px solid #E6E7EE; border-radius:16px; padding:14px 16px; margin-top:14px; display:flex; align-items:center; gap:12px; }
+      .tc-earn b{ font-family:"Manrope",sans-serif; font-size:17px; color:#0B1132; }
+      .tc-earn span{ display:block; font-size:12.5px; color:#6B7086; margin-top:2px; }
+      .tc-thread-head{ display:flex; align-items:center; gap:12px; margin-top:18px; }
+      .tc-back{ width:44px; height:44px; flex:0 0 auto; display:grid; place-items:center; padding:0; background:#F2F3F8; border:1.5px solid #E6E7EE; border-radius:12px; color:#0B1132; cursor:pointer; }
+      .tc-msgs{ padding:16px 16px 0; display:flex; flex-direction:column; gap:8px; }
+      .tc-msg{ max-width:78%; padding:10px 13px; border-radius:16px; font-size:14px; line-height:1.45; }
+      .tc-msg.them{ background:#F2F3F8; color:#0B1132; align-self:flex-start; border-bottom-left-radius:6px; }
+      .tc-msg.me{ background:#0B1132; color:#fff; align-self:flex-end; border-bottom-right-radius:6px; }
+      .tc-msg .tc-mtime{ display:block; font-size:10px; opacity:.55; margin-top:4px; text-align:right; }
+      .tc-inputrow{ display:flex; gap:10px; padding:14px 16px 0; }
+      .tc-input{ flex:1; background:#F8F9FC; border:1.5px solid #E6E7EE; border-radius:999px; padding:12px 16px; font-size:14px; color:#0B1132; font-family:inherit; outline:none; }
+      .tc-input:focus{ border-color:#C9A24B; }
+      .tc-send{ width:46px; height:46px; flex:none; border-radius:50%; background:#0B1132; border:1px solid #C9A24B; color:#C9A24B; display:grid; place-items:center; cursor:pointer; }
+      .tc-note{ text-align:center; font-size:12px; color:#9AA0BD; margin-top:12px; }
+      .tc-soon-tag{ background:#C9A24B; color:#0B1132; font-size:10.5px; font-weight:800; letter-spacing:.4px; padding:3px 8px; border-radius:999px; flex:none; text-transform:uppercase; }
+      .tc-info-lines{ font-size:14px; line-height:1.6; color:#3A3F58; margin:0 0 14px; }
+      .tc-info-lines b{ color:#0B1132; }
 
       /* --- TrybCoin popups (balance pop + proof pop): light popup cards --- */
       .coin-pop{ background:rgba(5,7,26,.55); }
@@ -2687,6 +2720,40 @@
         <div class="coin-pop-sub" style="margin-top:8px;">Use TrybCoin to trade, play games, or buy miners. Profits land in your Main Balance.</div>
         <a class="coin-pop-earn" id="coinPopEarn" href="#">Earn more TrybCoin →</a>
         <button class="btn ghost" id="coinPopClose" type="button" style="width:100%;margin-top:10px;">Close</button>
+      </div>
+    </div>
+
+    <div id="trybchatView" style="display:none;">
+      <div class="tc-list-wrap">
+        <div class="view-head" style="padding:0 16px;">
+          <div class="view-title">TrybChat</div>
+        </div>
+        <div class="tc-wrap">
+          <div class="tc-banner">
+            <b>Free month — Day 1 of 30</b>
+            <p>Your first month is free with full access. After that, a premium membership ($12 / 6 months) keeps TrybChat open.</p>
+            <button class="tc-unlock" id="tcUnlockBtn" type="button">Unlock — $12 / 6 months</button>
+          </div>
+          <div id="tcChatList"></div>
+          <div class="tc-earn">
+            <img src="./trybcoin.png" alt="TrybCoin" style="width:42px;height:42px;border-radius:50%;">
+            <div><b><span id="tcEarnedToday">128</span> TN earned today</b><span>Earn TrybCoin for every message you send — it lands in your TrybNetwork TrybCoin balance.</span></div>
+          </div>
+          <div class="tc-note">TrybChat preview — full launch coming soon.</div>
+        </div>
+      </div>
+      <div class="tc-thread-wrap" style="display:none;">
+        <div class="tc-thread-head" style="padding:0 16px;">
+          <button class="tc-back" id="tcThreadBack" type="button" aria-label="Back to chats"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="tc-av" id="tcThreadAv">A</span>
+          <div class="tc-main"><div class="tc-name"><span id="tcThreadName">Chat</span></div><div class="tc-last" id="tcThreadSub">@user</div></div>
+        </div>
+        <div class="tc-msgs" id="tcMsgs"></div>
+        <div class="tc-inputrow">
+          <input class="tc-input" id="tcInput" type="text" placeholder="Message…" autocomplete="off">
+          <button class="tc-send" id="tcSendBtn" type="button" aria-label="Send"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button>
+        </div>
+        <div class="tc-note">Preview chat — messages here aren't sent to anyone yet.</div>
       </div>
     </div>
 
@@ -5788,7 +5855,7 @@
          Entering a non-dashboard view pushes a history entry so the
          device back button returns to the dashboard; the on-screen
          Back buttons go through the same history step. */
-      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView", ayo: "ayoView", earn: "earnView", invest: "investView" };
+      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView", ayo: "ayoView", earn: "earnView", invest: "investView", trybchat: "trybchatView" };
       var viewPushed = false;
       function setView(v, skipPush){
         if (!VIEW_IDS[v]) v = "app";
@@ -8688,7 +8755,7 @@ s0.parentNode.insertBefore(s1,s0);
     <div class="overlay" id="v2ExploreOverlay">
       <div class="sheet v2-sheet" role="dialog" aria-modal="true" aria-labelledby="v2ExploreTitle">
         <h3 id="v2ExploreTitle">Explore</h3>
-        <p class="sheet-sub">Five ways to grow your money on TrybNetwork.</p>
+        <p class="sheet-sub">Six ways to grow your money on TrybNetwork.</p>
         <button class="v2-opt-row" id="v2GoTrade" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3v3M6 14v3M18 5v3M18 16v2"/><rect x="4" y="6" width="4" height="8" rx="0.8"/><rect x="16" y="8" width="4" height="8" rx="0.8"/><path d="M11 8v10M9.5 10.5h3v5h-3z"/></svg></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Trade</span><div class="v2-opt-sub">Binary trading with 90% payout on winning bids</div></span>
@@ -8709,12 +8776,30 @@ s0.parentNode.insertBefore(s1,s0);
           <span class="v2-opt-main"><span class="v2-opt-title">Fixed Savings</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% returns</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
         </button>
+        <button class="v2-opt-row" id="v2GoTrybChat" type="button">
+          <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1.1L3 20l1.1-5.3A8.5 8.5 0 1 1 21 11.5z"/></svg></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">TrybChat</span><div class="v2-opt-sub">Chat, connect &amp; earn TrybCoin</div></span>
+          <span class="tc-soon-tag">Coming soon</span>
+          <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
         <button class="v2-opt-row" id="v2GoEarn" type="button">
           <span class="v2-tx-ic"><img src="./trybcoin.png" alt="" style="width:30px;height:30px;border-radius:50%;"></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Earn TrybCoin</span><div class="v2-opt-sub">Complete simple tasks and earn TN Coin</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
         </button>
         <button class="v2-sheet-close" type="button" data-v2close="v2ExploreOverlay">Close</button>
+      </div>
+    </div>
+
+    <!-- Dashboard v2: TrybChat info sheet -->
+    <div class="overlay" id="v2TrybChatOverlay">
+      <div class="sheet v2-sheet" role="dialog" aria-modal="true" aria-labelledby="v2TrybChatTitle">
+        <h3 id="v2TrybChatTitle">TrybChat</h3>
+        <p class="sheet-sub" style="margin-bottom:10px;">Chat, connect &amp; earn TrybCoin.</p>
+        <p class="tc-info-lines">TrybChat is the TrybNetwork chat app — message friends, join the community, and <b>earn TrybCoin for every message you send</b>. Your coin lands in the same TrybCoin balance you already use here.</p>
+        <p class="tc-info-lines"><b>First month free</b> with full access. After that, a <b>$12 premium membership every 6 months</b> keeps TrybChat open — your TrybCoin is always yours.</p>
+        <button class="btn" id="v2OpenTrybChat" type="button" style="width:100%;">Open TrybChat</button>
+        <button class="v2-sheet-close" type="button" data-v2close="v2TrybChatOverlay">Close</button>
       </div>
     </div>
 
@@ -8957,6 +9042,8 @@ s0.parentNode.insertBefore(s1,s0);
       bind("v2GoMine", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("app", true); setTimeout(scrollToMiner, 60); });
       bind("v2GoPlay", function(){ closeScreen("v2ExploreOverlay"); if (typeof openScreen === "function") openScreen("v2GamesOverlay"); });
       bind("v2GoEarn", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("earn"); if (typeof renderEarn === "function") renderEarn(); });
+      bind("v2GoTrybChat", function(){ closeScreen("v2ExploreOverlay"); if (typeof openScreen === "function") openScreen("v2TrybChatOverlay"); });
+      bind("v2OpenTrybChat", function(){ closeScreen("v2TrybChatOverlay"); if (typeof tcShowList === "function") tcShowList(); if (typeof setView === "function") setView("trybchat"); });
       bind("v2GoInvest", function(){ closeScreen("v2ExploreOverlay"); if (typeof setView === "function") setView("invest"); });
       bind("v2TabHome", function(){ if (typeof setView === "function") setView("app", true); window.scrollTo(0, 0); });
       bind("v2TabTrade", function(){ if (typeof setView === "function") setView("binary"); });
@@ -8984,6 +9071,107 @@ s0.parentNode.insertBefore(s1,s0);
         };
         syncDock("app");
       })();
+      /* ---------- TrybChat preview (teaser) ---------- */
+      var TC_CHATS = [
+        { id: "community", name: "TrybNetwork Community", user: "Community group", av: "TN", time: "9:41 AM", last: "Admin: Fixed Savings is live — check Explore.", msgs: [
+          { who: "them", text: "Welcome to the TrybNetwork Community.", time: "9:30 AM" },
+          { who: "them", text: "Admin: Fixed Savings is live — check Explore.", time: "9:41 AM" }
+        ], replies: ["Exactly — and TrybChat earnings land straight in your TrybCoin balance.", "Welcome in! Say hi and start earning."] },
+        { id: "amara", name: "Amara Osei", user: "@amara_o", av: "AO", time: "9:12 AM", last: "The miner paid out again this week.", msgs: [
+          { who: "them", text: "Morning! Did your miner cash out?", time: "8:58 AM" },
+          { who: "me", text: "Yes — profits landed in my Main Balance.", time: "9:05 AM" },
+          { who: "them", text: "The miner paid out again this week.", time: "9:12 AM" }
+        ], replies: ["Nice. I am stacking mine toward the next top-up.", "Same here — steady every week."] },
+        { id: "tunde", name: "Tunde Bakare", user: "@tunde_b", av: "TB", time: "Yesterday", last: "That XAUUSD move was clean.", msgs: [
+          { who: "them", text: "Did you catch gold yesterday?", time: "4:20 PM" },
+          { who: "them", text: "That XAUUSD move was clean.", time: "4:21 PM" }
+        ], replies: ["Clean indeed. Watching for the retest now.", "I took partials at TP1 — no greed."] },
+        { id: "ngozi", name: "Ngozi Eze", user: "@ngozi_e", av: "NE", time: "Yesterday", last: "Sent you the group link.", msgs: [
+          { who: "them", text: "Sent you the group link.", time: "3:02 PM" }
+        ], replies: ["You are welcome — invite your friends too.", "Let me know once you are in."] },
+        { id: "ibrahim", name: "Ibrahim Musa", user: "@ibrahim_m", av: "IM", time: "Tue", last: "Whot rematch tonight?", msgs: [
+          { who: "me", text: "Good game yesterday.", time: "Tue" },
+          { who: "them", text: "Whot rematch tonight?", time: "Tue" }
+        ], replies: ["Tonight, same time. Loser buys data.", "Deal — bring your best cards."] }
+      ];
+      var tcState = { earned: 128, threads: {}, current: null };
+      function tcEsc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+      function tcNowTime(){ try { return new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }); } catch (e) { return ""; } }
+      function tcThread(id){
+        if (!tcState.threads[id]){
+          var c = null; for (var i = 0; i < TC_CHATS.length; i++) if (TC_CHATS[i].id === id) c = TC_CHATS[i];
+          tcState.threads[id] = { msgs: c ? c.msgs.slice() : [], replyIdx: 0 };
+        }
+        return tcState.threads[id];
+      }
+      function tcRenderList(){
+        var host = $("tcChatList"); if (!host) return;
+        var html = "";
+        for (var i = 0; i < TC_CHATS.length; i++){
+          var c = TC_CHATS[i], t = tcThread(c.id);
+          var last = t.msgs.length ? t.msgs[t.msgs.length - 1] : null;
+          html += '<button class="tc-chat" type="button" data-tcchat="' + c.id + '"><span class="tc-av">' + c.av + '</span><span class="tc-main"><span class="tc-name"><span>' + tcEsc(c.name) + '</span><span class="tc-time">' + tcEsc(last ? last.time : c.time) + '</span></span><div class="tc-last">' + tcEsc(last ? last.text : c.last) + '</div></span></button>';
+        }
+        host.innerHTML = html;
+      }
+      function tcRenderThread(){
+        var c = null; for (var i = 0; i < TC_CHATS.length; i++) if (TC_CHATS[i].id === tcState.current) c = TC_CHATS[i];
+        if (!c) return;
+        $("tcThreadAv").textContent = c.av;
+        $("tcThreadName").textContent = c.name;
+        $("tcThreadSub").textContent = c.user;
+        var t = tcThread(c.id), html = "";
+        for (var j = 0; j < t.msgs.length; j++){
+          var m = t.msgs[j];
+          html += '<div class="tc-msg ' + (m.who === "me" ? "me" : "them") + '">' + tcEsc(m.text) + '<span class="tc-mtime">' + tcEsc(m.time) + '</span></div>';
+        }
+        $("tcMsgs").innerHTML = html;
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+      function tcShowList(){
+        var v = $("trybchatView"); if (!v) return;
+        var lw = v.querySelector(".tc-list-wrap"), tw = v.querySelector(".tc-thread-wrap");
+        if (lw) lw.style.display = ""; if (tw) tw.style.display = "none";
+        tcState.current = null;
+        tcRenderList();
+      }
+      window.tcShowList = tcShowList;
+      function tcOpenChat(id){
+        tcState.current = id;
+        var v = $("trybchatView"); if (!v) return;
+        var lw = v.querySelector(".tc-list-wrap"), tw = v.querySelector(".tc-thread-wrap");
+        if (lw) lw.style.display = "none"; if (tw) tw.style.display = "";
+        tcRenderThread();
+      }
+      function tcSend(){
+        var inp = $("tcInput"); if (!inp) return;
+        var text = inp.value.trim(); if (!text || !tcState.current) return;
+        var c = null; for (var i = 0; i < TC_CHATS.length; i++) if (TC_CHATS[i].id === tcState.current) c = TC_CHATS[i];
+        var t = tcThread(tcState.current);
+        t.msgs.push({ who: "me", text: text, time: tcNowTime() });
+        inp.value = "";
+        tcState.earned += 1;
+        var el = $("tcEarnedToday"); if (el) el.textContent = tcState.earned;
+        tcRenderThread();
+        if (c && c.replies && c.replies.length){
+          var reply = c.replies[t.replyIdx % c.replies.length]; t.replyIdx++;
+          setTimeout(function(){
+            if (tcState.current !== c.id) return;
+            t.msgs.push({ who: "them", text: reply, time: tcNowTime() });
+            tcRenderThread();
+          }, 1400);
+        }
+      }
+      var tcListHost = $("tcChatList");
+      if (tcListHost) tcListHost.addEventListener("click", function(e){
+        var b = e.target.closest ? e.target.closest("[data-tcchat]") : null;
+        if (b) tcOpenChat(b.getAttribute("data-tcchat"));
+      });
+      var tcBack = $("tcThreadBack"); if (tcBack) tcBack.addEventListener("click", function(){ tcShowList(); });
+      var tcSendBtn = $("tcSendBtn"); if (tcSendBtn) tcSendBtn.addEventListener("click", tcSend);
+      var tcInp = $("tcInput"); if (tcInp) tcInp.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); tcSend(); } });
+      var tcUnlock = $("tcUnlockBtn"); if (tcUnlock) tcUnlock.addEventListener("click", function(){ if (typeof toast === "function") toast("TrybChat is coming soon", "Your first month will be free with full access when TrybChat launches."); });
+      tcRenderList();
       bind("v2SetupBtn", function(){
         var list = $("v2SetupList"); if (!list) return;
         var open = list.classList.toggle("open");
