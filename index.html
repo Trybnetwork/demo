@@ -3336,7 +3336,9 @@
       var currentUser = null;      // supabase auth user
       var profileRow = null;       // tn_profiles row
       var walletRow = null;        // tn_wallets row
-      var walletHydratedFor = null; // user id whose server wallet this session has loaded — persistWallet refuses to write before that (a stale/zero local state once overwrote a real balance)
+      var walletHydratedFor = null; // user id whose server wallet this session has loaded
+      var walletServerMain = null, walletServerTraded = null, walletServerCoins = null; // last server-confirmed wallet values; persist sends deltas against these via tn_apply_balance
+      var persistChain = Promise.resolve(), coinChain = Promise.resolve(); // serialize wallet writes — persistWallet refuses to write before that (a stale/zero local state once overwrote a real balance)
       var settledBidIds = {};      // bid ids already turned into history (no double payout)
       var bidSettleMode = "manual"; // 'manual' | 'auto', from tn_settings (bid_settlement_mode)
       var realtimeChannels = [];
@@ -3531,12 +3533,11 @@
       // Credit any user's Main Balance directly — the same wallet-credit
       // path the referral profit share uses (read balance, write back).
       function creditUserWallet(userId, amount){
-        return sb.from("tn_wallets").select("main_balance").eq("user_id", userId).maybeSingle().then(function(w){
-          if (w.error || !w.data) return false;
-          var bal = Math.round(((Number(w.data.main_balance) || 0) + amount) * 100) / 100;
-          return sb.from("tn_wallets").update({ main_balance: bal, updated_at: new Date().toISOString() }).eq("user_id", userId)
-            .then(function(u){ return !u.error; });
-        }).catch(function(){ return false; });
+        // Cross-user wallet credits are server-side only now (definer RPCs:
+        // tn_credit_referral_share, tn_settle_referral_bonus). The old
+        // read-modify-write path is retired; callers treat false as "not
+        // credited" and the bonus queue simply stays for the server flow.
+        return Promise.resolve(false);
       }
       function markReferralRewardPaid(referredId){
         return sb.from("tn_referrals").update({ reward_paid: true }).eq("referred_id", referredId).eq("reward_paid", false)
@@ -3598,37 +3599,26 @@
           }).catch(function(){});
       }
       function settleOneReferralBonus(row){
-        var amount = Math.round((Number(row.amount) || REFERRAL_REWARD) * 100) / 100;
-        // The referred user's net deposits decide whether the bonus vests.
-        return sb.from("tn_requests").select("type, amount").eq("user_id", row.referred_id).eq("status", "approved")
-          .then(function(res){
-            var net = 0;
-            (res.data || []).forEach(function(r){
-              var amt = Number(r.amount) || 0;
-              if (r.type === "deposit") net += amt;
-              else if (r.type === "withdrawal") net -= amt;
-            });
-            var next = net >= REFERRAL_MIN_DEPOSIT ? "vested" : "cancelled";
-            // Guarded flip: only the settler that moves the row out of
-            // 'pending' may credit — a bonus can never pay twice.
-            return sb.from("tn_referral_bonuses").update({ status: next }).eq("id", row.id).eq("status", "pending").select()
-              .then(function(upd){
-                if (upd.error || !upd.data || !upd.data.length) return false; // settled elsewhere first
-                state.refBonuses.forEach(function(b){ if (b.id === row.id) b.status = next; });
-                if (next === "cancelled"){ renderReferrals(); return true; }
-                state.main = Math.round((state.main + amount) * 100) / 100;
-                state.referralEarned = Math.round((state.referralEarned + amount) * 100) / 100;
-                state.txs.unshift({ id: uid(), type: "referral", amount: amount,
-                  note: "Referral bonus vested · credited to Main Balance", time: Date.now() });
-                if (state.txs.length > 120) state.txs.length = 120;
-                return persistWallet().then(function(){
-                  markReferralRewardPaid(row.referred_id);
-                  renderWallets(); renderHistory(); renderReferrals();
-                  toast("Referral bonus vested", fmtUSD(amount) + " from your referral's deposit is now in your Main Balance.", "win");
-                  return true;
-                });
-              });
-          }).catch(function(){ return false; });
+        // Server-side vesting (tn_settle_referral_bonus): it reads the
+        // referred user's approved requests (blocked for other users under
+        // per-user RLS), flips the row out of 'pending' atomically, credits
+        // the referrer and marks the referral paid — never twice.
+        return sb.rpc("tn_settle_referral_bonus", { p_bonus_id: row.id }).then(function(res){
+          if (res.error || !res.data || !res.data.ok || !res.data.settled) return false;
+          var d = res.data;
+          state.refBonuses.forEach(function(b){ if (b.id === row.id) b.status = d.status; });
+          if (d.status === "cancelled"){ renderReferrals(); return true; }
+          var amount = Math.round((Number(d.amount) || Number(row.amount) || REFERRAL_REWARD) * 100) / 100;
+          state.main = Math.round((state.main + amount) * 100) / 100;
+          if (walletServerMain !== null) walletServerMain = Math.round((walletServerMain + amount) * 100) / 100;
+          state.referralEarned = Math.round((state.referralEarned + amount) * 100) / 100;
+          state.txs.unshift({ id: uid(), type: "referral", amount: amount,
+            note: "Referral bonus vested · credited to Main Balance", time: Date.now() });
+          if (state.txs.length > 120) state.txs.length = 120;
+          renderWallets(); renderHistory(); renderReferrals();
+          toast("Referral bonus vested", fmtUSD(amount) + " from your referral's deposit is now in your Main Balance.", "win");
+          return true;
+        }).catch(function(){ return false; });
       }
       // App-load pass: settle anything due to vest, then check whether
       // this user's own deposit just qualified their referrer's bonus.
@@ -3816,22 +3806,25 @@
         }).join("");
       }
 
-      /* Persist the wallet row. Returns success. */
+      /* Persist the wallet. Server-controlled since 2026-10-23: sends the
+         DELTA against the last server-confirmed snapshot through
+         tn_apply_balance (row-locked, capped, ledger-logged). Direct
+         tn_wallets writes are admin-only now. */
       function persistWallet(){
         if (!sb || !currentUser) return Promise.resolve(false);
-        if (walletHydratedFor !== currentUser.id) return Promise.resolve(false);
-        var payload = {
-          user_id: currentUser.id,
-          main_balance: Math.round(state.main * 100) / 100,
-          traded_volume: state.bonusTraded,
-          bonus_locked: state.bonusLocked,
-          updated_at: new Date().toISOString()
-        };
-        return sb.from("tn_wallets").upsert(payload).then(function(res){
-          if (res.error){ netErrorToast("Saving your balance"); return false; }
-          walletRow = payload;
-          return true;
-        }).catch(function(){ netErrorToast("Saving your balance"); return false; });
+        if (walletHydratedFor !== currentUser.id || walletServerMain === null) return Promise.resolve(false);
+        persistChain = persistChain.then(function(){
+          var dMain = Math.round((Math.round(state.main * 100) / 100 - walletServerMain) * 100) / 100;
+          var dTraded = Math.round(((Number(state.bonusTraded) || 0) - walletServerTraded) * 100) / 100;
+          if (!dMain && !dTraded) return true;
+          return sb.rpc("tn_apply_balance", { p_main_delta: dMain, p_coin_delta: 0, p_traded_delta: dTraded, p_set_bonus_locked: !!state.bonusLocked, p_kind: "sync", p_ref: null }).then(function(res){
+            if (res.error || !res.data || !res.data.ok){ netErrorToast("Saving your balance"); return false; }
+            walletServerMain = Number(res.data.main_balance); walletServerTraded = Number(res.data.traded_volume);
+            walletRow = { user_id: currentUser.id, main_balance: walletServerMain, traded_volume: walletServerTraded, bonus_locked: !!res.data.bonus_locked, trybcoin: walletServerCoins };
+            return true;
+          }).catch(function(){ netErrorToast("Saving your balance"); return false; });
+        });
+        return persistChain;
       }
       // Kept for call-site compatibility with the old local save points:
       // every former save() is now a wallet write to Supabase.
@@ -3965,6 +3958,8 @@
             + refRows.filter(function(r){ return r.reward_paid && !bonusByReferred[r.referred_id]; }).length * REFERRAL_REWARD) * 100) / 100;
           state = fresh;
           walletHydratedFor = userId;
+          walletServerMain = Math.round((Number(state.main) || 0) * 100) / 100;
+          walletServerTraded = Number(state.bonusTraded) || 0;
           state.txs = buildWalletTxs(reqs.data).concat(keep.localTxs);
           state.txs.sort(function(a, b){ return b.time - a.time; });
           state.lastTick = Date.now();
@@ -4547,7 +4542,7 @@
       function loadTrybcoin(){
         if (!sb || !currentUser) return;
         sb.from("tn_wallets").select("trybcoin").eq("user_id", currentUser.id).maybeSingle().then(function(r){
-          earnCoinBal = (r.data && r.data.trybcoin) || 0;
+          earnCoinBal = (r.data && r.data.trybcoin) || 0; walletServerCoins = earnCoinBal;
           $("trybcoinBal").textContent = earnCoinBal.toLocaleString();
           $("trybcoinUsd").textContent = (earnCoinBal / TRYBCOIN_RATE).toFixed(2);
           $("convertHint").textContent = "Spend TrybCoin on games and miners — profits land in your Main Balance.";
@@ -4623,8 +4618,17 @@
       function coinCostForUsd(usd){ return Math.round(usd * TRYBCOIN_RATE); }
       function persistCoins(){
         if (!sb || !currentUser) return Promise.resolve(false);
-        return sb.from("tn_wallets").update({ trybcoin: earnCoinBal }).eq("user_id", currentUser.id)
-          .then(function(r){ return !r.error; }).catch(function(){ return false; });
+        if (walletServerCoins === null) return Promise.resolve(false);
+        coinChain = coinChain.then(function(){
+          var dCoins = Math.round(earnCoinBal - walletServerCoins);
+          if (!dCoins) return true;
+          return sb.rpc("tn_apply_balance", { p_main_delta: 0, p_coin_delta: dCoins, p_traded_delta: 0, p_set_bonus_locked: null, p_kind: "coins", p_ref: null }).then(function(res){
+            if (res.error || !res.data || !res.data.ok) return false;
+            walletServerCoins = Number(res.data.trybcoin);
+            return true;
+          }).catch(function(){ return false; });
+        });
+        return coinChain;
       }
       // Deduct a USD-denominated stake from the selected source.
       // Returns {ok, coins} — coins is the TrybCoin spent (0 for Main).
@@ -6385,7 +6389,7 @@
         stopAllDepositWatchers();
         if (typeof stopGames === "function") stopGames();
         bidSettleMode = "manual";
-        currentUser = null; profileRow = null; walletRow = null; walletHydratedFor = null;
+        currentUser = null; profileRow = null; walletRow = null; walletHydratedFor = null; walletServerMain = null; walletServerTraded = null; walletServerCoins = null;
         withdrawalsFrozen = false;
         state = blankState();
         settledBidIds = {};
@@ -6483,10 +6487,8 @@
             };
             return insertProfileWithCountry(profile, countryCode).then(function(pr){
               if (pr.error){ fail("Your login was created but the profile couldn't be saved — try logging in."); return null; }
-              return sb.from("tn_wallets").insert({
-                user_id: user.id, main_balance: WELCOME_BONUS, savings_interest: 0, traded_volume: 0, bonus_locked: true
-              }).then(function(wr){
-                if (wr.error){ fail("Your account was created but the wallet couldn't be set up — try logging in."); return null; }
+              return Promise.resolve({ error: null }).then(function(wr){
+                // Wallet row is created server-side by the profile bootstrap trigger (welcome bonus included).
                 var after = function(){
                   currentUser = user;
                   return loadUserData(user.id).then(function(){
