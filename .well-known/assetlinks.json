@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.trybnetwork.app",
+    "sha256_cert_fingerprints": ["BD:E7:15:BC:35:6D:D0:8D:77:19:57:B5:39:EE:CE:0A:F9:8C:E3:DE:45:6A:9E:EE:49:F5:DF:A3:8D:F0:0A:2B"]
+  }
+}]
