@@ -980,8 +980,8 @@
 .v2-wc-sub{ white-space:nowrap; }
 .v2-wc-title{ white-space:nowrap; }
 #minerStateBadge{ vertical-align:super; }
-#minerFan{ position:absolute; top:10px; left:10px; width:35px; height:35px; z-index:2; }
-#minerFan svg{ width:32px; height:32px; }
+#minerFan{ position:absolute; top:10px; left:10px; width:35px; height:35px; z-index:2; overflow:hidden; }
+#minerFan svg{ width:35px; height:35px; }
 #v2MinerCard .v2-wc-head{ padding-left:39px; }
 #miningInfoBtn{ position:absolute; top:8px; right:8px; left:auto; z-index:3; padding:2px; }
 #miningInfoBtn svg{ width:12px; height:12px; }
@@ -993,8 +993,8 @@
       .v2-card-btns .btn{ flex:1 1 auto; padding:9px 8px; font-size:13px; border-radius:10px; min-width:0; }
       .v2-status-line{ margin-top:10px; font-size:12px; color:#6B7086; line-height:1.45; }
       /* Miner cooling fan: the card icon IS the fan — blades spin only while a cycle runs. */
-      #minerFan svg{ width:40px; height:40px; display:block; }
-      #minerFan.fan-on{ box-shadow:0 0 0 2px rgba(203,213,227,.55), 0 0 16px rgba(203,213,227,.4); }
+      #minerFan svg{ width:35px; height:35px; display:block; }
+      #minerFan.fan-on{ box-shadow:0 0 16px rgba(203,213,227,.4); }
       .fan-blades{ transform-origin:36px 36px; transform-box:view-box; }
       #minerFan.fan-on .fan-blades, .fan-unit.fan-on .fan-blades{ animation:fanSpin .75s linear infinite; }
       @keyframes fanSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
