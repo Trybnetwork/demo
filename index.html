@@ -3205,8 +3205,10 @@
         return null;
       }
       /* Fill the signup Country select from COUNTRIES (the single source
-         of truth): United States pinned first and preselected, the rest
-         alphabetical by name. */
+         of truth): United States pinned first, the rest alphabetical.
+         The preselected value auto-detects the visitor's country from
+         their IP address (device locale region as fallback); a manual
+         change by the user is never overridden. Falls back to US. */
       (function(){
         var sel = document.getElementById("suCountry");
         if (!sel) return;
@@ -3222,6 +3224,63 @@
           sel.appendChild(o);
         });
         sel.value = "US";
+        var manual = false;
+        sel.addEventListener("change", function(){ manual = true; });
+        function applyDetected(code){
+          code = String(code || "").toUpperCase();
+          if (manual || !code || !countryOf(code)) return;
+          sel.value = code;
+        }
+        function regionFromLocale(loc){
+          var parts = String(loc || "").replace(/_/g, "-").split("-");
+          for (var pi = 1; pi < parts.length; pi++){
+            if (/^[A-Za-z]{2}$/.test(parts[pi])) return parts[pi].toUpperCase();
+          }
+          return "";
+        }
+        function deviceCountry(){
+          var langs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || ""];
+          for (var li = 0; li < langs.length; li++){
+            var rc = regionFromLocale(langs[li]);
+            if (rc) return rc;
+          }
+          try { return regionFromLocale(Intl.DateTimeFormat().resolvedOptions().locale); } catch (e) { return ""; }
+        }
+        function getJSON(url, cb){
+          var finished = false;
+          var ctl = ("AbortController" in window) ? new AbortController() : null;
+          var timer = setTimeout(function(){
+            if (ctl) { try { ctl.abort(); } catch (e) {} }
+            finish(null);
+          }, 3500);
+          function finish(data){
+            if (finished) return;
+            finished = true;
+            clearTimeout(timer);
+            cb(data);
+          }
+          try {
+            var opts = { credentials: "omit" };
+            if (ctl) opts.signal = ctl.signal;
+            fetch(url, opts).then(function(r){
+              if (!r.ok) throw new Error("geo lookup failed");
+              return r.json();
+            }).then(function(d){ finish(d); }).catch(function(){ finish(null); });
+          } catch (e) { finish(null); }
+        }
+        if (window.fetch){
+          getJSON("https://ipwho.is/", function(d){
+            var code = (d && d.success !== false) ? (d.country_code || d.country) : "";
+            if (code && countryOf(code)) { applyDetected(code); return; }
+            getJSON("https://api.country.is/", function(d2){
+              var code2 = d2 ? (d2.country || d2.country_code) : "";
+              if (code2 && countryOf(code2)) { applyDetected(code2); return; }
+              applyDetected(deviceCountry());
+            });
+          });
+        } else {
+          applyDetected(deviceCountry());
+        }
       })();
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
