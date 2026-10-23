@@ -974,8 +974,8 @@
       .v2-wc-sub{ font-size:13px; color:#6B7086; font-weight:600; margin-top:2px; }
       .v2-wc-amount{ font-size:30px; font-weight:800; margin-top:auto; padding-top:14px; font-variant-numeric:tabular-nums; letter-spacing:-.01em; white-space:nowrap; }
       .v2-wc-foot{ margin-top:8px; font-size:13px; color:#6B7086; font-weight:600; line-height:1.5; }
-      .v2-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:#1D9D63; box-shadow:0 0 0 3px rgba(29,157,99,.2); vertical-align:1px; }
-      .v2-dot-idle{ background:#B9BECF; box-shadow:0 0 0 3px rgba(107,112,134,.18); }
+      .v2-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:#1D9D63; box-shadow:0 0 0 2px rgba(29,157,99,.2); vertical-align:1px; flex:none; }
+      .v2-dot-idle{ background:#B9BECF; box-shadow:0 0 0 2px rgba(107,112,134,.18); }
       .v2-profit{ color:#1D9D63; font-weight:800; }
       .v2-card-btns{ display:flex; gap:7px; flex-wrap:wrap; margin-top:12px; }
       .v2-card-btns .btn{ flex:1 1 auto; padding:9px 8px; font-size:13px; border-radius:10px; min-width:0; }
@@ -1860,14 +1860,14 @@
               <div class="v2-wc-title">Miner</div>
               <div class="v2-wc-sub">2% daily profit</div>
             </div>
-            <span id="minerStateBadge" style="display:none;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:#1D9D63;white-space:nowrap;"><span class="v2-dot"></span>Active</span>
+            <span id="minerStateBadge" style="display:none;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#1D9D63;white-space:nowrap;flex:none;"><span class="v2-dot"></span>Active</span>
             <button class="v2-info-btn" id="miningInfoBtn" type="button" aria-expanded="false" aria-controls="miningInfo" aria-label="About Mining" style="padding:2px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             </button>
           </div>
           <div style="display:flex;align-items:baseline;gap:7px;">
             <div class="v2-wc-amount num" id="miningBalance">$0.00</div>
-            <span id="minerGainInline" class="v2-profit" style="display:none;font-size:15px;">+$0.00</span>
+            <span id="minerGainInline" class="v2-profit" style="display:none;font-size:12px;white-space:nowrap;">+$0.00</span>
           </div>
           <div class="v2-wc-foot" id="v2MinerFoot"><span style="color:#6B7086;">No active miner</span></div>
           <div class="v2-status-line" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
@@ -9588,6 +9588,8 @@ s0.parentNode.insertBefore(s1,s0);
   .tcw-msg.them .tcw-vplay{ background:#0B1132; color:#C9A24B; }
   .tcw-composer{ display:flex; gap:9px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid #EFF0F5; background:#fff; flex:none; align-items:center; }
   .tcw-composer input{ flex:1; background:#EFF0F5; border:1.5px solid transparent; border-radius:999px; padding:11px 15px; font-size:14px; outline:none; color:#0B1132; font-family:inherit; min-width:0; }
+  .tcw-composer textarea{ flex:1; background:#EFF0F5; border:1.5px solid transparent; border-radius:20px; padding:11px 15px; font-size:14px; outline:none; color:#0B1132; font-family:inherit; min-width:0; resize:none; line-height:1.4; max-height:100px; overflow-y:auto; }
+  .tcw-composer textarea:focus{ border-color:#C9A24B; }
   .tcw-send{ width:43px; height:43px; flex:none; border-radius:50%; background:#0B1132; border:none; color:#fff; display:grid; place-items:center; cursor:pointer; }
   .tcw-access{ padding:26px 22px; text-align:center; }
   .tcw-access h4{ margin:0 0 8px; font-size:17px; }
@@ -9624,7 +9626,7 @@ s0.parentNode.insertBefore(s1,s0);
     <div class="tcw-composer">
       <button class="tcw-attach" id="tcwAttach" type="button" aria-label="Send a photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg></button>
       <input id="tcwFile" type="file" accept="image/*" style="display:none;">
-      <input id="tcwInput" type="text" placeholder="Message…" autocomplete="off" maxlength="2000">
+      <textarea id="tcwInput" rows="1" placeholder="Message…" maxlength="2000"></textarea>
       <button class="tcw-send" id="tcwSend" type="button" aria-label="Send"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21.8 12 3.4 3.6l-.01 6.53L14 12 3.39 13.87z"/></svg></button>
     </div>
     <div class="tcw-toast" id="tcwToast" style="display:none;"></div>
@@ -9910,7 +9912,7 @@ s0.parentNode.insertBefore(s1,s0);
     var chatId = W.cur.chat_id;
     var path = chatId + "/" + W.user.id + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ".jpg";
     clearPendingPhoto();
-    inp.value = "";
+    inp.value = ""; inp.style.height = "auto";
     sb.storage.from("tc-media").upload(path, pp.blob, { contentType: "image/jpeg" }).then(function(up){
       if (up.error){ tcwToast("Photo failed to send"); return; }
       sb.rpc("tc_send_photo", { p_chat: chatId, p_path: path, p_caption: caption, p_hash: pp.hash }).then(function(res){
@@ -9932,7 +9934,7 @@ s0.parentNode.insertBefore(s1,s0);
     var body = inp.value.trim();
     if (!body || !W.cur) return;
     var chatId = W.cur.chat_id;
-    inp.value = "";
+    inp.value = ""; inp.style.height = "auto";
     sb.rpc("tc_send_message", { p_chat: chatId, p_body: body }).then(function(res){
       var d = res.data;
       if (!d || !d.ok){
@@ -10023,7 +10025,11 @@ s0.parentNode.insertBefore(s1,s0);
     });
   })();
   $("tcwSend").addEventListener("click", send);
-  $("tcwInput").addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); send(); } });
+  $("tcwInput").addEventListener("input", function(){
+    var el = $("tcwInput");
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 100) + "px";
+  });
   boot();
 })();
 </script>
