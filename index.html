@@ -1860,11 +1860,15 @@
               <div class="v2-wc-title">Miner</div>
               <div class="v2-wc-sub">2% daily profit</div>
             </div>
+            <span id="minerStateBadge" style="display:none;align-items:center;gap:5px;font-size:11.5px;font-weight:800;color:#1D9D63;white-space:nowrap;"><span class="v2-dot"></span>Active</span>
             <button class="v2-info-btn" id="miningInfoBtn" type="button" aria-expanded="false" aria-controls="miningInfo" aria-label="About Mining" style="padding:2px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             </button>
           </div>
-          <div class="v2-wc-amount num" id="miningBalance">$0.00</div>
+          <div style="display:flex;align-items:baseline;gap:7px;">
+            <div class="v2-wc-amount num" id="miningBalance">$0.00</div>
+            <span id="minerGainInline" class="v2-profit" style="display:none;font-size:15px;">+$0.00</span>
+          </div>
           <div class="v2-wc-foot" id="v2MinerFoot"><span style="color:#6B7086;">No active miner</span></div>
           <div class="v2-status-line" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
           <div id="minerAlertRow" style="display:none;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #EEF0F5;">
@@ -9172,14 +9176,26 @@ s0.parentNode.insertBefore(s1,s0);
               xd.setMonth(xd.getMonth() + 5);
               mExpired = now >= xd.getTime();
             }
-            if (!m){ foot.innerHTML = '<span style="color:#6B7086;">No active miner</span>'; }
+            var badge = $("minerStateBadge");
+            var gain = $("minerGainInline");
+            if (!m){
+              foot.innerHTML = '<span style="color:#6B7086;">No active miner</span>';
+              if (badge) badge.style.display = "none";
+              if (gain) gain.style.display = "none";
+            }
             else if (m.status === "running" && m.startedAt){
               var left = Math.max(0, m.startedAt + CYCLE_MS - now);
-              foot.innerHTML = '<span class="v2-dot"></span> Active · <span class="v2-profit">+' + fmtUSD(m.profit || 0) + '</span> today<div>Restarts in ' + fmtCountdown(left) + '</div>';
+              foot.innerHTML = 'Restarts in ' + fmtCountdown(left);
+              if (badge){ badge.style.display = "inline-flex"; badge.style.color = "#1D9D63"; badge.innerHTML = '<span class="v2-dot"></span> Active'; }
+              if (gain){ gain.style.display = ""; gain.textContent = "+" + fmtUSD(m.profit || 0); gain.style.filter = v2.hidden ? "blur(5px)" : ""; }
             } else if (mExpired){
-              foot.innerHTML = '<span class="v2-dot v2-dot-idle"></span> <span style="color:#B3261E;">Contract expired</span> · buy a new miner to keep mining';
+              foot.innerHTML = '<span style="color:#B3261E;">Buy a new miner to keep mining</span>';
+              if (badge){ badge.style.display = "inline-flex"; badge.style.color = "#B3261E"; badge.innerHTML = '<span class="v2-dot" style="background:#B3261E;box-shadow:0 0 0 3px rgba(179,38,30,.15);"></span> Expired'; }
+              if (gain) gain.style.display = "none";
             } else {
-              foot.innerHTML = '<span class="v2-dot v2-dot-idle"></span> Idle · start a cycle to earn <span class="v2-profit">+' + fmtUSD(m.profit || 0) + '</span>';
+              foot.innerHTML = 'Start a cycle to earn <span class="v2-profit">+' + fmtUSD(m.profit || 0) + '</span>';
+              if (badge){ badge.style.display = "inline-flex"; badge.style.color = "#6B7086"; badge.innerHTML = '<span class="v2-dot v2-dot-idle"></span> Idle'; }
+              if (gain) gain.style.display = "none";
             }
           }
           var mb = $("miningBalance"); if (mb) mb.style.filter = v2.hidden ? "blur(7px)" : "";
