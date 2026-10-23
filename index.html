@@ -978,10 +978,15 @@
       .v2-dot-idle{ background:#B9BECF; box-shadow:0 0 0 2px rgba(107,112,134,.18); }
 #v2MinerCard{ position:relative; }
 .v2-wc-sub{ white-space:nowrap; }
+.v2-wc-title{ white-space:nowrap; }
 #minerStateBadge{ vertical-align:super; }
-#miningInfoBtn{ position:absolute; top:6px; left:6px; z-index:3; padding:2px; }
-#minerFan{ width:35px; height:35px; }
+#minerFan{ position:absolute; top:10px; left:10px; width:35px; height:35px; z-index:2; }
 #minerFan svg{ width:18px; height:18px; }
+#v2MinerCard .v2-wc-head{ padding-left:39px; }
+#miningInfoBtn{ position:absolute; top:48px; left:18px; z-index:3; padding:2px; }
+#v2CoinCard{ position:relative; }
+#trybcoinChip{ position:absolute; top:5px; left:5px; z-index:2; }
+#v2CoinCard .v2-wc-head{ padding-left:39px; }
       .v2-profit{ color:#1D9D63; font-weight:800; }
       .v2-card-btns{ display:flex; gap:7px; flex-wrap:wrap; margin-top:12px; }
       .v2-card-btns .btn{ flex:1 1 auto; padding:9px 8px; font-size:13px; border-radius:10px; min-width:0; }
@@ -1870,10 +1875,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             </button>
           </div>
-          <div style="display:flex;align-items:baseline;gap:3px;">
-            <div class="v2-wc-amount num" id="miningBalance">$0.00</div>
-            <span id="minerGainInline" class="v2-profit" style="display:none;font-size:12px;white-space:nowrap;">+$0.00</span>
-          </div>
+          <div class="v2-wc-amount num" id="miningBalance">$0.00<span id="minerGainInline" class="v2-profit" style="display:none;font-size:12px;margin-left:3px;">+$0.00</span></div>
           <div class="v2-wc-foot" id="v2MinerFoot"><span style="color:#6B7086;">No active miner</span></div>
           <div class="v2-status-line" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
           <div id="minerAlertRow" style="display:none;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #EEF0F5;">
@@ -3963,7 +3965,7 @@
       function renderMining(){
         var m = state.miner;
         var now = Date.now();
-        $("miningBalance").textContent = fmtUSD(m ? m.balance : 0);
+        $("miningBalance").childNodes[0].nodeValue = fmtUSD(m ? m.balance : 0);
         var _mc = $("minerChip"); if (_mc) _mc.textContent = m ? m.tier : "No miner";
         var line = $("minerStatusLine");
         var startBtn = $("btnStartMining");
