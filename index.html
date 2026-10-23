@@ -3336,6 +3336,7 @@
       var currentUser = null;      // supabase auth user
       var profileRow = null;       // tn_profiles row
       var walletRow = null;        // tn_wallets row
+      var walletHydratedFor = null; // user id whose server wallet this session has loaded — persistWallet refuses to write before that (a stale/zero local state once overwrote a real balance)
       var settledBidIds = {};      // bid ids already turned into history (no double payout)
       var bidSettleMode = "manual"; // 'manual' | 'auto', from tn_settings (bid_settlement_mode)
       var realtimeChannels = [];
@@ -3809,6 +3810,7 @@
       /* Persist the wallet row. Returns success. */
       function persistWallet(){
         if (!sb || !currentUser) return Promise.resolve(false);
+        if (walletHydratedFor !== currentUser.id) return Promise.resolve(false);
         var payload = {
           user_id: currentUser.id,
           main_balance: Math.round(state.main * 100) / 100,
@@ -3953,6 +3955,7 @@
               .reduce(function(a, b){ return a + b.amount; }, 0)
             + refRows.filter(function(r){ return r.reward_paid && !bonusByReferred[r.referred_id]; }).length * REFERRAL_REWARD) * 100) / 100;
           state = fresh;
+          walletHydratedFor = userId;
           state.txs = buildWalletTxs(reqs.data).concat(keep.localTxs);
           state.txs.sort(function(a, b){ return b.time - a.time; });
           state.lastTick = Date.now();
@@ -6373,7 +6376,7 @@
         stopAllDepositWatchers();
         if (typeof stopGames === "function") stopGames();
         bidSettleMode = "manual";
-        currentUser = null; profileRow = null; walletRow = null;
+        currentUser = null; profileRow = null; walletRow = null; walletHydratedFor = null;
         withdrawalsFrozen = false;
         state = blankState();
         settledBidIds = {};
