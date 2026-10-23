@@ -9613,6 +9613,7 @@ s0.parentNode.insertBefore(s1,s0);
     })();
     </script>
 <!-- ================= TrybChat floating widget ================= -->
+<!-- ================= TrybChat floating widget ================= -->
 <style>
   #tcwBtn{ position:fixed; right:14px; bottom:96px; width:56px; height:56px; border-radius:50%; border:none; padding:0; background:#0B1132; box-shadow:0 10px 26px rgba(11,17,50,.38); z-index:300; display:none; cursor:pointer; }
   #tcwBtn.on{ display:block; }
@@ -9665,6 +9666,18 @@ s0.parentNode.insertBefore(s1,s0);
   .tcw-pending span{ flex:1; font-size:12.5px; color:#6B7086; }
   .tcw-pending button{ border:none; background:#EFF0F5; color:#0B1132; border-radius:999px; padding:6px 11px; font-size:12px; font-weight:700; cursor:pointer; }
   .tcw-attach{ width:40px; height:40px; flex:none; border-radius:50%; border:none; background:transparent; color:#0B1132; display:grid; place-items:center; cursor:pointer; }
+
+  .tcw-menu{ position:absolute; top:64px; right:12px; background:#fff; border-radius:14px; box-shadow:0 14px 34px rgba(11,17,50,.28); padding:6px; z-index:8; min-width:215px; }
+  .tcw-menu button{ display:block; width:100%; text-align:left; border:none; background:none; padding:11px 12px; font-size:14px; font-weight:700; color:#0B1132; border-radius:9px; cursor:pointer; font-family:inherit; }
+  .tcw-menu button:active{ background:#EFF0F5; }
+  .tcw-tipbar{ padding:10px 12px 6px; background:#FFF8E8; border-top:1px solid #F0E2B8; }
+  .tcw-tipbar .tt-title{ font-size:12.5px; font-weight:800; color:#0B1132; margin-bottom:8px; }
+  .tcw-tipbar .tt-row{ display:flex; gap:8px; align-items:center; }
+  .tcw-tipbar .tt-row input{ flex:1; min-width:0; border:1.5px solid #E3E5EE; border-radius:10px; padding:9px 11px; font-size:14px; font-family:inherit; background:#fff; }
+  .tcw-tipbar .tt-send{ border:none; background:#0B1132; color:#fff; border-radius:10px; padding:10px 16px; font-weight:800; cursor:pointer; font-family:inherit; }
+  .tcw-tipbar .tt-cancel{ border:none; background:#EFF0F5; color:#0B1132; border-radius:10px; padding:10px 13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .tcw-tipbar .tt-member{ display:block; width:100%; text-align:left; border:none; background:#fff; border-radius:9px; padding:9px 11px; font-size:13.5px; font-weight:700; color:#0B1132; cursor:pointer; font-family:inherit; margin-bottom:4px; }
+  .tcw-tipbar .tt-err{ color:#D64545; font-size:12px; font-weight:700; margin-top:6px; }
   .tcw-toast{ position:absolute; left:50%; bottom:84px; transform:translateX(-50%); background:#0B1132; color:#fff; font-size:12.5px; font-weight:700; padding:9px 15px; border-radius:999px; box-shadow:0 8px 22px rgba(11,17,50,.3); z-index:6; white-space:nowrap; }
   .tcw-msg .tcw-mt{ display:block; font-size:9.5px; opacity:.55; margin-top:3px; text-align:right; }
   .tcw-msg .tcw-ms{ display:block; font-size:10.5px; font-weight:700; color:#9A7B2D; margin-bottom:2px; }
@@ -9694,9 +9707,11 @@ s0.parentNode.insertBefore(s1,s0);
     <button class="tcw-hbtn" id="tcwBack" type="button" aria-label="Back to conversations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
     <span class="tcw-av" id="tcwThreadAv" style="width:36px;height:36px;font-size:13px;">?</span>
     <div class="tcw-head-main"><div class="tcw-title" id="tcwThreadName">Chat</div><div class="tcw-sub" id="tcwThreadSub"></div></div>
+    <button class="tcw-hbtn" id="tcwMenuBtn" type="button" aria-label="Conversation options"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
     <button class="tcw-hbtn" id="tcwClose2" type="button" aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="tcw-body" id="tcwListView"><div id="tcwList"></div></div>
+  <div class="tcw-menu" id="tcwMenu" style="display:none;"></div>
   <div class="tcw-body" id="tcwThreadView" style="display:none;">
     <div class="tcw-msgs" id="tcwMsgs"></div>
     <button class="tcw-down" id="tcwDown" type="button" style="display:none;" aria-label="Jump to latest message"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -9709,6 +9724,7 @@ s0.parentNode.insertBefore(s1,s0);
       <span>Photo ready — add a caption or just send</span>
       <button id="tcwPendingX" type="button">Remove</button>
     </div>
+    <div class="tcw-tipbar" id="tcwTipBar" style="display:none;"></div>
     <div class="tcw-composer">
       <button class="tcw-attach" id="tcwAttach" type="button" aria-label="Send a photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg></button>
       <input id="tcwFile" type="file" accept="image/*" style="display:none;">
@@ -9789,6 +9805,7 @@ s0.parentNode.insertBefore(s1,s0);
     host.innerHTML = html;
   }
   function showView(v){
+    hideWMenu(); hideWTip();
     $("tcwListView").style.display = v === "list" ? "" : "none";
     $("tcwThreadView").style.display = v === "thread" ? "" : "none";
     $("tcwHeadList").style.display = v === "thread" ? "none" : "";
@@ -10036,8 +10053,92 @@ s0.parentNode.insertBefore(s1,s0);
     }).catch(function(){ inp.value = body; });
   }
   $("tcwBtn").addEventListener("click", openPanel);
+
+  /* ---- thread 3-dot menu: clear / tip / profile ---- */
+  var wMenuArmed = "";
+  function hideWMenu(){ var m = $("tcwMenu"); if (m) m.style.display = "none"; wMenuArmed = ""; }
+  function hideWTip(){ var b = $("tcwTipBar"); if (b){ b.style.display = "none"; b.innerHTML = ""; } W.tipTo = null; }
+  function toggleWMenu(){
+    var m = $("tcwMenu"); if (!m || !W.cur) return;
+    if (m.style.display !== "none"){ hideWMenu(); return; }
+    var c = W.cur;
+    var html = '<button type="button" data-wm="clear">\uD83E\uDDF9 Clear conversation</button>';
+    html += '<button type="button" data-wm="tip">\uD83D\uDCB8 Send TrybCoin</button>';
+    if (c.kind === "dm") html += '<button type="button" data-wm="profile">\uD83D\uDC64 View profile</button>';
+    m.innerHTML = html;
+    m.style.display = "";
+    m.querySelectorAll("[data-wm]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var act = b.getAttribute("data-wm");
+        if (act === "profile"){ hideWMenu(); window.open("https://chat.trybnetwork.com/?profile=" + encodeURIComponent(c.peer_id), "_blank"); return; }
+        if (act === "tip"){ hideWMenu(); openWTip(); return; }
+        if (act === "clear"){
+          if (wMenuArmed !== "clear"){ wMenuArmed = "clear"; b.textContent = "Tap again \u2014 clear ALL messages"; b.style.color = "#D64545"; return; }
+          hideWMenu();
+          sb.rpc("tc_clear_chat", { p_chat: c.chat_id }).then(function(res){
+            var d = res.data;
+            if (res.error || !d || !d.ok){ tcwToast((d && d.error === "not_allowed") ? "Only the group creator can clear." : "Couldn't clear \u2014 try again."); return; }
+            W.msgs = []; renderMsgs();
+            tcwToast("Conversation cleared");
+            loadChats();
+          });
+        }
+      });
+    });
+  }
+  function openWTip(){
+    if (!W.cur) return;
+    var c = W.cur;
+    if (c.kind === "dm"){ showWTipAmount(c.peer_id, display(c).name); return; }
+    var bar = $("tcwTipBar");
+    bar.innerHTML = '<div class="tt-title">Send TrybCoin to\u2026</div>';
+    bar.style.display = "";
+    sb.rpc("tc_group_info", { p_chat: c.chat_id }).then(function(res){
+      var mem = (res.data && res.data.members) || [];
+      var html = '<div class="tt-title">Send TrybCoin to\u2026</div>';
+      mem.forEach(function(mm){
+        if (mm.user_id === W.user.id) return;
+        html += '<button type="button" class="tt-member" data-tt="' + mm.user_id + '">' + esc(mm.full_name || "Member") + "</button>";
+      });
+      html += '<button type="button" class="tt-cancel" id="tcwTipCancel">Cancel</button>';
+      bar.innerHTML = html;
+      bar.querySelectorAll("[data-tt]").forEach(function(b){
+        b.addEventListener("click", function(){ showWTipAmount(b.getAttribute("data-tt"), b.textContent); });
+      });
+      $("tcwTipCancel").addEventListener("click", hideWTip);
+    }).catch(function(){ tcwToast("Couldn't load members."); hideWTip(); });
+  }
+  function showWTipAmount(toId, toName){
+    var bar = $("tcwTipBar"); if (!bar) return;
+    W.tipTo = toId;
+    bar.innerHTML = '<div class="tt-title">\uD83D\uDCB8 Send TrybCoin to ' + esc(toName) + '</div><div class="tt-row"><input id="tcwTipAmt" type="number" min="1" step="1" placeholder="Amount (TN)"><button type="button" class="tt-send" id="tcwTipSend">Send</button><button type="button" class="tt-cancel" id="tcwTipCancel2">Cancel</button></div><div class="tt-err" id="tcwTipErr"></div>';
+    bar.style.display = "";
+    $("tcwTipCancel2").addEventListener("click", hideWTip);
+    $("tcwTipSend").addEventListener("click", function(){
+      var amt = Math.floor(Number($("tcwTipAmt").value));
+      var err = $("tcwTipErr");
+      if (!W.cur || !W.tipTo) return;
+      if (!(amt >= 1)){ err.textContent = "Enter an amount of at least 1 TN."; return; }
+      sb.rpc("tc_tip", { p_chat: W.cur.chat_id, p_to: W.tipTo, p_amount: amt }).then(function(res){
+        var d = res.data;
+        if (res.error || !d || !d.ok){
+          var e2 = (d && d.error) || "";
+          err.textContent = e2 === "insufficient" ? "Not enough TrybCoin." : e2 === "daily_send_limit" ? "You've hit today's 500 TN sending limit." : e2 === "daily_receive_limit" ? "They've hit today's 500 TN receiving limit." : "Tip failed \u2014 try again.";
+          return;
+        }
+        hideWTip();
+        tcwToast("Sent " + amt + " TN \uD83D\uDCB8");
+        loadMsgs(W.cur.chat_id);
+      });
+    });
+  }
   $("tcwClose").addEventListener("click", closePanel);
   $("tcwClose2").addEventListener("click", closePanel);
+  $("tcwMenuBtn").addEventListener("click", function(e){ e.stopPropagation(); toggleWMenu(); });
+  document.addEventListener("click", function(e){
+    var m = $("tcwMenu");
+    if (m && m.style.display !== "none" && !e.target.closest("#tcwMenu") && !e.target.closest("#tcwMenuBtn")) hideWMenu();
+  });
   $("tcwOpenApp").addEventListener("click", function(){ window.open("https://chat.trybnetwork.com", "_blank"); });
   $("tcwBack").addEventListener("click", function(){ leaveThread(); showView("list"); loadChats(); });
   $("tcwList").addEventListener("click", function(e){
@@ -10119,6 +10220,7 @@ s0.parentNode.insertBefore(s1,s0);
   boot();
 })();
 </script>
+<!-- =============== /TrybChat floating widget =============== -->
 <!-- =============== /TrybChat floating widget =============== -->
 
 </body>
