@@ -1601,8 +1601,11 @@
       #authGate .forgot-link{ color:#9A7B24; }
       #authGate .auth-back{ color:#9A7B24; }
       #authGate .auth-note{ color:#6B7086; }
-      #authGate .auth-download{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px 10px; margin:0 0 16px; border-radius:12px; border:1.5px solid #C9A24B; background:rgba(201,162,75,.10); color:#9A7B24; font-family:"Manrope",sans-serif; font-weight:800; font-size:14px; text-decoration:none; box-sizing:border-box; }
+      #authGate .auth-download{ display:flex; align-items:center; justify-content:center; gap:11px; width:100%; padding:9px 10px; margin:0 0 16px; border-radius:10px; border:1px solid #000000; background:#000000; color:#FFFFFF; text-decoration:none; box-sizing:border-box; }
       #authGate .auth-download:active{ transform:translateY(1px); }
+      #authGate .auth-download .dl-txt{ display:flex; flex-direction:column; align-items:flex-start; }
+      #authGate .auth-download .dl-small{ font-family:"Manrope",sans-serif; font-size:9.5px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; opacity:.85; line-height:1.1; }
+      #authGate .auth-download .dl-big{ font-family:"Manrope",sans-serif; font-size:17.5px; font-weight:800; line-height:1.15; }
       #authGate .sheet-err{ color:#D64545; }
       #authGate .sheet-err.show{
         display:block; background:#FDECEC; border:1px solid #F3C2C2; border-radius:12px; padding:11px 13px;
@@ -1676,8 +1679,8 @@
         </div>
 
         <a class="auth-download" href="https://github.com/Trybnetwork/demo/releases/download/v1.0/trybnetwork.apk">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download the Android app
+          <svg width="23" height="23" viewBox="0 0 24 24" aria-hidden="true"><path fill="#00D2FF" d="M4 3 L13.5 12 L4 21 Z"/><path fill="#00F076" d="M4 3 L17 9.2 L13.5 12 Z"/><path fill="#FFCE00" d="M17 9.2 L20 12 L17 14.8 L13.5 12 Z"/><path fill="#FF3A44" d="M4 21 L13.5 12 L17 14.8 Z"/></svg>
+          <span class="dl-txt"><span class="dl-small">Download the</span><span class="dl-big">Android App</span></span>
         </a>
 
         <form id="signupForm" novalidate>
