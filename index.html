@@ -1601,6 +1601,8 @@
       #authGate .forgot-link{ color:#9A7B24; }
       #authGate .auth-back{ color:#9A7B24; }
       #authGate .auth-note{ color:#6B7086; }
+      #authGate .auth-download{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px 10px; margin:0 0 16px; border-radius:12px; border:1.5px solid #C9A24B; background:rgba(201,162,75,.10); color:#9A7B24; font-family:"Manrope",sans-serif; font-weight:800; font-size:14px; text-decoration:none; box-sizing:border-box; }
+      #authGate .auth-download:active{ transform:translateY(1px); }
       #authGate .sheet-err{ color:#D64545; }
       #authGate .sheet-err.show{
         display:block; background:#FDECEC; border:1px solid #F3C2C2; border-radius:12px; padding:11px 13px;
@@ -1672,6 +1674,11 @@
           <button type="button" id="authTabSignup" class="active">Sign Up</button>
           <button type="button" id="authTabLogin">Log In</button>
         </div>
+
+        <a class="auth-download" href="https://github.com/Trybnetwork/demo/releases/download/v1.0/trybnetwork.apk">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download the Android app
+        </a>
 
         <form id="signupForm" novalidate>
           <div class="form-field">
