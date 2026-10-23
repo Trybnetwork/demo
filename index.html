@@ -1867,16 +1867,16 @@
           <div class="v2-wc-amount num" id="miningBalance">$0.00</div>
           <div class="v2-wc-foot" id="v2MinerFoot"><span style="color:#6B7086;">No active miner</span></div>
           <div class="v2-status-line" id="minerStatusLine">No miner yet — buy a rig and earn every 24 hours.</div>
-          <div id="minerAlertRow" style="display:none;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px 12px;border:1px solid #E6E7EE;border-radius:12px;background:#F8F9FC;">
-            <span style="font-size:12.5px;color:#3C4356;line-height:1.35;">🔔 <b>Cooldown alerts</b><br><span style="color:#6B7086;">Get a phone notification when your miner cools down.</span></span>
-            <button id="minerAlertBtn" type="button" style="flex:none;border:1.5px solid #0B1132;background:#0B1132;color:#fff;border-radius:999px;padding:7px 14px;font-family:Manrope,sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;">Turn on</button>
+          <div id="minerAlertRow" style="display:none;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #EEF0F5;">
+            <span style="font-size:12.5px;font-weight:700;color:#3C4356;">🔔 Cooldown alerts</span>
+            <button id="minerAlertBtn" type="button" role="switch" aria-checked="false" aria-label="Miner cooldown alerts" style="flex:none;width:46px;height:26px;border-radius:999px;border:none;background:#D8DCE6;position:relative;cursor:pointer;padding:0;transition:background .2s;"><span id="minerAlertKnob" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(11,17,50,.25);transition:left .2s;"></span></button>
           </div>
           <div class="v2-card-btns">
             <button class="btn" id="btnStartMining" type="button" style="display:none;">Start Mining</button>
             <button class="btn ghost" id="btnCashout" type="button" disabled style="color:#0B1132;border-color:#D8DCE6;">Cashout</button>
           </div>
           <div class="lock-note card-info" id="miningInfo" style="color:#6B7086;">
-            <span>Put in any amount from <b>$5 to $50,000</b> with your Main Balance or TrybCoin — buying a miner is a straight purchase, and it earns <b>2% of what you put in every 24 hours</b>. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. <b>Make sure to come back every 24hrs to restart the miner</b> — it cools down after each cycle and mines nothing until restarted. Cashout moves your mining profits into Main Balance once a week — profits unlock 7 days after purchase, then 7 days after each cashout. Cashing out never closes your miner. One thing does end it: the contract runs <b>5 months</b> from purchase — after that the miner expires, and buying a new one starts a fresh contract. Topping up adds to your current rig; your Mining profits carry over.</span>
+            <span>Put in any amount from <b>$5 to $50,000</b> with your Main Balance or TrybCoin — buying a miner is a straight purchase, and it earns <b>2% of what you put in every 24 hours</b>. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. <b>Make sure to come back every 24hrs to restart the miner</b> — it cools down after each cycle and mines nothing until restarted. Turn on <b>Cooldown alerts</b> under the miner status and your phone gets a notification the moment it cools down. Cashout moves your mining profits into Main Balance once a week — profits unlock 7 days after purchase, then 7 days after each cashout. Cashing out never closes your miner. One thing does end it: the contract runs <b>5 months</b> from purchase — after that the miner expires, and buying a new one starts a fresh contract. Topping up adds to your current rig; your Mining profits carry over.</span>
           </div>
         </article>
 
@@ -5888,9 +5888,10 @@
           var reg = await navigator.serviceWorker.getRegistration("/");
           var sub = reg ? await reg.pushManager.getSubscription() : null;
           var on = !!sub && Notification.permission === "granted";
-          btn.textContent = on ? "Turn off" : "Turn on";
-          btn.style.background = on ? "#FFFFFF" : "#0B1132";
-          btn.style.color = on ? "#0B1132" : "#FFFFFF";
+          btn.setAttribute("aria-checked", on ? "true" : "false");
+          btn.style.background = on ? "#0B1132" : "#D8DCE6";
+          var knob = $("minerAlertKnob");
+          if (knob) knob.style.left = on ? "23px" : "3px";
         } catch (e) { /* keep default label */ }
       }
       async function tnMinerAlertToggle(){
