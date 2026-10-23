@@ -3368,6 +3368,15 @@
       var REFERRAL_SHARE_RATE = 0.01;
       function creditReferralShare(sourceType, sourceId, profit){
         if (!sb || !currentUser || !(profit > 0)) return Promise.resolve(false);
+        return sb.rpc("tn_credit_referral_share", { p_source_type: sourceType, p_source_id: String(sourceId), p_profit: profit })
+          .then(function(res){
+            if (res.error) return creditReferralShareLegacy(sourceType, sourceId, profit);
+            return !!(res.data && res.data.credited);
+          })
+          .catch(function(){ return creditReferralShareLegacy(sourceType, sourceId, profit); });
+      }
+      function creditReferralShareLegacy(sourceType, sourceId, profit){
+        if (!sb || !currentUser || !(profit > 0)) return Promise.resolve(false);
         var amount = Math.round(profit * REFERRAL_SHARE_RATE * 10000) / 10000;
         if (!(amount > 0)) return Promise.resolve(false);
         return sb.from("tn_referrals").select("referrer_id").eq("referred_id", currentUser.id).limit(1)
@@ -6441,10 +6450,17 @@
           authError("suErr", msg);
         }
         // Username / email uniqueness + referral lookup, then auth signup.
+        var takenRpc = sb.rpc("tn_profile_taken", { p_username: username, p_email: email }).then(function(r){
+          if (r.error || !r.data) return null; return r.data;
+        }).catch(function(){ return null; });
+        var ownerRpc = ref ? sb.rpc("tn_referral_owner", { p_code: ref.toUpperCase() }).then(function(r){
+          if (r.error || !r.data || !r.data.ok) return { data: null };
+          return { data: { id: r.data.referrer_id } };
+        }).catch(function(){ return { data: null }; }) : Promise.resolve({ data: null });
         Promise.all([
-          sb.from("tn_profiles").select("id").eq("username", username).maybeSingle(),
-          sb.from("tn_profiles").select("id").eq("email", email).maybeSingle(),
-          ref ? sb.from("tn_profiles").select("id").eq("referral_code", ref.toUpperCase()).maybeSingle() : Promise.resolve({ data: null })
+          takenRpc.then(function(t){ return { data: t && t.username_taken ? { id: 1 } : null }; }),
+          takenRpc.then(function(t){ return { data: t && t.email_taken ? { id: 1 } : null }; }),
+          ownerRpc
         ]).then(function(checks){
           if (checks[0].data){ fail("That username is already taken — pick another one."); return null; }
           if (checks[1].data){ fail("An account with this email already exists — try logging in instead."); return null; }
@@ -8533,6 +8549,17 @@
           }).catch(function(){ return false; });
       }
       function duelSettle(kind, winnerP){
+        if (!duel || !sb) return Promise.resolve(false);
+        var winnerId = kind === "win" ? (winnerP === "p1" ? duel.player1_id : duel.player2_id) : null;
+        return sb.rpc("tn_duel_settle", { p_duel: duel.id, p_kind: kind, p_winner: winnerId })
+          .then(function(res){
+            if (res.error || !res.data || !res.data.ok) return duelSettleLegacy(kind, winnerP);
+            duelShowResult();
+            return res.data.settled ? "ok" : "settled";
+          })
+          .catch(function(){ return duelSettleLegacy(kind, winnerP); });
+      }
+      function duelSettleLegacy(kind, winnerP){
         // kind: 'win' | 'draw' | 'forfeit'. winnerP: 'p1' | 'p2' | null.
         if (!duel || !sb) return Promise.resolve(false);
         var stake = duel.stake, patch = {}, credits = [];
