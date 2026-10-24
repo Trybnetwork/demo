@@ -2441,6 +2441,7 @@
             <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="bankAmt">$0.00</span><button class="copy-btn" type="button" id="copyBankAmt">Copy</button></div>
             <div class="pd-ngn">Send<span class="pd-ngn-amt num" id="bankNgn">₦0</span></div>
             <p class="pd-rate">Rate: ₦1,380/$ (parallel market)</p>
+            <p class="pd-note">Minimum deposit $5.</p>
             <p class="pd-note">Send the Naira amount above to this Palmpay account, attach your receipt below, then tap “I've sent it”. Your balance is credited in USD once the deposit is approved.</p>
             <div class="receipt-block">
               <label for="receiptInput">Transfer receipt (required)</label>
@@ -2456,6 +2457,7 @@
             <div class="pd-row"><span class="pd-label">Processing fee</span><span class="pd-value num">1.00 USDT</span></div>
             <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="cryptoAmt">0.00 USDT</span><button class="copy-btn" type="button" id="copyCryptoAmt">Copy</button></div>
             <img class="pd-qr" id="cryptoQr" alt="QR code for your USDT (TRC-20) deposit wallet address" />
+            <p class="pd-note">Minimum deposit $10.</p>
             <p class="pd-note">Send exactly <span class="num" id="cryptoExact">0.00 USDT</span> (including the 1 USDT processing fee) — scan the QR code or copy the address above. The wallet address changes with each deposit, so always use the one shown here. Send USDT on the TRC-20 network only, then tap “I've sent it” below.</p>
           </div>
         </div>
@@ -4920,7 +4922,7 @@
         var cfg = {
           deposit: {
             title: "Deposit",
-            sub: "Choose how you want to fund your account. Minimum deposit is $5 by bank transfer, $10 by USDT.",
+            sub: "Choose how you want to fund your account.",
             avail: "", max: null, btn: "I've sent it"
           },
           withdraw: {
