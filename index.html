@@ -3554,17 +3554,23 @@
         return sb.from("tn_referrals").update({ reward_paid: true }).eq("referred_id", referredId).eq("reward_paid", false)
           .then(function(){ return true; }).catch(function(){ return false; });
       }
-      // Qualifying event, seen from the referred user's side: my first
-      // approved deposit reached $10 and my referral row is unpaid.
+      // Qualifying event, seen from the referred user's side: my NET
+      // approved deposits (deposits minus withdrawals, any mix of
+      // deposits) reached $10 and my referral row is unpaid.
       function checkReferralQualification(){
         if (!sb || !currentUser || referralBonusBusy) return;
         sb.from("tn_referrals").select("*").eq("referred_id", currentUser.id).eq("reward_paid", false).limit(1)
           .then(function(res){
             var ref = (res.data || [])[0];
             if (!ref || !ref.referrer_id) return;
-            var deps = state.adminRequests.filter(function(r){ return r.self && r.type === "deposit" && r.status === "approved"; })
-              .slice().sort(function(a, b){ return a.time - b.time; });
-            if (!deps.length || !(deps[0].amount >= REFERRAL_MIN_DEPOSIT)) return;
+            var net = 0, hasDep = false;
+            state.adminRequests.forEach(function(r){
+              if (!r || !r.self || r.status !== "approved") return;
+              var a = Number(r.amount) || 0;
+              if (r.type === "deposit"){ net += a; hasDep = true; }
+              else if (r.type === "withdrawal"){ net -= a; }
+            });
+            if (!hasDep || !(net >= REFERRAL_MIN_DEPOSIT)) return;
             queueReferralBonus(ref);
           }).catch(function(){});
       }
