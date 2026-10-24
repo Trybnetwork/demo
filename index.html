@@ -427,6 +427,11 @@
       }
       .avatar.av-1{background:#34C98E;} .avatar.av-2{background:#7EA6E0;} .avatar.av-3{background:#E0857E;}
       .avatar.av-4{background:#B79AE0;} .avatar.av-5{background:#E0B36A;}
+      .av-wrap{position:relative; display:inline-flex; flex:0 0 auto;}
+      .flag-badge{position:absolute; top:-3px; right:-3px; width:16px; height:16px; background:#fff; border-radius:50%; display:grid; place-items:center; font-size:11px; line-height:1; box-shadow:0 1px 4px rgba(11,17,50,.35); pointer-events:none; z-index:2;}
+      .flag-badge.sm{width:13px; height:13px; font-size:9px;}
+      .duel-inviter{display:flex; align-items:center; gap:12px; margin:10px 0;}
+      .duel-inviter p{margin:0;}
       .drawer-profile .dp-name{font-family:"Sora",sans-serif; font-weight:800; font-size:15.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
       .drawer-profile .dp-email{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
       .drawer-nav{margin-top:22px; display:flex; flex-direction:column; gap:6px;}
@@ -1821,7 +1826,7 @@
           Earn $3
         </button>
         <button class="header-profile v2-gone" id="headerProfile" type="button" aria-hidden="true" tabindex="-1">
-          <span class="avatar" id="headerAvatar">TR</span>
+          <span class="av-wrap"><span class="avatar" id="headerAvatar">TR</span><span class="flag-badge sm" id="headerFlag" style="display:none"></span></span>
           <span class="hp-text"><span class="hp-name" id="headerName">Trader</span><br><span class="hp-sub" id="headerSub">No username set</span></span>
         </button>
       </header>
@@ -2509,7 +2514,7 @@
     <aside class="drawer" id="drawer" aria-label="Menu" aria-hidden="true">
       <div class="drawer-head">
         <div class="drawer-profile">
-          <span class="avatar" id="drawerAvatar">DT</span>
+          <span class="av-wrap"><span class="avatar" id="drawerAvatar">DT</span><span class="flag-badge" id="drawerFlag" style="display:none"></span></span>
           <div style="min-width:0;">
             <div class="dp-name" id="drawerName">Trader</div>
             <div class="dp-email" id="drawerEmail">No email set</div>
@@ -5493,6 +5498,31 @@
         if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
         return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
       }
+      /* Signup-country flag badges (tn_user_countries RPC; NULL -> 'NG' server-side) */
+      var countryByIdCache = {};
+      function flagForCode(code){
+        code = String(code || "").toUpperCase();
+        var c = (typeof countryOf === "function") ? countryOf(code) : null;
+        if (c && c.flag) return c.flag;
+        if (/^[A-Z]{2}$/.test(code)) return String.fromCodePoint(127397 + code.charCodeAt(0), 127397 + code.charCodeAt(1));
+        return "";
+      }
+      function setFlagBadge(el, code){
+        if (!el) return;
+        var f = flagForCode(code);
+        if (f){ el.textContent = f; el.style.display = "grid"; }
+        else el.style.display = "none";
+      }
+      function fetchUserCountries(ids){
+        var missing = [];
+        (ids || []).forEach(function(id){ if (id && !(id in countryByIdCache) && missing.indexOf(id) < 0) missing.push(id); });
+        if (!missing.length) return Promise.resolve(countryByIdCache);
+        if (typeof sb === "undefined" || !sb || !sb.rpc) return Promise.resolve(countryByIdCache);
+        return sb.rpc("tn_user_countries", { p_ids: missing }).then(function(r){
+          if (r && r.data){ Object.keys(r.data).forEach(function(k){ countryByIdCache[k] = r.data[k]; }); }
+          return countryByIdCache;
+        }).catch(function(){ return countryByIdCache; });
+      }
       function paintAvatar(el, avatarIdx, name, photo){
         el.className = "avatar" + (avatarIdx > 0 ? " av-" + avatarIdx : "") + (photo ? " has-photo" : "");
         if (photo){ el.style.backgroundImage = "url(" + photo + ")"; el.textContent = ""; }
@@ -5505,9 +5535,12 @@
       }
       function renderProfileEverywhere(){
         paintAvatar($("drawerAvatar"), state.profile.avatar, state.profile.name, state.profile.photo);
+        var ownCountryCode = (state.profile && state.profile.country) || (typeof profileRow !== "undefined" && profileRow && profileRow.country) || "NG";
+        setFlagBadge($("drawerFlag"), ownCountryCode);
         $("drawerName").textContent = state.profile.name;
         $("drawerEmail").textContent = profileSubLine(state.profile);
         paintAvatar($("headerAvatar"), state.profile.avatar, state.profile.name, state.profile.photo);
+        setFlagBadge($("headerFlag"), ownCountryCode);
         /* Header icon: once the user uploads a profile photo, the header
            emblem shows their photo; with no photo it stays the emblem. */
         var emblemImg = document.querySelector("#menuBtn img");
@@ -8676,11 +8709,13 @@
         var stake = Number(row.stake);
         openDuelOverlay(
           "<h3>Duel invite</h3>" +
-          "<p><b>" + escapeHtml(inviterName || "A player") + "</b> invited you to a " + gname + " duel — " + fmtUSD(stake) + " stake each. Winner takes 90% of the pot.</p>" +
+          '<div class="duel-inviter"><span class="av-wrap"><span class="avatar">' + escapeHtml(avatarInitials(inviterName || "A player")) + '</span><span class="flag-badge" id="duelInviterFlag" style="display:none"></span></span>' +
+          "<p><b>" + escapeHtml(inviterName || "A player") + "</b> invited you to a " + gname + " duel — " + fmtUSD(stake) + " stake each. Winner takes 90% of the pot.</p></div>" +
           '<div class="duel-row"><button class="menu-btn primary" id="duelAcceptBtn" type="button">Accept (' + fmtUSD(stake) + ")</button>" +
           '<button class="menu-btn" id="duelDeclineBtn" type="button">Decline</button></div>' +
           '<div class="duel-note">Duels are Main Balance only — TrybCoin can\'t be staked. Two duels per day. If your opponent disconnects mid-game (5 min, no move), both players are refunded 90% of their stake.</div>'
         );
+        fetchUserCountries([row.player1_id]).then(function(){ setFlagBadge($("duelInviterFlag"), countryByIdCache[row.player1_id]); });
         $("duelAcceptBtn").addEventListener("click", function(){ closeDuelOverlay(); duelAcceptFlow(row); });
         $("duelDeclineBtn").addEventListener("click", closeDuelOverlay);
       }
@@ -9697,6 +9732,7 @@ s0.parentNode.insertBefore(s1,s0);
   .tcw-row{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:#fff; border:none; padding:12px 14px; cursor:pointer; font-family:inherit; color:inherit; }
   .tcw-row:active{ background:#F8F9FC; }
   .tcw-av{ width:48px; height:48px; border-radius:50%; background:#0B1132; color:#C9A24B; display:grid; place-items:center; font-weight:800; font-size:16px; flex:none; overflow:hidden; }
+  .tcw-avwrap{ position:relative; display:inline-block; flex:none; }
   .tcw-av img{ width:100%; height:100%; object-fit:cover; display:block; }
   .tcw-main{ flex:1; min-width:0; }
   .tcw-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
@@ -9770,7 +9806,7 @@ s0.parentNode.insertBefore(s1,s0);
   </div>
   <div class="tcw-head" id="tcwHeadThread" style="display:none;">
     <button class="tcw-hbtn" id="tcwBack" type="button" aria-label="Back to conversations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <span class="tcw-av" id="tcwThreadAv" style="width:36px;height:36px;font-size:13px;">?</span>
+    <span class="tcw-avwrap"><span class="tcw-av" id="tcwThreadAv" style="width:36px;height:36px;font-size:13px;">?</span><span class="flag-badge sm" id="tcwThreadFlag" style="display:none"></span></span>
     <div class="tcw-head-main"><div class="tcw-title" id="tcwThreadName">Chat</div><div class="tcw-sub" id="tcwThreadSub"></div></div>
     <button class="tcw-hbtn" id="tcwMenuBtn" type="button" aria-label="Conversation options"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
     <button class="tcw-hbtn" id="tcwClose2" type="button" aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
@@ -9803,7 +9839,7 @@ s0.parentNode.insertBefore(s1,s0);
 (function(){
   var LOGO = "https://chat.trybnetwork.com/icon-192.png";
   var COMMUNITY = "00000000-0000-0000-0000-00000000c001";
-  var W = { user: null, chats: [], cur: null, msgs: [], chan: null, media: {}, profiles: {}, audio: null, audioPath: null, booted: false };
+  var W = { user: null, chats: [], cur: null, msgs: [], chan: null, media: {}, profiles: {}, audio: null, audioPath: null, booted: false, countries: {} };
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function richText(s){
@@ -9822,6 +9858,25 @@ s0.parentNode.insertBefore(s1,s0);
     return out;
   }
   function initials(n){ var p = String(n || "?").trim().split(/\s+/); return ((p[0] || "?").charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : "")).toUpperCase(); }
+  function flagEmoji(code){
+    code = String(code || "").toUpperCase();
+    if (!/^[A-Z]{2}$/.test(code)) return "";
+    return String.fromCodePoint(127397 + code.charCodeAt(0), 127397 + code.charCodeAt(1));
+  }
+  function fetchCountries(ids){
+    var missing = [];
+    (ids || []).forEach(function(id){ if (id && !(id in W.countries) && missing.indexOf(id) < 0) missing.push(id); });
+    if (!missing.length || typeof sb === "undefined" || !sb || !sb.rpc) return Promise.resolve(false);
+    return sb.rpc("tn_user_countries", { p_ids: missing }).then(function(r){
+      var added = false;
+      if (r && r.data){ Object.keys(r.data).forEach(function(k){ if (!(k in W.countries)) added = true; W.countries[k] = r.data[k]; }); }
+      return added;
+    }).catch(function(){ return false; });
+  }
+  function flagBadgeHTML(uid){
+    var f = uid ? flagEmoji(W.countries[uid]) : "";
+    return f ? '<span class="flag-badge">' + f + "</span>" : "";
+  }
   function fmtClock(ts){ var d = new Date(ts); var h = d.getHours(), m = d.getMinutes(); var ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return h + ":" + (m < 10 ? "0" : "") + m + " " + ap; }
   function fmtTime(ts){ var d = new Date(ts), now = new Date(); if (d.toDateString() === now.toDateString()) return fmtClock(ts); var y = new Date(now); y.setDate(now.getDate() - 1); if (d.toDateString() === y.toDateString()) return "Yesterday"; return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
   function fmtDur(s){ s = Math.max(0, Math.round(Number(s) || 0)); return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60); }
@@ -9847,7 +9902,12 @@ s0.parentNode.insertBefore(s1,s0);
     return d.avUrl ? '<img src="' + esc(d.avUrl) + '" alt="">' : esc(initials(d.avName));
   }
   function loadChats(){
-    return sb.rpc("tc_my_chats").then(function(res){ W.chats = res.data || []; renderList(); paintBadge(); }).catch(function(){});
+    return sb.rpc("tc_my_chats").then(function(res){
+      W.chats = res.data || []; renderList(); paintBadge();
+      var ids = [];
+      W.chats.forEach(function(c){ if (c.kind === "dm" && c.peer_id) ids.push(c.peer_id); });
+      fetchCountries(ids).then(function(added){ if (added) renderList(); });
+    }).catch(function(){});
   }
   function paintBadge(){
     var t = 0; W.chats.forEach(function(c){ t += c.unread || 0; });
@@ -9865,7 +9925,10 @@ s0.parentNode.insertBefore(s1,s0);
       if (c.last_kind === "voice") last = (c.last_sender === W.user.id ? "You: " : "") + "🎤 Voice message";
       else if (c.last_kind === "photo") last = (c.last_sender === W.user.id ? "You: " : "") + "📷 " + (c.last_body || "Photo");
       else last = c.last_body ? ((c.last_sender === W.user.id ? "You: " : "") + c.last_body) : "Say hello 👋";
-      html += '<button class="tcw-row' + (c.unread > 0 ? " unread" : "") + '" type="button" data-tcwchat="' + c.chat_id + '"><span class="tcw-av">' + avHTML(d) + '</span><span class="tcw-main"><span class="tcw-top"><span class="tcw-name">' + esc(d.name) + '</span><span class="tcw-time">' + esc(c.last_at ? fmtTime(c.last_at) : "") + '</span></span><span class="tcw-last"><span style="overflow:hidden;text-overflow:ellipsis;">' + esc(last) + "</span>" + (c.unread > 0 ? '<span class="tcw-unread">' + c.unread + "</span>" : "") + "</span></span></button>";
+      var avCell = (c.kind === "dm" && c.peer_id)
+        ? '<span class="tcw-avwrap"><span class="tcw-av">' + avHTML(d) + "</span>" + flagBadgeHTML(c.peer_id) + "</span>"
+        : '<span class="tcw-av">' + avHTML(d) + "</span>";
+      html += '<button class="tcw-row' + (c.unread > 0 ? " unread" : "") + '" type="button" data-tcwchat="' + c.chat_id + '">' + avCell + '<span class="tcw-main"><span class="tcw-top"><span class="tcw-name">' + esc(d.name) + '</span><span class="tcw-time">' + esc(c.last_at ? fmtTime(c.last_at) : "") + '</span></span><span class="tcw-last"><span style="overflow:hidden;text-overflow:ellipsis;">' + esc(last) + "</span>" + (c.unread > 0 ? '<span class="tcw-unread">' + c.unread + "</span>" : "") + "</span></span></button>";
     });
     host.innerHTML = html;
   }
@@ -9899,6 +9962,17 @@ s0.parentNode.insertBefore(s1,s0);
     W.cur = c; W.msgs = [];
     var d = display(c);
     $("tcwThreadAv").innerHTML = avHTML(d);
+    var tf = $("tcwThreadFlag");
+    if (tf){
+      if (c.kind === "dm" && c.peer_id){
+        var paintTF = function(){
+          var f = flagEmoji(W.countries[c.peer_id]);
+          if (f){ tf.textContent = f; tf.style.display = "grid"; } else tf.style.display = "none";
+        };
+        paintTF();
+        fetchCountries([c.peer_id]).then(function(added){ if (added && W.cur && W.cur.chat_id === c.chat_id) paintTF(); });
+      } else tf.style.display = "none";
+    }
     $("tcwThreadName").textContent = d.name;
     $("tcwThreadSub").textContent = d.sub || "";
     showView("thread");
