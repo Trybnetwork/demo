@@ -330,6 +330,8 @@
       .copy-btn:active{transform:translateY(1px);}
       .pd-qr{display:block; width:190px; max-width:100%; height:auto; margin:14px auto 4px; border-radius:10px; background:#fff; padding:10px;}
       .pd-note{font-size:12px; color:var(--muted); line-height:1.55; margin:10px 0 0; text-align:center;}
+      .min-note{display:none;}
+      .min-note.show{display:block;}
       .pd-ngn{margin-top:14px; text-align:center; font-size:13px; color:var(--muted); font-weight:700;}
       .pd-ngn .pd-ngn-amt{display:block; font-family:"Sora",sans-serif; font-weight:800; font-size:24px; color:var(--gold-bright); margin-top:2px; letter-spacing:-.3px;}
       .pd-rate{font-size:11.5px; color:var(--muted-2); text-align:center; margin:5px 0 0; font-weight:700;}
@@ -2362,6 +2364,8 @@
         <h3 id="sheetTitle">Move funds</h3>
         <p class="sheet-sub" id="sheetSub"></p>
         <div class="amt-wrap"><span>$</span><input id="sheetAmount" class="num" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></div>
+        <p class="pd-note min-note" id="bankMinNote">Minimum deposit $5.</p>
+        <p class="pd-note min-note" id="cryptoMinNote">Minimum deposit $10.</p>
         <div class="max-row"><span id="sheetAvail"></span><button class="max-btn" id="sheetMax" type="button">Use max</button></div>
         <div class="wager-progress" id="wagerProgress" style="display:none">
           <div class="wager-bar"><div class="wager-bar-fill" id="wagerBarFill"></div></div>
@@ -2441,7 +2445,6 @@
             <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="bankAmt">$0.00</span><button class="copy-btn" type="button" id="copyBankAmt">Copy</button></div>
             <div class="pd-ngn">Send<span class="pd-ngn-amt num" id="bankNgn">₦0</span></div>
             <p class="pd-rate">Rate: ₦1,380/$ (parallel market)</p>
-            <p class="pd-note">Minimum deposit $5.</p>
             <p class="pd-note">Send the Naira amount above to this Palmpay account, attach your receipt below, then tap “I've sent it”. Your balance is credited in USD once the deposit is approved.</p>
             <div class="receipt-block">
               <label for="receiptInput">Transfer receipt (required)</label>
@@ -2457,7 +2460,6 @@
             <div class="pd-row"><span class="pd-label">Processing fee</span><span class="pd-value num">1.00 USDT</span></div>
             <div class="pd-row"><span class="pd-label">Amount to send</span><span class="pd-value num" id="cryptoAmt">0.00 USDT</span><button class="copy-btn" type="button" id="copyCryptoAmt">Copy</button></div>
             <img class="pd-qr" id="cryptoQr" alt="QR code for your USDT (TRC-20) deposit wallet address" />
-            <p class="pd-note">Minimum deposit $10.</p>
             <p class="pd-note">Send exactly <span class="num" id="cryptoExact">0.00 USDT</span> (including the 1 USDT processing fee) — scan the QR code or copy the address above. The wallet address changes with each deposit, so always use the one shown here. Send USDT on the TRC-20 network only, then tap “I've sent it” below.</p>
           </div>
         </div>
@@ -4901,6 +4903,8 @@
         $("methodCrypto").classList.toggle("active", m === "crypto");
         $("bankDetails").classList.toggle("show", m === "bank");
         $("cryptoDetails").classList.toggle("show", m === "crypto");
+        $("bankMinNote").classList.toggle("show", m === "bank");
+        $("cryptoMinNote").classList.toggle("show", m === "crypto");
         syncDepositAmounts();
         updateSheetConfirmState();
       }
@@ -4919,6 +4923,8 @@
         $("methodCrypto").classList.remove("active");
         $("bankDetails").classList.remove("show");
         $("cryptoDetails").classList.remove("show");
+        $("bankMinNote").classList.remove("show");
+        $("cryptoMinNote").classList.remove("show");
         var cfg = {
           deposit: {
             title: "Deposit",
