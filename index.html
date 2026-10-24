@@ -2723,7 +2723,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">What bonuses are there?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every referral whose first deposit is <b>12 USDT</b> — track it in the Refer &amp; Earn panel and share your referral code from there.</div>
+            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every referral whose first deposit is <b>10 USDT</b> — track it in the Refer &amp; Earn panel and share your referral code from there.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does the Binary Arena work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -2795,8 +2795,8 @@
         <div class="tc-wrap">
           <div class="tc-banner">
             <b>Free month — Day 1 of 30</b>
-            <p>Your first month is free with full access. After that, a premium membership ($12 / 6 months) keeps TrybChat open.</p>
-            <button class="tc-unlock" id="tcUnlockBtn" type="button">Unlock — $12 / 6 months</button>
+            <p>Your first month is free with full access. After that, a premium membership ($4 / 2 months) keeps TrybChat open.</p>
+            <button class="tc-unlock" id="tcUnlockBtn" type="button">Unlock — $4 / 2 months</button>
           </div>
           <div id="tcChatList"></div>
           <div class="tc-earn">
@@ -3297,7 +3297,7 @@
       var WELCOME_BONUS = 3;
       var BONUS_UNLOCK_VOLUME = 10;
       var REFERRAL_REWARD = 3;
-      var REFERRAL_MIN_DEPOSIT = 12; // first approved deposit that qualifies a referral
+      var REFERRAL_MIN_DEPOSIT = 10; // first approved deposit that qualifies a referral
       var REFERRAL_VEST_DAYS = 7;    // referral bonuses vest this long after qualifying
       var ASSETS = {
         BTCUSD: { name: "Bitcoin / USD",  tv: "COINBASE:BTCUSD", dec: 2 },
@@ -3527,12 +3527,12 @@
       /* ================= Referral bonus vesting (anti-abuse) =================
          The $3 referral bonus no longer lands the moment a referred
          user's first deposit is approved. The qualifying event — this
-         user's first approved deposit of $12+ — writes a
+         user's first approved deposit of $10+ — writes a
          tn_referral_bonuses row (status 'pending', vests_at 7 days
          out) instead of crediting the referrer on the spot. On app
          load, pending rows past their vest date settle lazily: if the
          referred user's net deposits (approved deposits minus
-         completed withdrawals) are still $12+, the bonus is marked
+         completed withdrawals) are still $10+, the bonus is marked
          'vested' and $3 is credited — the guarded status flip makes
          sure it can never credit twice — otherwise it is marked
          'cancelled'. If the tn_referral_bonuses table doesn't exist
@@ -3555,7 +3555,7 @@
           .then(function(){ return true; }).catch(function(){ return false; });
       }
       // Qualifying event, seen from the referred user's side: my first
-      // approved deposit reached $12 and my referral row is unpaid.
+      // approved deposit reached $10 and my referral row is unpaid.
       function checkReferralQualification(){
         if (!sb || !currentUser || referralBonusBusy) return;
         sb.from("tn_referrals").select("*").eq("referred_id", currentUser.id).eq("reward_paid", false).limit(1)
@@ -4914,7 +4914,7 @@
         var cfg = {
           deposit: {
             title: "Deposit",
-            sub: "Choose how you want to fund your account. Minimum deposit is $12.",
+            sub: "Choose how you want to fund your account. Minimum deposit is $5 by bank transfer, $10 by USDT.",
             avail: "", max: null, btn: "I've sent it"
           },
           withdraw: {
@@ -5393,14 +5393,17 @@
         function done(){ sheetSubmitting = false; updateSheetConfirmState(); }
         updateSheetConfirmState();
         if (sheetMode === "deposit"){
-          if (amt < 12){
-            done();
-            sheetError("Minimum deposit is $12 — enter at least $12 to deposit.");
-            return;
-          }
           if (!depositMethod){
             done();
             sheetError("Choose a deposit method — Bank Transfer or Crypto — and send to the details shown first.");
+            return;
+          }
+          var minDeposit = depositMethod === "bank" ? 5 : 10;
+          if (amt < minDeposit){
+            done();
+            sheetError(depositMethod === "bank"
+              ? "Minimum deposit is $5 for bank transfer — enter at least $5 to deposit."
+              : "Minimum deposit is $10 for USDT — enter at least $10 to deposit.");
             return;
           }
           if (depositMethod === "bank" && !receiptUrl){
@@ -9170,7 +9173,7 @@ s0.parentNode.insertBefore(s1,s0);
         <h3 id="v2TrybChatTitle">TrybChat</h3>
         <p class="sheet-sub" style="margin-bottom:10px;">Chat, connect &amp; earn TrybCoin.</p>
         <p class="tc-info-lines">TrybChat is the TrybNetwork chat app — message friends, join the community, and <b>earn TrybCoin for every message you send</b>. Your coin lands in the same TrybCoin balance you already use here.</p>
-        <p class="tc-info-lines"><b>First month free</b> with full access. After that, a <b>$12 premium membership every 6 months</b> keeps TrybChat open — your TrybCoin is always yours.</p>
+        <p class="tc-info-lines"><b>First month free</b> with full access. After that, a <b>$4 premium membership every 2 months</b> keeps TrybChat open — your TrybCoin is always yours.</p>
         <a class="btn" id="v2OpenTrybChat" href="https://chat.trybnetwork.com/" target="_blank" rel="noopener" style="width:100%;display:block;text-align:center;text-decoration:none;">Open TrybChat</a>
         <button class="v2-sheet-close" type="button" data-v2close="v2TrybChatOverlay">Close</button>
       </div>
