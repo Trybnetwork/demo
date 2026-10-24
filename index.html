@@ -2727,7 +2727,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">What bonuses are there?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every referral whose first deposit is <b>10 USDT</b> — track it in the Refer &amp; Earn panel and share your referral code from there.</div>
+            <div class="faq-a">A <b>3 USDT welcome bonus</b> is credited to your Main Balance when you start. It is held back from withdrawals until you have traded <b>10 USDT in total volume</b>; after that it is fully yours to move. You also earn a <b>3 USDT referral bonus</b> for every friend who signs up with your referral code once their <b>net deposits reach 10 USDT</b> — that's their total approved deposits minus withdrawals, and it can build up in steps (for example $5 + $5 by bank transfer, or $10 by USDT). The bonus is then <b>held for 7 days</b> and paid into your Main Balance if their net deposits are still 10 USDT or more when the hold ends; if they withdraw and drop below 10 USDT during the wait, the bonus is cancelled. You also earn <b>1% of every profit your referrals make, for life</b>. Track it all in the Refer &amp; Earn panel and share your referral code from there.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does the Binary Arena work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -6193,7 +6193,7 @@
       if (simBtn){
         simBtn.textContent = "How referrals work";
         simBtn.addEventListener("click", function(){
-          toast("Referrals are live", "Share your code " + state.refCode + " — anyone who enters it when they sign up is recorded under Refer & Earn automatically, on every device.");
+          toast("How referrals work", "Share your code " + state.refCode + " — when a friend who signed up with it reaches $10 in net deposits (approved deposits minus withdrawals; it can build up in steps), a $3 bonus is queued for you. After a 7-day hold it is paid into your Main Balance, as long as their net deposits are still $10 or more — if they drop below $10 during the wait, the bonus is cancelled. You also earn 1% of every profit your referrals make, for life.");
         });
       }
       var _rfl = $("refList"); if (_rfl) _rfl.addEventListener("click", function(){});
@@ -9103,7 +9103,7 @@ s0.parentNode.insertBefore(s1,s0);
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>
             How it works
           </button>
-          <p class="card-info" id="refCardSub" style="color:#6B7086;font-size:13px;line-height:1.55;">Refer your friends and earn $3 referral bonus when they make their first deposit, T&amp;C applies.<br>Earn 1% lifetime rewards from each profit your referral makes.</p>
+          <p class="card-info" id="refCardSub" style="color:#6B7086;font-size:13px;line-height:1.55;"><b>How you get the $3 bonus:</b><br>1. A friend signs up with your code or link.<br>2. When their <b>net deposits reach $10</b> — total approved deposits minus withdrawals, in one go or in steps (e.g. $5 + $5 by bank, or $10 by USDT) — your $3 bonus is queued.<br>3. The bonus is <b>held for 7 days</b>. If their net deposits are still $10 or more when the hold ends, the $3 is paid into your Main Balance. If they withdraw and drop below $10 during the wait, the bonus is cancelled.<br>Plus: you earn <b>1% of every profit</b> your referrals make — for life.</p>
           <div class="ref-code-row">
             <div class="ref-code" style="background:#F2F3F8;border-color:#E6E7EE;">
               <div>
@@ -9434,7 +9434,7 @@ s0.parentNode.insertBefore(s1,s0);
       if (_simRef){
         _simRef.textContent = "How referrals work";
         _simRef.addEventListener("click", function(){
-          toast("Referrals are live", "Share your code " + state.refCode + " \u2014 anyone who enters it when they sign up is recorded under Refer & Earn automatically, on every device.");
+          toast("How referrals work", "Share your code " + state.refCode + " \u2014 when a friend who signed up with it reaches $10 in net deposits (approved deposits minus withdrawals; it can build up in steps), a $3 bonus is queued for you. After a 7-day hold it is paid into your Main Balance, as long as their net deposits are still $10 or more \u2014 if they drop below $10 during the wait, the bonus is cancelled. You also earn 1% of every profit your referrals make, for life.");
         });
       }
       bind("v2EyeBtn", function(){
