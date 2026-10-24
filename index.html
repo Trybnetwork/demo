@@ -10292,9 +10292,10 @@ s0.parentNode.insertBefore(s1,s0);
 
 <style>
 /* Safe-area (2026-10-24): keep headers clear of the iPhone Dynamic Island / status bar in the PWA */
-.wrap{ padding-top: env(safe-area-inset-top, 0px); }
 .auth-gate{ padding-top: calc(26px + env(safe-area-inset-top, 0px)); }
 .drawer{ padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
+header.topbar{ position:sticky; top:0; z-index:55; background:rgba(247,248,252,.9); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:calc(14px + env(safe-area-inset-top, 0px)) 2px 8px; }
+
 </style>
 </body>
 </html>
