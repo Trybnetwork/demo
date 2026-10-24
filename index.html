@@ -1112,6 +1112,12 @@
       .v2-opt-sub{ font-size:13px; color:#6B7086; font-weight:600; margin-top:2px; line-height:1.4; }
       .v2-opt-row .v2-chev-r{ width:18px; height:18px; color:#6B7086; flex:none; }
       .v2-sheet-close{ width:100%; margin-top:6px; padding:14px; border-radius:13px; background:#F2F3F8; font-size:15.5px; font-weight:800; border:none; cursor:pointer; color:#0B1132; font-family:inherit; }
+      /* Explore sheet: layers above the sticky header (55) and the TrybChat widget (300/310); content scrolls internally; Close stays pinned outside the scroll area; sticky header hidden while it is open */
+      #v2ExploreOverlay{ z-index:320; }
+      #v2ExploreOverlay .sheet{ display:flex; flex-direction:column; max-height:calc(100dvh - 12px - env(safe-area-inset-top, 0px)); }
+      #v2ExploreOverlay .v2-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; min-height:0; overscroll-behavior:contain; }
+      #v2ExploreOverlay .v2-sheet-close{ flex:none; }
+      body.explore-open header.topbar{ visibility:hidden; }
       .v2-ref-linkbox{ border:1.5px dashed #C9A24B; border-radius:13px; padding:12px 14px; font-size:13.5px; font-weight:700; color:#6B7086; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:#FFFDF6; margin:10px 0; }
       .v2-ref-stats{ display:flex; gap:10px; margin:14px 0; }
       .v2-ref-stats .v2-rstat{ flex:1; background:#F2F3F8; border-radius:14px; padding:12px 8px; text-align:center; }
@@ -5565,8 +5571,8 @@
         $("drawer").setAttribute("aria-hidden", "true");
         $("menuBtn").setAttribute("aria-expanded", "false");
       }
-      function openScreen(id){ $(id).className = "overlay show"; }
-      function closeScreen(id){ $(id).className = "overlay"; }
+      function openScreen(id){ $(id).className = "overlay show"; if (id === "v2ExploreOverlay") document.body.classList.add("explore-open"); }
+      function closeScreen(id){ $(id).className = "overlay"; if (id === "v2ExploreOverlay") document.body.classList.remove("explore-open"); }
       var profileAvatarPick = 0;
       var profilePhotoPick = "";
       function profileError(msg){ var e = $("profileErr"); e.textContent = msg; e.className = "sheet-err show"; }
@@ -9110,6 +9116,7 @@ s0.parentNode.insertBefore(s1,s0);
     <!-- Dashboard v2: Explore sheet -->
     <div class="overlay" id="v2ExploreOverlay">
       <div class="sheet v2-sheet" role="dialog" aria-modal="true" aria-labelledby="v2ExploreTitle">
+        <div class="v2-scroll">
         <h3 id="v2ExploreTitle">Explore</h3>
         <p class="sheet-sub">More ways to grow your money on TrybNetwork.</p>
         <button class="v2-opt-row" id="v2GoTrade" type="button">
@@ -9152,6 +9159,7 @@ s0.parentNode.insertBefore(s1,s0);
           <span class="v2-opt-main"><span class="v2-opt-title">Earn TrybCoin</span><div class="v2-opt-sub">Complete simple tasks and earn TN Coin</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
         </button>
+        </div>
         <button class="v2-sheet-close" type="button" data-v2close="v2ExploreOverlay">Close</button>
       </div>
     </div>
@@ -10368,7 +10376,7 @@ s0.parentNode.insertBefore(s1,s0);
 /* Safe-area (2026-10-24): keep headers clear of the iPhone Dynamic Island / status bar in the PWA */
 .auth-gate{ padding-top: calc(26px + env(safe-area-inset-top, 0px)); }
 .drawer{ padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
-header.topbar{ position:sticky; top:0; z-index:55; background:rgba(247,248,252,.9); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:calc(14px + env(safe-area-inset-top, 0px)) 2px 8px; }
+header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:calc(14px + env(safe-area-inset-top, 0px)) 2px 8px; }
 
 </style>
 </body>
