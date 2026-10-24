@@ -10289,5 +10289,12 @@ s0.parentNode.insertBefore(s1,s0);
 <!-- =============== /TrybChat floating widget =============== -->
 <!-- =============== /TrybChat floating widget =============== -->
 
+
+<style>
+/* Safe-area (2026-10-24): keep headers clear of the iPhone Dynamic Island / status bar in the PWA */
+.wrap{ padding-top: env(safe-area-inset-top, 0px); }
+.auth-gate{ padding-top: calc(26px + env(safe-area-inset-top, 0px)); }
+.drawer{ padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
+</style>
 </body>
 </html>
