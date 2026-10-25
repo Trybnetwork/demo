@@ -1765,11 +1765,12 @@
 
         <form id="otpForm" novalidate style="display:none;">
           <p class="auth-intro" style="margin:0 0 14px;">We sent a 6-digit verification code to <b id="otpEmailLabel"></b>. Enter it below to finish creating your account — the code expires in 10 minutes.</p>
+          <p style="margin:-6px 0 14px; color:var(--muted-2); font-size:13px; line-height:1.5;">Can't find it? Check your <b>spam or junk folder</b> — the email sometimes lands there instead of your inbox.</p>
           <div class="form-field">
             <label for="otpCode">Verification code</label>
             <input class="text-input" id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······" style="text-align:center; font-size:22px; font-weight:700; letter-spacing:8px;" />
           </div>
-          <div class="auth-success" id="otpOk">New code sent — check your inbox.</div>
+          <div class="auth-success" id="otpOk">New code sent — check your inbox or spam folder.</div>
           <div class="sheet-err" id="otpErr"></div>
           <button class="btn" type="submit" id="otpSubmit">Verify &amp; create account</button>
           <p class="auth-note"><button class="auth-back" type="button" id="otpResend" disabled>Resend code</button> <span id="otpResendNote" style="color:var(--muted-2);"></span></p>
