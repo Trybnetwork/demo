@@ -6511,11 +6511,14 @@
         });
       }
       /* ---- Email OTP gate (custom — tn-email-otp.sql + tn-otp Edge Function) ----
-         Zero-downtime: signup asks tn_otp_status() first. Only when the
-         server says required AND sender_ready does the flow detour through
-         a 6-digit email code; the tn_profiles insert trigger then consumes
-         the verified row server-side. In every other state (including a
-         failed status call) signup runs exactly as it always has. */
+         Signup asks tn_otp_status() first. Only when the server AFFIRMATIVELY
+         says not-required (or sender not ready) does signup run without a
+         code. A failed or empty status call FAILS CLOSED: the database
+         trigger enforces verification on its own, so proceeding on a
+         failed check would create a login whose profile can never save.
+         When verification is required, the flow detours through a 6-digit
+         email code and the tn_profiles insert trigger consumes the
+         verified row server-side. */
       var pendingOtp = null;   // { email, proceed } while the code form is up
       var otpCountdownTimer = null;
       function otpApi(payload){
@@ -6570,17 +6573,18 @@
         $("signupForm").style.display = "";
       }
       function otpGate(email, fail, proceed){
-        if (!sb) return proceed();
+        if (!sb){ fail("Couldn't reach the server — check your connection and try again."); return null; }
         return sb.rpc("tn_otp_status").then(function(r){
-          var st = (!r.error && r.data) ? r.data : null;
-          if (!st || !st.required || !st.sender_ready) return proceed();
+          if (r.error || !r.data){ fail("Couldn't check verification status just now — check your connection and try again."); return null; }
+          var st = r.data;
+          if (!st.required || !st.sender_ready) return proceed();
           return otpSend(email).then(function(sent){
             if (!sent.ok){ fail(sent.msg); return null; }
             pendingOtp = { email: email, proceed: proceed };
             showOtpForm(email);
             return null;
           });
-        }).catch(function(){ return proceed(); });
+        }).catch(function(){ fail("Couldn't check verification status just now — check your connection and try again."); return null; });
       }
       $("otpForm").addEventListener("submit", function(e){
         e.preventDefault();
@@ -6670,14 +6674,24 @@
           if (ref && !checks[2].data){ fail("That referral code doesn't match any account. Check it, or leave the field empty."); return null; }
           var referredBy = checks[2].data ? checks[2].data.id : null;
           return otpGate(email, fail, function(){
+          // Resolve the auth user first. If a login already exists for this
+          // email but signup never finished (no profile — the code step was
+          // abandoned, or a check failed midway), sign in with the password
+          // from this form and finish the profile below instead of
+          // stranding the account.
           return sb.auth.signUp({ email: email, password: pass }).then(function(res){
+            var obfuscated = !res.error && res.data && res.data.user && !res.data.session &&
+              res.data.user.identities && res.data.user.identities.length === 0;
+            if (!res.error && !obfuscated) return res.data ? res.data.user : null;
             if (res.error){
               var m = (res.error.message || "").toLowerCase();
-              if (m.indexOf("already") > -1) fail("An account with this email already exists — try logging in instead.");
-              else fail("Couldn't create your account — " + (res.error.message || "please try again."));
-              return null;
+              if (m.indexOf("already") === -1){ fail("Couldn't create your account — " + (res.error.message || "please try again.")); return null; }
             }
-            var user = res.data.user;
+            return sb.auth.signInWithPassword({ email: email, password: pass }).then(function(si){
+              if (si.error || !si.data.user){ fail("This email already has a login, but the password you entered doesn't match it — go to Log In with the original password, then complete Sign Up using that same password."); return null; }
+              return si.data.user;
+            });
+          }).then(function(user){
             if (!user){ fail("Account created — check your email to confirm, then log in."); return null; }
             var refCode = makeRefCode();
             var profile = {
@@ -6729,7 +6743,18 @@
             currentUser = res.data.user;
             loadUserData(currentUser.id).then(function(ok){
               submitBtn.disabled = false; submitBtn.textContent = "Log In";
-              if (!ok || !profileRow){ authError("liErr", "Signed in, but your profile couldn't be loaded — try again."); return; }
+              if (!ok || !profileRow){
+                // The login exists but no profile was ever saved (signup
+                // was interrupted) — route to Sign Up to finish; the
+                // signup flow heals the account after email verification.
+                var em = currentUser.email || (idv.indexOf("@") > -1 ? idv : "");
+                if (sb) sb.auth.signOut().catch(function(){});
+                currentUser = null;
+                authTab("signup");
+                if (em) $("suEmail").value = em;
+                authError("suErr", "Your login exists but signup never finished — complete this form with the same password to finish your account.");
+                return;
+              }
               enterApp();
               logLoginSession(currentUser.id);
               toast("Welcome back, " + state.profile.name.split(" ")[0], "Signed in as @" + state.profile.username + ".");
