@@ -1763,6 +1763,19 @@
           <button class="btn" type="submit">Create account</button>
         </form>
 
+        <form id="otpForm" novalidate style="display:none;">
+          <p class="auth-intro" style="margin:0 0 14px;">We sent a 6-digit verification code to <b id="otpEmailLabel"></b>. Enter it below to finish creating your account — the code expires in 10 minutes.</p>
+          <div class="form-field">
+            <label for="otpCode">Verification code</label>
+            <input class="text-input" id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······" style="text-align:center; font-size:22px; font-weight:700; letter-spacing:8px;" />
+          </div>
+          <div class="auth-success" id="otpOk">New code sent — check your inbox.</div>
+          <div class="sheet-err" id="otpErr"></div>
+          <button class="btn" type="submit" id="otpSubmit">Verify &amp; create account</button>
+          <p class="auth-note"><button class="auth-back" type="button" id="otpResend" disabled>Resend code</button> <span id="otpResendNote" style="color:var(--muted-2);"></span></p>
+          <p class="auth-note"><button class="auth-back" type="button" id="otpBack">← Back</button></p>
+        </form>
+
         <form id="loginForm" novalidate style="display:none;">
           <div class="form-field">
             <label for="liId">Username or email</label>
@@ -6330,6 +6343,7 @@
         $("resetForm").style.display = "none";
         $("signupForm").style.display = signup ? "" : "none";
         $("loginForm").style.display = signup ? "none" : "";
+        $("otpForm").style.display = "none";
         $("authTabSignup").classList.toggle("active", signup);
         $("authTabLogin").classList.toggle("active", !signup);
         $("suErr").className = "sheet-err";
@@ -6495,6 +6509,121 @@
           return pr;
         });
       }
+      /* ---- Email OTP gate (custom — tn-email-otp.sql + tn-otp Edge Function) ----
+         Zero-downtime: signup asks tn_otp_status() first. Only when the
+         server says required AND sender_ready does the flow detour through
+         a 6-digit email code; the tn_profiles insert trigger then consumes
+         the verified row server-side. In every other state (including a
+         failed status call) signup runs exactly as it always has. */
+      var pendingOtp = null;   // { email, proceed } while the code form is up
+      var otpCountdownTimer = null;
+      function otpApi(payload){
+        return fetch(SUPABASE_URL + "/functions/v1/tn-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": SUPABASE_ANON_KEY },
+          body: JSON.stringify(payload)
+        }).then(function(r){ return r.json().catch(function(){ return null; }); })
+          .catch(function(){ return null; });
+      }
+      function otpError(msg){ authError("otpErr", msg); }
+      function otpSend(email){
+        return otpApi({ action: "send", email: email }).then(function(j){
+          if (!j) return { ok: false, msg: "Couldn't send the verification code — check your connection and try again." };
+          if (j.ok || j.error === "cooldown") return { ok: true };
+          if (j.error === "rate_limited") return { ok: false, msg: "Too many codes have been requested for this email — wait an hour and try again." };
+          return { ok: false, msg: "Couldn't send the verification code — try again in a moment." };
+        });
+      }
+      function otpCountdownStart(){
+        var btn = $("otpResend"), note = $("otpResendNote"), left = 60;
+        if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+        btn.disabled = true; note.textContent = "You can resend in " + left + "s";
+        otpCountdownTimer = setInterval(function(){
+          left--;
+          if (left <= 0){
+            clearInterval(otpCountdownTimer); otpCountdownTimer = null;
+            btn.disabled = false; note.textContent = "";
+          } else {
+            note.textContent = "You can resend in " + left + "s";
+          }
+        }, 1000);
+      }
+      function showOtpForm(email){
+        $("authTabs").style.display = "none";
+        $("signupForm").style.display = "none";
+        $("loginForm").style.display = "none";
+        $("forgotForm").style.display = "none";
+        $("resetForm").style.display = "none";
+        $("otpEmailLabel").textContent = email;
+        $("otpCode").value = "";
+        $("otpErr").className = "sheet-err";
+        $("otpOk").className = "auth-success";
+        $("otpForm").style.display = "";
+        otpCountdownStart();
+        setTimeout(function(){ $("otpCode").focus(); }, 60);
+      }
+      function hideOtpForm(){
+        if (otpCountdownTimer){ clearInterval(otpCountdownTimer); otpCountdownTimer = null; }
+        $("otpForm").style.display = "none";
+        $("authTabs").style.display = "";
+        $("signupForm").style.display = "";
+      }
+      function otpGate(email, fail, proceed){
+        if (!sb) return proceed();
+        return sb.rpc("tn_otp_status").then(function(r){
+          var st = (!r.error && r.data) ? r.data : null;
+          if (!st || !st.required || !st.sender_ready) return proceed();
+          return otpSend(email).then(function(sent){
+            if (!sent.ok){ fail(sent.msg); return null; }
+            pendingOtp = { email: email, proceed: proceed };
+            showOtpForm(email);
+            return null;
+          });
+        }).catch(function(){ return proceed(); });
+      }
+      $("otpForm").addEventListener("submit", function(e){
+        e.preventDefault();
+        if (!pendingOtp) return;
+        var code = $("otpCode").value.trim();
+        if (!/^\d{6}$/.test(code)){ otpError("Enter the 6-digit code from the email."); return; }
+        var btn = $("otpSubmit");
+        btn.disabled = true; btn.textContent = "Verifying…";
+        otpApi({ action: "verify", email: pendingOtp.email, code: code }).then(function(j){
+          btn.disabled = false; btn.textContent = "Verify & create account";
+          if (j && j.ok){
+            var p = pendingOtp; pendingOtp = null;
+            hideOtpForm();
+            return p.proceed();
+          }
+          var err = (j && j.error) || "";
+          if (err === "wrong_code") otpError("That code isn't right" + (j.attempts_left != null ? " — " + j.attempts_left + " attempt" + (j.attempts_left === 1 ? "" : "s") + " left." : " — check it and try again."));
+          else if (err === "too_many_attempts") otpError("Too many wrong attempts — tap “Resend code” below for a fresh code.");
+          else if (err === "expired") otpError("That code has expired — tap “Resend code” below for a fresh one.");
+          else if (err === "no_code") otpError("No code is waiting for this email — tap “Resend code” below.");
+          else otpError("Couldn't verify the code — check your connection and try again.");
+          return null;
+        });
+      });
+      $("otpResend").addEventListener("click", function(){
+        if (!pendingOtp || $("otpResend").disabled) return;
+        var btn = $("otpResend"); btn.disabled = true;
+        otpSend(pendingOtp.email).then(function(sent){
+          if (sent.ok){
+            $("otpErr").className = "sheet-err";
+            $("otpOk").className = "auth-success show";
+            otpCountdownStart();
+          } else {
+            btn.disabled = false;
+            otpError(sent.msg);
+          }
+        });
+      });
+      $("otpBack").addEventListener("click", function(){
+        pendingOtp = null;
+        hideOtpForm();
+        var submitBtn = $("signupForm").querySelector('button[type="submit"]');
+        submitBtn.disabled = false; submitBtn.textContent = "Create account";
+      });
       $("signupForm").addEventListener("submit", function(e){
         e.preventDefault();
         if (!sb){ authError("suErr", "Couldn't reach the server — check your connection and try again."); return; }
@@ -6539,6 +6668,7 @@
           if (checks[1].data){ fail("An account with this email already exists — try logging in instead."); return null; }
           if (ref && !checks[2].data){ fail("That referral code doesn't match any account. Check it, or leave the field empty."); return null; }
           var referredBy = checks[2].data ? checks[2].data.id : null;
+          return otpGate(email, fail, function(){
           return sb.auth.signUp({ email: email, password: pass }).then(function(res){
             if (res.error){
               var m = (res.error.message || "").toLowerCase();
@@ -6573,6 +6703,7 @@
                 return after();
               });
             });
+          });
           });
         }).catch(function(){
           fail("Couldn't reach the server — check your connection and try again.");
