@@ -1673,6 +1673,62 @@
       #v2CoinCard .v2-wc-amount{ margin-top:0; }
       #v2CoinCard .v2-coin-soon-row{ margin-top:auto; padding-top:12px; }
     </style>
+      <style>
+      /* ---------- TrybLife ---------- */
+      #tryblifeView{ padding-bottom:110px; color:#0B1132; }
+      #tryblifeView .txh-head h2{ font-family:"Sora",sans-serif; font-size:21px; font-weight:800; margin:0; }
+      .tl-tn-chip{ margin-left:auto; background:#FBF3DC; border:1px solid #EAD9A0; color:#7A5E14; border-radius:999px; padding:6px 12px; font-weight:700; font-size:13px; white-space:nowrap; }
+      .tl-card{ background:#FFFFFF; border:1px solid #E6E7EE; border-radius:16px; padding:14px; margin-top:12px; }
+      .tl-card h3{ margin:0 0 6px; font-size:15px; font-weight:800; }
+      .tl-sub{ color:#6B7086; font-size:13px; margin:0 0 8px; }
+      .tl-lanes{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+      .tl-lane{ text-align:left; border:2px solid #E6E7EE; background:#F7F8FC; border-radius:14px; padding:12px; cursor:pointer; font:inherit; color:#0B1132; }
+      .tl-lane.on{ border-color:#0B1132; background:#EEF0FA; }
+      .tl-lane b{ display:block; font-size:15px; margin-bottom:4px; }
+      .tl-lane span{ font-size:12px; color:#6B7086; line-height:1.45; display:block; }
+      .tl-name-in{ width:100%; box-sizing:border-box; border:1.5px solid #D8DCE6; border-radius:10px; padding:11px 12px; font:inherit; font-size:15px; color:#0B1132; background:#fff; }
+      .tl-hero{ display:flex; align-items:center; gap:12px; }
+      .tl-ava{ width:52px; height:52px; border-radius:50%; background:#0B1132; color:#C9A24B; display:grid; place-items:center; font-weight:800; font-size:20px; flex:0 0 auto; }
+      .tl-hero-name{ font-weight:800; font-size:16px; }
+      .tl-hero-sub{ color:#6B7086; font-size:12.5px; }
+      .tl-cash{ font-family:"Sora",sans-serif; font-size:30px; font-weight:800; margin:10px 0 2px; }
+      .tl-networth{ color:#6B7086; font-size:12.5px; }
+      .tl-bar{ height:8px; background:#EEF0FA; border-radius:99px; overflow:hidden; margin-top:6px; }
+      .tl-bar > i{ display:block; height:100%; background:#C9A24B; border-radius:99px; }
+      .tl-bar-row{ display:flex; justify-content:space-between; font-size:12px; color:#6B7086; margin-top:10px; }
+      .tl-alert{ background:#FDECEC; border:1px solid #F3C2C2; color:#B3261E; border-radius:12px; padding:10px 12px; font-size:13px; margin-top:12px; }
+      .tl-alert.soft{ background:#FBF3DC; border-color:#EAD9A0; color:#7A5E14; }
+      .tl-actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+      .tl-act{ border:1.5px solid #E6E7EE; background:#F7F8FC; border-radius:14px; padding:12px; text-align:left; cursor:pointer; font:inherit; color:#0B1132; }
+      .tl-act b{ display:block; font-size:14.5px; }
+      .tl-act span{ font-size:12px; color:#6B7086; display:block; margin-top:2px; line-height:1.4; }
+      .tl-act:disabled{ opacity:.45; cursor:not-allowed; }
+      .tl-sleep{ width:100%; margin-top:10px; }
+      .tl-log{ list-style:none; margin:6px 0 0; padding:0; }
+      .tl-log li{ padding:8px 0; border-top:1px solid #EEF0FA; font-size:13.5px; line-height:1.5; }
+      .tl-log li:first-child{ border-top:none; }
+      .tl-log .tl-tn{ color:#7A5E14; font-weight:700; }
+      .tl-row{ display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid #EEF0FA; }
+      .tl-row:first-of-type{ border-top:none; }
+      .tl-row-main{ flex:1; min-width:0; }
+      .tl-row-main b{ display:block; font-size:14px; }
+      .tl-row-main span{ font-size:12px; color:#6B7086; display:block; }
+      .tl-row .btn{ flex:0 0 auto; padding:8px 14px; }
+      .tl-cur{ font-size:11px; font-weight:800; color:#14714A; background:#E3F5EC; border-radius:99px; padding:4px 9px; white-space:nowrap; }
+      .tl-locked{ font-size:11px; font-weight:700; color:#9AA0BD; white-space:nowrap; }
+      .tl-bank-grid{ display:grid; grid-template-columns:1fr; gap:14px; }
+      .tl-amt-row{ display:flex; gap:8px; }
+      .tl-amt-row .tl-name-in{ flex:1; }
+      .tl-chips{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+      .tl-chip{ border:1.5px solid #D8DCE6; background:#fff; color:#0B1132; border-radius:99px; padding:5px 11px; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; }
+      .tl-est{ font-size:13px; color:#6B7086; margin-top:8px; }
+      .tl-est b{ color:#0B1132; }
+      .tl-ms{ display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid #EEF0FA; font-size:13.5px; }
+      .tl-ms:first-of-type{ border-top:none; }
+      .tl-ms .st{ margin-left:auto; font-size:12px; font-weight:700; white-space:nowrap; }
+      .tl-ms .st.done{ color:#14714A; }
+      .tl-ms .st.todo{ color:#9AA0BD; }
+    </style>
   </head>
   <body>
     <div id="google_translate_element" aria-hidden="true"></div>
@@ -2774,6 +2830,103 @@
         <div class="sheet-btns">
           <button class="btn" id="helpClose" type="button">Close</button>
         </div>
+      </div>
+    </div>
+
+    <div id="tryblifeView" style="display:none;">
+      <div class="txh-head">
+        <button class="btn ghost txh-back" id="tlBackBtn" type="button">← Back</button>
+        <div>
+          <h2>TrybLife</h2>
+        </div>
+        <span class="tl-tn-chip">🪙 <span id="tlTnBal">0</span> TN</span>
+      </div>
+
+      <div id="tlCreate" class="tl-card" style="display:none;">
+        <h3>Start your Lagos life</h3>
+        <p class="tl-sub">Work, hustle, pay rent every Saturday — and convert your hustle money to real TrybCoin. ₦100 = 1 TN.</p>
+        <input class="tl-name-in" id="tlName" type="text" maxlength="18" placeholder="Your character's name" autocomplete="off" />
+        <div class="tl-lanes">
+          <button class="tl-lane on" id="tlLaneNepo" type="button" data-lane="nepo"><b>👑 Nepo</b><span>Start with ₦500,000, a family house in Lekki and a bank job unlocked. But family obligations will keep billing you.</span></button>
+          <button class="tl-lane" id="tlLaneLapo" type="button" data-lane="lapo"><b>🔥 Lapo</b><span>Start with ₦15,000 and one room in Ajegunle. No connections — but your side gigs pay +25%. The hustle is real.</span></button>
+        </div>
+        <button class="btn" id="tlStartBtn" type="button" style="width:100%;">Start living</button>
+        <p class="tl-sub" style="margin-top:10px;">In-game ₦ is fictional — but the TrybCoin you convert it to is real inside TrybNetwork.</p>
+      </div>
+
+      <div id="tlMain" style="display:none;">
+        <div class="tl-card">
+          <div class="tl-hero">
+            <div class="tl-ava" id="tlAva">?</div>
+            <div>
+              <div class="tl-hero-name" id="tlHeroName">—</div>
+              <div class="tl-hero-sub" id="tlHeroSub">—</div>
+            </div>
+          </div>
+          <div class="tl-cash" id="tlCash">₦0</div>
+          <div class="tl-networth" id="tlNetWorth">Net worth ₦0</div>
+          <div class="tl-bar-row"><span>⚡ Energy</span><span id="tlEnergyTxt">100/100</span></div>
+          <div class="tl-bar"><i id="tlEnergyBar" style="width:100%;"></i></div>
+          <div class="tl-bar-row"><span id="tlDayTxt">Day 1 · Monday</span><span id="tlHoursTxt">16h left today</span></div>
+          <div id="tlRentAlert"></div>
+          <div class="tl-actions">
+            <button class="tl-act" id="tlWorkBtn" type="button"><b>💼 Work a shift</b><span id="tlWorkSub">6h · earns your salary</span></button>
+            <button class="tl-act" id="tlGigBtn" type="button"><b>🏃 Side gig</b><span>3h · POS runs, okada delivery, owambe DJ…</span></button>
+            <button class="tl-act" id="tlRestBtn" type="button"><b>🛋️ Rest</b><span>2h · recharge your energy</span></button>
+            <button class="tl-act" id="tlJobBtn" type="button"><b>📈 Jobs &amp; homes</b><span>Climb the ladder, upgrade your life</span></button>
+          </div>
+          <button class="btn tl-sleep" id="tlSleepBtn" type="button">🌙 Sleep — end the day</button>
+        </div>
+
+        <div class="tl-card">
+          <h3>Your story so far</h3>
+          <ul class="tl-log" id="tlLog"></ul>
+        </div>
+
+        <div class="tl-card">
+          <h3>🏦 TrybLife Bank</h3>
+          <div class="tl-bank-grid">
+            <div>
+              <p class="tl-sub"><b style="color:#0B1132;">Convert hustle money to TrybCoin</b><br/>₦100 = 1 TN. Conversions count toward your daily earn cap, and you only pay for the TN you actually receive.</p>
+              <div class="tl-amt-row"><input class="tl-name-in num" id="tlConvIn" type="number" inputmode="numeric" min="100" step="100" placeholder="₦ amount" /></div>
+              <div class="tl-chips">
+                <button class="tl-chip" type="button" data-tlchip="10000">₦10k</button>
+                <button class="tl-chip" type="button" data-tlchip="50000">₦50k</button>
+                <button class="tl-chip" type="button" data-tlchip="100000">₦100k</button>
+                <button class="tl-chip" type="button" data-tlchip="max">Max</button>
+              </div>
+              <div class="tl-est" id="tlConvEst">You get ≈ <b>0 TN</b></div>
+              <button class="btn" id="tlConvBtn" type="button" style="width:100%;margin-top:8px;">Convert to TrybCoin</button>
+            </div>
+            <div>
+              <p class="tl-sub"><b style="color:#0B1132;">Rent due? Buy funds with TrybCoin</b><br/>1 TN = ₦100, straight into your game cash. TN earned anywhere on TrybNetwork works here.</p>
+              <div class="tl-amt-row"><input class="tl-name-in num" id="tlBuyIn" type="number" inputmode="numeric" min="1" step="1" placeholder="TN amount" /></div>
+              <div class="tl-est" id="tlBuyEst">You get ≈ <b>₦0</b></div>
+              <button class="btn" id="tlBuyBtn" type="button" style="width:100%;margin-top:8px;">Buy funds with TN</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-card" id="tlJobsCard">
+          <h3>Jobs</h3>
+          <div id="tlJobs"></div>
+          <h3 style="margin-top:14px;">Homes</h3>
+          <p class="tl-sub">Rent is due every Saturday. Moving charges the new home's weekly rent upfront.</p>
+          <div id="tlHomes"></div>
+        </div>
+
+        <div class="tl-card">
+          <h3>Goals &amp; milestones</h3>
+          <div id="tlGoals"></div>
+          <div id="tlMilestones"></div>
+          <button class="btn ghost" id="tlResetBtn" type="button" style="margin-top:14px;color:#B3261E;border-color:#F3C2C2;">Start over (new life)</button>
+        </div>
+      </div>
+
+      <div id="tlOver" class="tl-card" style="display:none;">
+        <h3>🚪 Your landlord has spoken</h3>
+        <p class="tl-sub" id="tlOverTxt">You missed rent twice. The run is over — but every Lagos legend started again from somewhere.</p>
+        <button class="btn" id="tlRestartBtn" type="button" style="width:100%;">Start a new life</button>
       </div>
     </div>
 
@@ -6391,7 +6544,7 @@
          Entering a non-dashboard view pushes a history entry so the
          device back button returns to the dashboard; the on-screen
          Back buttons go through the same history step. */
-      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView", ayo: "ayoView", earn: "earnView", invest: "investView", trybchat: "trybchatView" };
+      var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView" };var VIEW_IDS = { app: "appView", history: "txHistoryView", binary: "binaryView", aviator: "aviatorView", spin: "spinView", whot: "whotView", ayo: "ayoView", earn: "earnView", invest: "investView", trybchat: "trybchatView", tryblife: "tryblifeView" };
       var viewPushed = false;
       function setView(v, skipPush){
         if (!VIEW_IDS[v]) v = "app";
@@ -6401,6 +6554,7 @@
         if (v === "binary" && (tvPending || !$("tvChart").querySelector("iframe"))) loadTvChart();
         if (v === "whot" && typeof whotRender === "function") whotRender(); // re-fit card rows now visibleif (v === "whot" && typeof whotRender === "function") whotRender(); // re-fit card rows now visible
         if (v === "ayo" && typeof ayoRender === "function") ayoRender();
+        if (v === "tryblife" && typeof tlRender === "function") tlRender();
         if (v === "invest") renderInvestments();
         // Re-enter an active duel after navigating away: rebuild from the seed + move log.
         if (typeof duelReenter === "function") duelReenter(v);
@@ -9534,6 +9688,11 @@ s0.parentNode.insertBefore(s1,s0);
           <span class="v2-opt-main"><span class="v2-opt-title">Play</span><div class="v2-opt-sub">Lots of reward games where your skill pays</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
         </button>
+                <button class="v2-opt-row" id="v2GoTrybLife" type="button">
+          <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">TrybLife</span><div class="v2-opt-sub">Live a Lagos life. Earn TrybCoin.</div></span>
+          <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
         <button class="v2-opt-row" id="v2GoInvest" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-6M9 20V6M14 20v-9M19 20V3M2 20h20"/></svg></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Fixed Savings</span><div class="v2-opt-sub">Lock funds for a term, earn up to 26% returns</div></span>
@@ -9650,6 +9809,11 @@ s0.parentNode.insertBefore(s1,s0);
         <button class="v2-opt-row" data-v2game="ayo" type="button">
           <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="7" cy="8" rx="3" ry="2"/><ellipse cx="17" cy="8" rx="3" ry="2"/><ellipse cx="7" cy="16" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg></span>
           <span class="v2-opt-main"><span class="v2-opt-title">Ayo</span><div class="v2-opt-sub">The traditional mancala board game</div></span>
+          <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+                <button class="v2-opt-row" data-v2game="tryblife" type="button">
+          <span class="v2-tx-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span>
+          <span class="v2-opt-main"><span class="v2-opt-title">TrybLife</span><div class="v2-opt-sub">Live a Lagos life — hustle money converts to TrybCoin</div></span>
           <svg class="v2-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
         </button>
         <button class="v2-sheet-close" type="button" data-v2close="v2GamesOverlay">Close</button>
@@ -9897,7 +10061,7 @@ s0.parentNode.insertBefore(s1,s0);
         if (typeof setView !== "function" || window.__v2DockSync) return;
         window.__v2DockSync = true;
         var _setViewOrig = setView;
-        var tabFor = { app: "v2TabHome", binary: "v2TabTrade", aviator: "v2TabGames", spin: "v2TabGames", whot: "v2TabGames", ayo: "v2TabGames", earn: "v2TabHome", history: "v2TabHome" };
+        var tabFor = { app: "v2TabHome", binary: "v2TabTrade", aviator: "v2TabGames", spin: "v2TabGames", whot: "v2TabGames", ayo: "v2TabGames", tryblife: "v2TabGames", earn: "v2TabHome", history: "v2TabHome" };
         var tabIds = ["v2TabHome", "v2TabTrade", "v2TabGames", "v2TabMenu"];
         function syncDock(v){
           window.__v2View = v;
@@ -10923,5 +11087,488 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
 })();
 
 </script>
+  <script>
+  /* ---------- TrybLife (2026-10-26): a Lagos life-sim inside TrybNetwork.
+     In-game naira is fictional and client-held; TrybCoin is real and moves
+     ONLY through the server RPCs (tl_award / tl_convert / tl_buy_funds),
+     which enforce the daily cap, trust ramp and device rule. ---------- */
+  (function(){
+    "use strict";
+    function $(id){ return document.getElementById(id); }
+    function esc(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+    function fmtN(n){ return "₦" + Math.round(Number(n) || 0).toLocaleString("en-US"); }
+    function rand(min, max){ return Math.floor(min + Math.random() * (max - min + 1)); }
+    function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
+
+    var JOBS = [
+      { id: "pos", name: "POS Attendant", pay: 4500, lvl: 1 },
+      { id: "conductor", name: "Danfo Conductor", pay: 5500, lvl: 1 },
+      { id: "sales", name: "Sales Rep", pay: 9000, lvl: 2 },
+      { id: "banker", name: "Bank Teller", pay: 11600, lvl: 3 },
+      { id: "creator", name: "Content Creator", payMin: 0, payMax: 40000, lvl: 4 },
+      { id: "supervisor", name: "Supervisor", pay: 18000, lvl: 5 },
+      { id: "manager", name: "Manager", pay: 35000, lvl: 7 },
+      { id: "tech", name: "Tech Bro / Sis", pay: 45000, lvl: 9 }
+    ];
+    var HOMES = {
+      family: { name: "Family House", area: "Lekki", rent: 0, energy: 120, rest: 50 },
+      face: { name: "Face-Me-I-Face-You", area: "Ajegunle", rent: 7000, energy: 100, rest: 30 },
+      self: { name: "Self-Contain", area: "Yaba", rent: 15000, energy: 110, rest: 40 },
+      mini: { name: "Mini Flat", area: "Lekki Phase 1", rent: 40000, energy: 120, rest: 50 },
+      duplex: { name: "Duplex", area: "Ikoyi", rent: 90000, energy: 140, rest: 65 }
+    };
+    var HOME_ORDER = ["face", "self", "mini", "duplex"];
+    var GIGS = [
+      { name: "POS runs for a busy agent", min: 2000, max: 6000 },
+      { name: "Okada delivery across town", min: 3000, max: 8000 },
+      { name: "Market errands for two traders", min: 2500, max: 7000 },
+      { name: "Owambe DJ set", min: 5000, max: 12000 },
+      { name: "Freelance design job", min: 4000, max: 11000 },
+      { name: "Helped a shop restock at dawn", min: 3000, max: 6500 }
+    ];
+    var EVENTS = [
+      { t: "NEPA took the light during your shift. You finished with torchlight like a pro.", xp: 4 },
+      { t: "Your aunty in Canada sent you ₦20,000 unprovoked. Family is everything.", cash: 20000 },
+      { t: "Area boys 'settled' you at the junction.", cash: -5000 },
+      { t: "Fuel scarcity! Transport fare doubled today.", cash: -3500 },
+      { t: "Your landlord invented a new 'service charge' from nowhere.", cash: -8000 },
+      { t: "A customer dashed you ₦3,000 for good service.", cash: 3000 },
+      { t: "Owambe weekend! You sprayed small, but your network grew.", cash: -6000, xp: 10 },
+      { t: "Rain flooded your street. You waded to work like a soldier.", xp: 6, energy: -10 },
+      { t: "Your phone screen cracked. Painful repairs.", cash: -12000 },
+      { t: "You jump-started a neighbour's car — he pressed ₦5,000 into your hand.", cash: 5000 },
+      { t: "A danfo conductor tried to 'forget' your change. You collected it with confidence.", cash: 1500, xp: 3 },
+      { t: "Levy collectors came round with their wahala.", cash: -4000 },
+      { t: "An old classmate linked you a small contract.", cash: 15000, xp: 5 },
+      { t: "Generator repair at home. The real Lagos tax.", cash: -9000 },
+      { t: "You sold your old sneakers online within the hour.", cash: 7000 },
+      { t: "Family meeting survived: 'when will you bring somebody home?' Uncle still gave you ₦2,000 transport.", cash: 2000 },
+      { t: "A video of you dancing at owambe went small-viral. New followers!", xp: 12 },
+      { t: "You found ₦2,500 in your old jeans. Blessed day.", cash: 2500 },
+      { t: "Daddy's friend called about an 'opportunity'. Mostly vibes, small connections.", xp: 8, lane: "nepo" },
+      { t: "Family obligations: three relatives needed 'urgent 2k' — times fifty.", cash: -25000, lane: "nepo" },
+      { t: "Your POS corner got a new regular — a boutique owner who tips well.", cash: 6000, lane: "lapo" },
+      { t: "Rain entered through the roof. You fixed it yourself, landlord-style.", xp: 5, cash: -2000, lane: "lapo" }
+    ];
+    var XP_LVL = [0, 40, 100, 180, 280, 400, 540, 700, 880, 1080];
+    var MILESTONES = [
+      { key: "nw100k", at: 100000, tn: 20, label: "Reach ₦100k net worth" },
+      { key: "nw500k", at: 500000, tn: 30, label: "Reach ₦500k net worth" },
+      { key: "nw1m", at: 1000000, tn: 50, label: "Reach ₦1M net worth" },
+      { key: "madeit", at: 2500000, tn: 100, label: "Made It in Lagos — ₦2.5M net worth" }
+    ];
+    var CAR_PRICE = 750000;
+    var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    var LS_KEY = "tn_tryblife_v1";
+
+    var S = null;          // game state (null = no character yet)
+    var loaded = false;
+    var tnDelta = 0;       // session TN delta on top of the app-wide balance
+    var createLane = "nepo";
+    var resetArmed = false;
+    var busy = false;
+
+    function uid(){ try { return (typeof currentUser !== "undefined" && currentUser && currentUser.id) ? currentUser.id : null; } catch (e) { return null; } }
+    function devKey(){ try { return localStorage.getItem("tn_device_id") || localStorage.getItem("tn_vid") || ""; } catch (e) { return ""; } }
+    function tnShown(){ var base = 0; try { if (typeof earnCoinBal === "number") base = earnCoinBal; } catch (e) {} return Math.max(0, base + tnDelta); }
+    function say(title, sub){ if (typeof toast === "function") toast(title, sub || ""); }
+    function level(){ if (!S) return 1; var l = 1; for (var i = 1; i < XP_LVL.length; i++) if (S.xp >= XP_LVL[i]) l = i + 1; return l; }
+    function job(){ for (var i = 0; i < JOBS.length; i++) if (JOBS[i].id === S.job) return JOBS[i]; return JOBS[0]; }
+    function home(){ return HOMES[S.home] || HOMES.face; }
+    function maxEnergy(){ return home().energy; }
+    function netWorth(){ return (S ? S.cash : 0) + (S && S.car ? CAR_PRICE : 0); }
+    function statusTitle(){
+      var nw = netWorth();
+      if (nw >= 2500000) return "Made It in Lagos 👑";
+      if (nw >= 1000000) return "Chairman 🎩";
+      if (nw >= 500000) return "Baller 💰";
+      if (nw >= 100000) return "Upcoming ⭐";
+      return S.lane === "nepo" ? "Nepo Baby 👑" : "Hustler 🔥";
+    }
+    function log(text, isTn){
+      if (!S) return;
+      S.log.unshift({ t: text, tn: !!isTn, d: S.day });
+      if (S.log.length > 40) S.log.length = 40;
+    }
+
+    function saveLocal(){ try { if (S) { S._ts = Date.now(); localStorage.setItem(LS_KEY, JSON.stringify(S)); } } catch (e) {} }
+    var pushTimer = null;
+    function pushSave(now){
+      if (!S || !uid() || typeof sb === "undefined") return;
+      var run = function(){
+        try {
+          sb.from("tl_saves").upsert({ user_id: uid(), state: S, updated_at: new Date().toISOString() }).then(function(){}, function(){});
+        } catch (e) {}
+      };
+      if (now) { run(); return Promise.resolve(); }
+      clearTimeout(pushTimer); pushTimer = setTimeout(run, 700);
+      return Promise.resolve();
+    }
+    function pullServer(){
+      var u = uid();
+      if (!u || typeof sb === "undefined") return;
+      try {
+        sb.from("tl_saves").select("state").eq("user_id", u).maybeSingle().then(function(res){
+          var srv = res && res.data && res.data.state;
+          if (srv && srv.name){
+            if (!S || (Number(srv._ts) || 0) > (Number(S._ts) || 0)){ S = srv; saveLocal(); tlRender(); }
+          } else if (S) pushSave(true);
+        }, function(){});
+      } catch (e) {}
+    }
+
+    function tlAward(amount, reason){
+      var u = uid();
+      if (!u || typeof sb === "undefined") return;
+      try {
+        sb.rpc("tl_award", { p_amount: amount, p_reason: reason, p_device_key: devKey() }).then(function(res){
+          var d = res && res.data;
+          if (d && d.ok && d.credited > 0){
+            tnDelta += d.credited;
+            log("Milestone reward: +" + d.credited + " TN landed in your TrybCoin balance.", true);
+            say("+" + d.credited + " TrybCoin", "Milestone reward — real TN, spendable across TrybNetwork.");
+            saveLocal(); tlRender();
+          }
+        }, function(){});
+      } catch (e) {}
+    }
+    function checkMilestones(){
+      if (!S) return;
+      var nw = netWorth();
+      MILESTONES.forEach(function(m){
+        if (!S.ms[m.key] && nw >= m.at){
+          S.ms[m.key] = true;
+          log("🏆 Milestone: " + m.label + " — +" + m.tn + " TN reward on its way.", true);
+          tlAward(m.tn, "milestone_" + m.key);
+        }
+      });
+    }
+    function maybeEvent(chance){
+      if (Math.random() > chance) return;
+      var pool = EVENTS.filter(function(e){ return !e.lane || e.lane === S.lane; });
+      var e = pick(pool);
+      if (e.cash) S.cash = Math.max(0, S.cash + e.cash);
+      if (e.xp) S.xp += e.xp;
+      if (e.energy) S.energy = Math.max(0, Math.min(maxEnergy(), S.energy + e.energy));
+      log("🎲 " + e.t);
+    }
+    function afterAction(){ saveLocal(); pushSave(false); checkMilestones(); tlRender(); }
+
+    function doWork(){
+      if (!S || S.over) return;
+      var j = job();
+      if (S.hours < 6) return say("No hours left today", "Sleep to start a fresh day.");
+      if (S.energy < 25) return say("Energy too low", "Rest first, or sleep.");
+      var pay = j.payMax ? rand(j.payMin, j.payMax) : j.pay;
+      S.cash += pay; S.xp += 12; S.energy -= 25; S.hours -= 6;
+      log("💼 " + j.name + " shift done — +" + fmtN(pay) + ".");
+      maybeEvent(0.25);
+      afterAction();
+    }
+    function doGig(){
+      if (!S || S.over) return;
+      if (S.hours < 3) return say("No hours left today", "Sleep to start a fresh day.");
+      if (S.energy < 15) return say("Energy too low", "Rest first, or sleep.");
+      var g = pick(GIGS);
+      var pay = Math.round(rand(g.min, g.max) * (S.lane === "lapo" ? 1.25 : 1));
+      S.cash += pay; S.xp += 6; S.energy -= 15; S.hours -= 3;
+      log("🏃 Gig: " + g.name + " — +" + fmtN(pay) + (S.lane === "lapo" ? " (Lapo bonus applied)" : "") + ".");
+      maybeEvent(0.2);
+      afterAction();
+    }
+    function doRest(){
+      if (!S || S.over) return;
+      if (S.hours < 2) return say("No hours left today", "Sleep to start a fresh day.");
+      S.energy = Math.min(maxEnergy(), S.energy + home().rest);
+      S.hours -= 2;
+      log("🛋️ You rested and recharged.");
+      afterAction();
+    }
+    function doSleep(){
+      if (!S || S.over) return;
+      var wasSaturday = ((S.day - 1) % 7) === 5;
+      S.day += 1; S.hours = 16; S.energy = maxEnergy();
+      log("🌙 Day " + S.day + " — " + DAYS[(S.day - 1) % 7] + ". Fresh energy, fresh chances.");
+      // Play streak (real calendar days)
+      try {
+        var today = new Date().toDateString();
+        var yest = new Date(Date.now() - 86400000).toDateString();
+        if (S.lastSleep !== today){
+          S.streak = (S.lastSleep === yest) ? (S.streak || 0) + 1 : 1;
+          S.lastSleep = today;
+          if (S.streak % 7 === 0 && S.lastStreakAward !== S.streak){
+            S.lastStreakAward = S.streak;
+            log("🔥 " + S.streak + "-day streak! +25 TN reward on its way.", true);
+            tlAward(25, "streak_" + S.streak);
+          }
+        }
+      } catch (e) {}
+      if (wasSaturday){
+        var h = home();
+        if (h.rent <= 0){
+          log("🏠 Family house — no rent this week. Soft life.");
+        } else if (S.cash >= h.rent){
+          S.cash -= h.rent; S.missed = 0;
+          log("🏠 Rent paid: " + fmtN(h.rent) + " for your " + h.name + ". Landlord is smiling.");
+        } else {
+          S.missed = (S.missed || 0) + 1;
+          if (S.missed >= 2){
+            S.over = true;
+            log("🚪 You missed rent twice — your landlord changed the locks. This life is over.");
+            say("Game over", "Your landlord ended this run. Start a new life when you're ready.");
+          } else {
+            log("⚠️ Rent of " + fmtN(h.rent) + " is due and you can't cover it! Convert TN or hustle fast — one more miss and you're out.");
+            say("Rent missed", "One more missed rent and your landlord ends this life.");
+          }
+        }
+      }
+      maybeEvent(0.6);
+      afterAction();
+    }
+
+    function doConvert(){
+      if (busy || !S) return;
+      var amt = Math.floor(Number(($("tlConvIn") || {}).value) || 0);
+      if (!uid()) return say("Sign in first", "TrybCoin conversion needs your TrybNetwork account.");
+      if (amt < 100) return say("Minimum ₦100", "₦100 converts to 1 TN.");
+      if (amt > S.cash) return say("Not enough cash", "You have " + fmtN(S.cash) + " in game cash.");
+      busy = true;
+      pushSave(true);
+      try {
+        sb.rpc("tl_convert", { p_naira: amt, p_device_key: devKey() }).then(function(res){
+          busy = false;
+          var d = res && res.data;
+          if (!d || !d.ok){
+            var err = d && d.error;
+            return say("Conversion failed", err === "insufficient_funds" ? "Your saved balance is lower — reopen TrybLife and try again." : "Please try again in a moment.");
+          }
+          S.cash = Number(d.cash);
+          tnDelta += Number(d.credited) || 0;
+          if (Number(d.credited) > 0){
+            log("🏦 Converted " + fmtN(d.debited) + " → +" + d.credited + " TN." + (Number(d.debited) < amt ? " Daily earn cap reached — the rest of your ₦ stayed in the game." : ""), true);
+            say("+" + d.credited + " TrybCoin", "Converted from your hustle money.");
+          } else {
+            log("🏦 Conversion paused: today's earn cap is full. Your ₦ is untouched — come back tomorrow.", true);
+            say("Daily cap reached", "Your ₦ is untouched. Conversions reopen tomorrow.");
+          }
+          saveLocal(); pushSave(true); tlRender();
+        }, function(){ busy = false; say("Conversion failed", "Network hiccup — try again."); });
+      } catch (e) { busy = false; }
+    }
+    function doBuyFunds(){
+      if (busy || !S) return;
+      var tn = Math.floor(Number(($("tlBuyIn") || {}).value) || 0);
+      if (!uid()) return say("Sign in first", "Buying funds needs your TrybNetwork account.");
+      if (tn < 1) return say("Enter an amount", "1 TN buys ₦100 of game funds.");
+      if (tn > tnShown()) return say("Not enough TrybCoin", "Your balance is " + tnShown().toLocaleString("en-US") + " TN.");
+      busy = true;
+      pushSave(true);
+      try {
+        sb.rpc("tl_buy_funds", { p_tn: tn }).then(function(res){
+          busy = false;
+          var d = res && res.data;
+          if (!d || !d.ok){
+            var err = d && d.error;
+            return say("Purchase failed", err === "insufficient_tn" ? "Your TrybCoin balance is lower than that." : err === "no_save" ? "Start your life first, then buy funds." : "Please try again in a moment.");
+          }
+          S.cash = Number(d.cash);
+          tnDelta -= Number(d.spent_tn) || 0;
+          log("🏦 Bought " + fmtN(d.gained) + " of game funds with " + d.spent_tn + " TN.");
+          say(fmtN(d.gained) + " added", "Bought with " + d.spent_tn + " TN. Rent stands no chance.");
+          saveLocal(); pushSave(true); checkMilestones(); tlRender();
+        }, function(){ busy = false; say("Purchase failed", "Network hiccup — try again."); });
+      } catch (e) { busy = false; }
+    }
+
+    function renderJobs(){
+      var host = $("tlJobs"); if (!host || !S) return;
+      var html = "";
+      JOBS.forEach(function(j){
+        var payTxt = j.payMax ? fmtN(j.payMin) + "–" + fmtN(j.payMax) + " / shift (volatile)" : fmtN(j.pay) + " / shift";
+        var right;
+        if (S.job === j.id) right = '<span class="tl-cur">Current job</span>';
+        else if (level() < j.lvl) right = '<span class="tl-locked">Needs level ' + j.lvl + "</span>";
+        else right = '<button class="btn" type="button" data-tljob="' + j.id + '">Take job</button>';
+        html += '<div class="tl-row"><div class="tl-row-main"><b>' + esc(j.name) + "</b><span>" + payTxt + " · Level " + j.lvl + "</span></div>" + right + "</div>";
+      });
+      host.innerHTML = html;
+    }
+    function renderHomes(){
+      var host = $("tlHomes"); if (!host || !S) return;
+      var html = "";
+      if (S.home === "family"){
+        html += '<div class="tl-row"><div class="tl-row-main"><b>Family House</b><span>Lekki · ₦0 rent · your starting perk (leaving is forever)</span></div><span class="tl-cur">Current home</span></div>';
+      }
+      HOME_ORDER.forEach(function(id){
+        var h = HOMES[id];
+        var right = S.home === id ? '<span class="tl-cur">Current home</span>'
+          : '<button class="btn" type="button" data-tlhome="' + id + '">Move · ' + fmtN(h.rent) + "</button>";
+        html += '<div class="tl-row"><div class="tl-row-main"><b>' + esc(h.name) + "</b><span>" + esc(h.area) + " · " + fmtN(h.rent) + "/week · " + h.energy + " energy</span></div>" + right + "</div>";
+      });
+      host.innerHTML = html;
+    }
+    function renderGoals(){
+      var g = $("tlGoals"), m = $("tlMilestones");
+      if (!g || !m || !S) return;
+      if (S.car) g.innerHTML = '<div class="tl-ms">🚗 You own a car — chairman levels.<span class="st done">Done · +40 TN</span></div>';
+      else g.innerHTML = '<div class="tl-ms">🚗 Buy your first car — ' + fmtN(CAR_PRICE) + '<span class="st todo">+40 TN milestone</span></div><button class="btn" type="button" data-tlcar="1" style="width:100%;">Buy the car</button>';
+      var html = "";
+      MILESTONES.forEach(function(ms){
+        html += '<div class="tl-ms">' + (S.ms[ms.key] ? "🏆 " : "🎯 ") + esc(ms.label) + '<span class="st ' + (S.ms[ms.key] ? "done" : "todo") + '">' + (S.ms[ms.key] ? "Done" : "+" + ms.tn + " TN") + "</span></div>";
+      });
+      m.innerHTML = html;
+    }
+
+    function tlRender(){
+      var chip = $("tlTnBal"); if (chip) chip.textContent = tnShown().toLocaleString("en-US");
+      var create = $("tlCreate"), main = $("tlMain"), over = $("tlOver");
+      if (!create || !main || !over) return;
+      if (!loaded){
+        loaded = true;
+        try { var raw = localStorage.getItem(LS_KEY); if (raw) S = JSON.parse(raw); } catch (e) { S = null; }
+        pullServer();
+      }
+      if (!S){ create.style.display = ""; main.style.display = "none"; over.style.display = "none"; return; }
+      create.style.display = "none";
+      main.style.display = S.over ? "none" : "";
+      over.style.display = S.over ? "" : "none";
+      if (S.over) return;
+      $("tlAva").textContent = (S.name || "?").charAt(0).toUpperCase();
+      $("tlHeroName").textContent = S.name;
+      $("tlHeroSub").textContent = statusTitle() + " · " + job().name + " · Level " + level() + " · " + home().name;
+      $("tlCash").textContent = fmtN(S.cash);
+      $("tlNetWorth").textContent = "Net worth " + fmtN(netWorth()) + " · XP " + S.xp;
+      $("tlEnergyTxt").textContent = S.energy + "/" + maxEnergy();
+      $("tlEnergyBar").style.width = Math.max(0, Math.min(100, (S.energy / maxEnergy()) * 100)) + "%";
+      $("tlDayTxt").textContent = "Day " + S.day + " · " + DAYS[(S.day - 1) % 7];
+      $("tlHoursTxt").textContent = S.hours + "h left today";
+      var ra = $("tlRentAlert");
+      if (((S.day - 1) % 7) === 5 && home().rent > 0) ra.innerHTML = '<div class="tl-alert soft">🏠 Rent day! ' + fmtN(home().rent) + " leaves your account when you sleep tonight." + (S.cash < home().rent ? " You are short — convert TN to funds below, quick." : "") + "</div>";
+      else if (S.missed > 0) ra.innerHTML = '<div class="tl-alert">⚠️ You owe rent (' + fmtN(home().rent) + "). Cover it before next Saturday or your landlord ends this life.</div>";
+      else ra.innerHTML = "";
+      var j = job();
+      $("tlWorkSub").textContent = "6h · " + j.name + " pays " + (j.payMax ? fmtN(j.payMin) + "–" + fmtN(j.payMax) : fmtN(j.pay));
+      $("tlWorkBtn").disabled = S.hours < 6 || S.energy < 25;
+      $("tlGigBtn").disabled = S.hours < 3 || S.energy < 15;
+      $("tlRestBtn").disabled = S.hours < 2;
+      $("tlSleepBtn").textContent = "🌙 Sleep — start Day " + (S.day + 1);
+      $("tlLog").innerHTML = S.log.slice(0, 8).map(function(l){
+        return '<li' + (l.tn ? ' class="tl-tn"' : "") + ">" + esc(l.t) + "</li>";
+      }).join("");
+      renderJobs(); renderHomes(); renderGoals();
+      updConvEst(); updBuyEst();
+    }
+    window.tlRender = tlRender;
+
+    function updConvEst(){
+      var inp = $("tlConvIn"), est = $("tlConvEst");
+      if (!inp || !est) return;
+      var amt = Math.floor(Number(inp.value) || 0);
+      est.innerHTML = "You get ≈ <b>" + Math.floor(amt / 100).toLocaleString("en-US") + " TN</b>";
+    }
+    function updBuyEst(){
+      var inp = $("tlBuyIn"), est = $("tlBuyEst");
+      if (!inp || !est) return;
+      var tn = Math.floor(Number(inp.value) || 0);
+      est.innerHTML = "You get ≈ <b>" + fmtN(tn * 100) + "</b>";
+    }
+
+    function startLife(){
+      var name = (($("tlName") || {}).value || "").trim();
+      if (!name) name = createLane === "nepo" ? "Nepo Baby" : "Street Hustler";
+      S = {
+        v: 1, name: name, lane: createLane, day: 1, hours: 16,
+        cash: createLane === "nepo" ? 500000 : 15000,
+        xp: createLane === "nepo" ? 100 : 0,
+        energy: createLane === "nepo" ? 120 : 100,
+        job: createLane === "nepo" ? "banker" : "pos",
+        home: createLane === "nepo" ? "family" : "face",
+        missed: 0, over: false, car: false, ms: {}, log: [],
+        streak: 0, lastSleep: "", lastStreakAward: 0
+      };
+      log(createLane === "nepo"
+        ? "👑 You woke up in Lekki with ₦500,000 and soft life waiting. Try not to fumble it."
+        : "🔥 You woke up in Ajegunle with ₦15,000 and big dreams. Rent is Saturday. Hustle!");
+      saveLocal(); pushSave(true);
+      say("Welcome to Lagos, " + name, "Rent is due every Saturday. Good luck out there.");
+      tlRender();
+    }
+    function wipeLife(){
+      S = null;
+      try { localStorage.removeItem(LS_KEY); } catch (e) {}
+      var u = uid();
+      if (u && typeof sb !== "undefined"){
+        try { sb.from("tl_saves").upsert({ user_id: u, state: {}, updated_at: new Date().toISOString() }).then(function(){}, function(){}); } catch (e) {}
+      }
+      tlRender();
+    }
+
+    function bind(id, fn){ var el = $(id); if (el) el.addEventListener("click", fn); }
+    bind("tlBackBtn", function(){ if (typeof goHome === "function") goHome(); else if (typeof setView === "function") setView("app", true); });
+    bind("tlLaneNepo", function(){ createLane = "nepo"; $("tlLaneNepo").classList.add("on"); $("tlLaneLapo").classList.remove("on"); });
+    bind("tlLaneLapo", function(){ createLane = "lapo"; $("tlLaneLapo").classList.add("on"); $("tlLaneNepo").classList.remove("on"); });
+    bind("tlStartBtn", startLife);
+    bind("tlRestartBtn", function(){ wipeLife(); });
+    bind("tlWorkBtn", doWork);
+    bind("tlGigBtn", doGig);
+    bind("tlRestBtn", doRest);
+    bind("tlSleepBtn", doSleep);
+    bind("tlJobBtn", function(){ var c = $("tlJobsCard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    bind("tlConvBtn", doConvert);
+    bind("tlBuyBtn", doBuyFunds);
+    bind("tlResetBtn", function(){
+      var b = $("tlResetBtn");
+      if (!resetArmed){
+        resetArmed = true;
+        b.textContent = "Tap again to confirm — this wipes your life";
+        setTimeout(function(){ resetArmed = false; b.textContent = "Start over (new life)"; }, 3000);
+        return;
+      }
+      resetArmed = false; b.textContent = "Start over (new life)";
+      wipeLife();
+      say("New beginnings", "Your old life is gone. Pick a lane and go again.");
+    });
+    var convIn = $("tlConvIn"); if (convIn) convIn.addEventListener("input", updConvEst);
+    var buyIn = $("tlBuyIn"); if (buyIn) buyIn.addEventListener("input", updBuyEst);
+    document.addEventListener("click", function(e){
+      var t = e.target && e.target.closest ? e.target : null;
+      if (!t) return;
+      var chip = t.closest("[data-tlchip]");
+      if (chip && S){
+        var v = chip.getAttribute("data-tlchip");
+        var inp = $("tlConvIn");
+        if (inp){ inp.value = v === "max" ? Math.floor(S.cash / 100) * 100 : v; updConvEst(); }
+        return;
+      }
+      var jb = t.closest("[data-tljob]");
+      if (jb && S){
+        var jid = jb.getAttribute("data-tljob");
+        for (var i = 0; i < JOBS.length; i++) if (JOBS[i].id === jid){ S.job = jid; log("💼 New job: " + JOBS[i].name + ". Congratulations, try not to get sacked."); }
+        afterAction(); return;
+      }
+      var hb = t.closest("[data-tlhome]");
+      if (hb && S){
+        var hid = hb.getAttribute("data-tlhome"), h = HOMES[hid];
+        if (S.cash < h.rent) return say("Can't move yet", "Moving needs " + fmtN(h.rent) + " upfront — that's this week's rent.");
+        S.cash -= h.rent; S.home = hid; S.energy = Math.min(S.energy, maxEnergy());
+        log("🏠 You moved to a " + h.name + " in " + h.area + " — " + fmtN(h.rent) + " paid upfront.");
+        afterAction(); return;
+      }
+      var cb = t.closest("[data-tlcar]");
+      if (cb && S && !S.car){
+        if (S.cash < CAR_PRICE) return say("Not yet, chairman", "A car costs " + fmtN(CAR_PRICE) + ". Keep hustling.");
+        S.cash -= CAR_PRICE; S.car = true; S.ms.car = true;
+        log("🚗 You bought your first car! Neighbours are already calling you chairman. +40 TN milestone on its way.", true);
+        tlAward(40, "milestone_car");
+        afterAction(); return;
+      }
+    });
+    /* Explore entry (row added alongside the other Explore rows). */
+    bind("v2GoTrybLife", function(){
+      if (typeof closeScreen === "function") closeScreen("v2ExploreOverlay");
+      if (typeof setView === "function") setView("tryblife");
+    });
+  })();
+  </script>
 </body>
 </html>
