@@ -2885,6 +2885,7 @@
 
         <div class="tl-card">
           <h3>🏦 TrybLife Bank</h3>
+          <button class="btn ghost" id="tlImportBtn" type="button" style="margin-bottom:10px;">🎮 Import a guest claim</button>
           <div class="tl-bank-grid">
             <div>
               <p class="tl-sub"><b style="color:#0B1132;">Convert hustle money to TrybCoin</b><br/>₦100 = 1 TN. Conversions count toward your daily earn cap, and you only pay for the TN you actually receive.</p>
@@ -11440,6 +11441,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
         loaded = true;
         try { var raw = localStorage.getItem(LS_KEY); if (raw) S = JSON.parse(raw); } catch (e) { S = null; }
         pullServer();
+        tlTryPendingClaim();
       }
       if (!S){ create.style.display = ""; main.style.display = "none"; over.style.display = "none"; return; }
       create.style.display = "none";
@@ -11472,6 +11474,92 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
       updConvEst(); updBuyEst();
     }
     window.tlRender = tlRender;
+
+    /* ----- Guest claims: a guest life arrives as a compact code (claim
+       link from trybnetwork.com/life or a pasted code). The save imports;
+       banked milestone TN pays through tl_award (daily cap decides), and
+       whatever the cap cannot pay becomes game cash — nothing is lost.
+       Forgery ceiling: milestone TN is clamped to what the milestones +
+       streak in the code could legitimately have banked. ----- */
+    var TL_MS_KEYS = { nw100k: 20, nw500k: 30, nw1m: 50, madeit: 100, car: 40 };
+    var tlClaimTried = false;
+    try {
+      var tlcm = /[?&]tlclaim=([A-Za-z0-9\-_]+)/.exec(window.location.search || "");
+      if (tlcm){
+        try { localStorage.setItem("tn_tlclaim_pending", tlcm[1]); } catch (e) {}
+        try { history.replaceState(null, "", window.location.pathname + window.location.hash); } catch (e) {}
+      }
+    } catch (e) {}
+    function tlDecodeClaim(code){
+      if (!code) return null;
+      var m = /tlclaim=([A-Za-z0-9\-_]+)/.exec(String(code));
+      if (m) code = m[1];
+      code = String(code).trim();
+      if (!/^[A-Za-z0-9\-_]+$/.test(code)) return null;
+      try {
+        var b = code.replace(/-/g, "+").replace(/_/g, "/");
+        while (b.length % 4) b += "=";
+        return JSON.parse(decodeURIComponent(escape(atob(b))));
+      } catch (e) { return null; }
+    }
+    function tlImportClaim(code){
+      var p = tlDecodeClaim(code);
+      if (!p){ say("That claim didn't check out", "The code looks incomplete — copy it again from the guest game."); return false; }
+      if (S && S.day > 2){ say("You already have a life going", "A guest claim can't overwrite a life in progress."); return false; }
+      var lane = p.l === "nepo" ? "nepo" : "lapo";
+      var jobIds = {}; JOBS.forEach(function(j){ jobIds[j.id] = 1; });
+      var streak = Math.max(0, Math.min(3650, Math.floor(Number(p.st) || 0)));
+      var guestTn = Math.max(0, Math.min(100000, Math.floor(Number(p.g) || 0)));
+      var maxG = 240 + Math.floor(streak / 7) * 25;
+      if (guestTn > maxG) guestTn = maxG;
+      var ms = {};
+      (Array.isArray(p.ms) ? p.ms : []).forEach(function(k){ if (TL_MS_KEYS[k]) ms[k] = true; });
+      var homeId = HOMES[p.h] ? p.h : (lane === "nepo" ? "family" : "face");
+      S = {
+        v: 1, name: (String(p.n || "Hustler").slice(0, 18) || "Hustler"), lane: lane,
+        day: Math.max(1, Math.min(10000, Math.floor(Number(p.d) || 1))), hours: 16,
+        cash: Math.max(0, Math.min(5000000, Math.floor(Number(p.c) || 0))),
+        xp: Math.max(0, Math.min(100000, Math.floor(Number(p.x) || 0))),
+        energy: (HOMES[homeId] || HOMES.face).energy,
+        job: jobIds[p.j] ? p.j : "pos", home: homeId,
+        missed: 0, over: false, car: !!Number(p.car || 0), bought: 0, ms: ms, log: [],
+        streak: streak, lastSleep: "", lastStreakAward: 0
+      };
+      log("🎮 Your guest life just moved in — welcome to the full app, " + S.name + ".");
+      function settle(restTn){
+        if (restTn > 0){
+          S.cash += restTn * 100;
+          log("🪙 " + restTn + " TN of milestone rewards became " + fmtN(restTn * 100) + " of game cash (daily claim limit) — nothing lost.", true);
+        }
+        saveLocal(); pushSave(true); checkMilestones(); tlRender();
+      }
+      if (guestTn > 0 && uid() && typeof sb !== "undefined"){
+        try {
+          sb.rpc("tl_award", { p_amount: guestTn, p_reason: "guest_claim", p_device_key: devKey() }).then(function(res){
+            var d = res && res.data, credited = (d && d.ok) ? (Number(d.credited) || 0) : 0;
+            tnDelta += credited;
+            if (credited > 0) log("🪙 Guest milestones paid: +" + credited + " TN in your TrybCoin balance.", true);
+            settle(guestTn - credited);
+            say("Guest claim complete", credited > 0 ? "+" + credited + " TN landed — your life continues here now." : "Your life moved in — milestone value became game cash.");
+          }, function(){ settle(guestTn); say("Guest life imported", "Milestone value became game cash."); });
+        } catch (e) { settle(guestTn); }
+      } else {
+        settle(guestTn);
+        say("Guest life imported", "Your Lagos life continues here now.");
+      }
+      return true;
+    }
+    window.__tlImport = tlImportClaim;
+    function tlTryPendingClaim(){
+      if (tlClaimTried) return;
+      tlClaimTried = true;
+      var pc = "";
+      try { pc = localStorage.getItem("tn_tlclaim_pending") || ""; } catch (e) {}
+      if (pc && uid()){
+        try { localStorage.removeItem("tn_tlclaim_pending"); } catch (e) {}
+        tlImportClaim(pc);
+      }
+    }
 
     function updConvEst(){
       var inp = $("tlConvIn"), est = $("tlConvEst");
@@ -11528,6 +11616,10 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
     bind("tlSleepBtn", doSleep);
     bind("tlJobBtn", function(){ var c = $("tlJobsCard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); });
     bind("tlConvBtn", doConvert);
+    bind("tlImportBtn", function(){
+      var code = window.prompt("Paste your TrybLife guest claim code:");
+      if (code) tlImportClaim(code);
+    });
     bind("tlBuyBtn", doBuyFunds);
     bind("tlResetBtn", function(){
       var b = $("tlResetBtn");
