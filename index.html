@@ -4525,7 +4525,7 @@
         if (!sb || !currentUser){ toast("Not signed in", "Log in again to place a bid."); return; }
         var stake = effectiveStake();
         if (!(stake > 0)){ toast("Enter a stake first", "Set a stake amount above $0 to place a bid."); return; }
-        var dd = deductStake(stake, "main"); // Binary trading is Main Balance only — TrybCoin can't stake bids.
+        var dd = deductStake(stake, "main", true); // Binary trading is Main Balance only — TrybCoin can't stake bids.
         if (!dd.ok) return;
         bidBusy = true;
         $("btnHigher").disabled = true; $("btnLower").disabled = true;
@@ -4880,7 +4880,7 @@
       }
       // Deduct a USD-denominated stake from the selected source.
       // Returns {ok, coins} — coins is the TrybCoin spent (0 for Main).
-      function deductStake(usd, forceSrc){
+      function deductStake(usd, forceSrc, guardBonus){
         usd = round2(usd);
         if ((forceSrc || state.stakeSource || "main") === "trybcoin"){
           var coins = coinCostForUsd(usd);
@@ -4897,8 +4897,8 @@
           toast("Insufficient Main Balance", "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + ".");
           return { ok: false, coins: 0, source: "main" };
         }
-        if (usd > movableMain()){
-          toast("Welcome bonus locked", "Your $3 welcome bonus unlocks after you trade $10 of your own money. You can stake " + fmtUSD(movableMain()) + " right now.");
+        if (guardBonus && usd > movableMain()){
+          toast("Welcome bonus locked", "The welcome bonus can't be staked on Trading, Ayo or Whot until you trade $10 of your own money. You can stake " + fmtUSD(movableMain()) + " right now.");
           return { ok: false, coins: 0, source: "main" };
         }
         state.main = round2(state.main - usd);
@@ -7890,7 +7890,7 @@
         if (!sb || !currentUser){ toast("Not signed in", "Log in again to play."); return; }
         var stake = gameStakeFrom("whotAmount");
         if (!validateGameStake(stake)) return;
-        var dd = deductStake(stake);
+        var dd = deductStake(stake, null, true);
         if (!dd.ok) return;
         whotBusy = true; whotRender();
         var prevMain = state.main, prevCoins = earnCoinBal;
@@ -8423,7 +8423,7 @@
         if (!sb || !currentUser){ toast("Not signed in", "Log in again to play."); return; }
         var stake = gameStakeFrom("ayoAmount");
         if (!validateGameStake(stake)) return;
-        var dd = deductStake(stake);
+        var dd = deductStake(stake, null, true);
         if (!dd.ok) return;
         ayoBusy = true; ayoRender();
         var prevMain = state.main, prevCoins = earnCoinBal;
@@ -8753,6 +8753,10 @@
         if (!validateGameStake(stake)) return;
         duelDailyOk(game).then(function(ok){
           if (!ok){ toast("Daily duel used", "You can play two duels per day per game — come back tomorrow."); return; }
+          if (stake > movableMain()){
+            toast("Welcome bonus locked", "The welcome bonus can't be staked on duels until you trade $10 of your own money. You can stake " + fmtUSD(movableMain()) + " right now.");
+            return;
+          }
           var prevMain = state.main;
           state.main = round2(state.main - stake);
           duelCreating = true;
@@ -8818,6 +8822,9 @@
           var stake = Number(row.stake);
           if (!(stake >= 1) || stake > state.main){
             toast("Can't accept", "You need " + fmtUSD(stake) + " in Main Balance to accept this duel.", "lose"); return;
+          }
+          if (stake > movableMain()){
+            toast("Welcome bonus locked", "The welcome bonus can't be staked on duels until you trade $10 of your own money.", "lose"); return;
           }
           var prevMain = state.main;
           state.main = round2(state.main - stake);
