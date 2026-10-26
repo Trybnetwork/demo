@@ -3239,7 +3239,26 @@
         { code: "BR", name: "Brazil", ccy: "BRL", symbol: "R$", flag: "🇧🇷", rate: 5.5 },
         { code: "MX", name: "Mexico", ccy: "MXN", symbol: "Mex$", flag: "🇲🇽", rate: 17.2 },
         { code: "TR", name: "Turkey", ccy: "TRY", symbol: "₺", flag: "🇹🇷", rate: 32.5 },
-        { code: "AU", name: "Australia", ccy: "AUD", symbol: "A$", flag: "🇦🇺", rate: 1.52 }
+        { code: "AU", name: "Australia", ccy: "AUD", symbol: "A$", flag: "🇦🇺", rate: 1.52 },
+        { code: "AL", name: "Albania", ccy: "ALL", symbol: "L", flag: "🇦🇱", rate: 82 },
+        { code: "AF", name: "Afghanistan", ccy: "AFN", symbol: "؋", flag: "🇦🇫", rate: 66 },
+        { code: "UA", name: "Ukraine", ccy: "UAH", symbol: "₴", flag: "🇺🇦", rate: 41.5 },
+        { code: "PL", name: "Poland", ccy: "PLN", symbol: "zł", flag: "🇵🇱", rate: 4.0 },
+        { code: "RO", name: "Romania", ccy: "RON", symbol: "lei", flag: "🇷🇴", rate: 4.6 },
+        { code: "GR", name: "Greece", ccy: "EUR", symbol: "€", flag: "🇬🇷", rate: 0.92 },
+        { code: "SE", name: "Sweden", ccy: "SEK", symbol: "kr", flag: "🇸🇪", rate: 10.4 },
+        { code: "NP", name: "Nepal", ccy: "NPR", symbol: "रू", flag: "🇳🇵", rate: 134 },
+        { code: "LK", name: "Sri Lanka", ccy: "LKR", symbol: "Rs", flag: "🇱🇰", rate: 293 },
+        { code: "KH", name: "Cambodia", ccy: "KHR", symbol: "៛", flag: "🇰🇭", rate: 4100 },
+        { code: "MM", name: "Myanmar", ccy: "MMK", symbol: "K", flag: "🇲🇲", rate: 2100 },
+        { code: "GE", name: "Georgia", ccy: "GEL", symbol: "₾", flag: "🇬🇪", rate: 2.7 },
+        { code: "AM", name: "Armenia", ccy: "AMD", symbol: "֏", flag: "🇦🇲", rate: 383 },
+        { code: "AZ", name: "Azerbaijan", ccy: "AZN", symbol: "₼", flag: "🇦🇿", rate: 1.7 },
+        { code: "KZ", name: "Kazakhstan", ccy: "KZT", symbol: "₸", flag: "🇰🇿", rate: 540 },
+        { code: "UZ", name: "Uzbekistan", ccy: "UZS", symbol: "so'm", flag: "🇺🇿", rate: 12700 },
+        { code: "TJ", name: "Tajikistan", ccy: "TJS", symbol: "ЅМ", flag: "🇹🇯", rate: 10.9 },
+        { code: "RS", name: "Serbia", ccy: "RSD", symbol: "din", flag: "🇷🇸", rate: 110 },
+        { code: "BA", name: "Bosnia and Herzegovina", ccy: "BAM", symbol: "KM", flag: "🇧🇦", rate: 1.8 }
       ];
       function countryOf(code){
         code = String(code || "").toUpperCase();
@@ -9175,8 +9194,8 @@ s0.parentNode.insertBefore(s1,s0);
     <script>
     /* ---------- Auto-translate: Google engine, auto-detect + manual override ---------- */
     (function(){
-      var SUPPORTED = ["en","fr","es","pt","ar","ha","yo","ig","sw","hi","ur","zh-CN","de","it","ru","tr","id","vi","th","tl","ta","te","bn","pa","ml","am","so","zu","sn","ja","ko","fa"];
-      var NAMES = {"en":"English","fr":"Fran\u00e7ais","es":"Espa\u00f1ol","pt":"Portugu\u00eas","ar":"\u0627\u0644\u0639\u0631\u0628\u064a\u0629","ha":"Hausa","yo":"Yor\u00f9b\u00e1","ig":"Igbo","sw":"Kiswahili","hi":"\u0939\u093f\u0928\u094d\u0926\u0940","ur":"\u0627\u0631\u062f\u0648","zh-CN":"\u4e2d\u6587","de":"Deutsch","it":"Italiano","ru":"\u0420\u0443\u0441\u0441\u043a\u0438\u0439","tr":"T\u00fcrk\u00e7e","id":"Bahasa Indonesia","vi":"Ti\u1ebfng Vi\u1ec7t","th":"\u0e44\u0e17\u0e22","tl":"Filipino","ta":"\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD","te":"\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41","bn":"\u09AC\u09BE\u0982\u09B2\u09BE","pa":"\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40","ml":"\u0D2E\u0D32\u0D2F\u0D3E\u0D33\u0D02","am":"\u12A0\u121B\u122D\u129B","so":"Soomaali","zu":"isiZulu","sn":"chiShona","ja":"\u65E5\u672C\u8A9E","ko":"\uD55C\uAD6D\uC5B4","fa":"\u0641\u0627\u0631\u0633\u06CC"};
+      var SUPPORTED = ["en","fr","es","pt","ar","ha","yo","ig","sw","hi","ur","zh-CN","de","it","ru","tr","id","vi","th","tl","ta","te","bn","pa","ml","am","so","zu","sn","ja","ko","fa","sq","ps","uk","pl","nl","ro","el","sv","ne","si","km","my","ka","hy","az","kk","uz","tg","sr","bs"];
+      var NAMES = {"en":"English","fr":"Fran\u00e7ais","es":"Espa\u00f1ol","pt":"Portugu\u00eas","ar":"\u0627\u0644\u0639\u0631\u0628\u064a\u0629","ha":"Hausa","yo":"Yor\u00f9b\u00e1","ig":"Igbo","sw":"Kiswahili","hi":"\u0939\u093f\u0928\u094d\u0926\u0940","ur":"\u0627\u0631\u062f\u0648","zh-CN":"\u4e2d\u6587","de":"Deutsch","it":"Italiano","ru":"\u0420\u0443\u0441\u0441\u043a\u0438\u0439","tr":"T\u00fcrk\u00e7e","id":"Bahasa Indonesia","vi":"Ti\u1ebfng Vi\u1ec7t","th":"\u0e44\u0e17\u0e22","tl":"Filipino","ta":"\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD","te":"\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41","bn":"\u09AC\u09BE\u0982\u09B2\u09BE","pa":"\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40","ml":"\u0D2E\u0D32\u0D2F\u0D3E\u0D33\u0D02","am":"\u12A0\u121B\u122D\u129B","so":"Soomaali","zu":"isiZulu","sn":"chiShona","ja":"\u65E5\u672C\u8A9E","ko":"\uD55C\uAD6D\uC5B4","fa":"\u0641\u0627\u0631\u0633\u06CC","sq":"Shqip","ps":"پښتو","uk":"Українська","pl":"Polski","nl":"Nederlands","ro":"Română","el":"Ελληνικά","sv":"Svenska","ne":"नेपाली","si":"සිංහල","km":"ខ្មែរ","my":"မြန်မာ","ka":"ქართული","hy":"Հայերեն","az":"Azərbaycan","kk":"Қазақша","uz":"O'zbek","tg":"Тоҷикӣ","sr":"Српски","bs":"Bosanski"};
       function cookieLang(){
         var m = document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
         return m ? decodeURIComponent(m[1]) : null;
