@@ -9945,6 +9945,7 @@ s0.parentNode.insertBefore(s1,s0);
 <style>
   #tcwBtn{ position:fixed; right:14px; bottom:96px; width:56px; height:56px; border-radius:50%; border:none; padding:0; background:#0B1132; box-shadow:0 10px 26px rgba(11,17,50,.38); z-index:300; display:none; cursor:pointer; }
   #tcwBtn.on{ display:block; }
+  body:has(.overlay.show) #tcwBtn, body.sheet-open #tcwBtn, body.explore-open #tcwBtn{ display:none !important; }
   #tcwBtn img{ width:100%; height:100%; border-radius:50%; display:block; }
   #tcwBtn .tcw-bdg{ position:absolute; top:-4px; right:-4px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:#F02849; color:#fff; font-size:11px; font-weight:800; display:grid; place-items:center; border:2px solid #fff; font-family:"Manrope",sans-serif; }
   #tcwPanel{ position:fixed; left:10px; right:10px; bottom:86px; height:min(74dvh,640px); background:#fff; border-radius:22px; box-shadow:0 24px 60px rgba(11,17,50,.35); z-index:310; display:none; flex-direction:column; overflow:hidden; border:1px solid #E6E7EE; font-family:"Manrope",system-ui,sans-serif; color:#0B1132; }
