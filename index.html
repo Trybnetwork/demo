@@ -11234,7 +11234,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
     }
     function checkMilestones(){
       if (!S) return;
-      var nw = netWorth();
+      var nw = Math.max(0, S.cash - (S.bought || 0)) + (S.car ? CAR_PRICE : 0);
       MILESTONES.forEach(function(m){
         if (!S.ms[m.key] && nw >= m.at){
           S.ms[m.key] = true;
@@ -11243,11 +11243,16 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
         }
       });
     }
+    function spendCash(amt){
+      var d = Math.min(amt, S.cash);
+      S.bought = Math.max(0, (S.bought || 0) - d);
+      S.cash -= d;
+    }
     function maybeEvent(chance){
       if (Math.random() > chance) return;
       var pool = EVENTS.filter(function(e){ return !e.lane || e.lane === S.lane; });
       var e = pick(pool);
-      if (e.cash) S.cash = Math.max(0, S.cash + e.cash);
+      if (e.cash) { if (e.cash < 0) spendCash(-e.cash); else S.cash += e.cash; }
       if (e.xp) S.xp += e.xp;
       if (e.energy) S.energy = Math.max(0, Math.min(maxEnergy(), S.energy + e.energy));
       log("🎲 " + e.t);
@@ -11308,7 +11313,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
         if (h.rent <= 0){
           log("🏠 Family house — no rent this week. Soft life.");
         } else if (S.cash >= h.rent){
-          S.cash -= h.rent; S.missed = 0;
+          spendCash(h.rent); S.missed = 0;
           log("🏠 Rent paid: " + fmtN(h.rent) + " for your " + h.name + ". Landlord is smiling.");
         } else {
           S.missed = (S.missed || 0) + 1;
@@ -11331,7 +11336,9 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
       var amt = Math.floor(Number(($("tlConvIn") || {}).value) || 0);
       if (!uid()) return say("Sign in first", "TrybCoin conversion needs your TrybNetwork account.");
       if (amt < 100) return say("Minimum ₦100", "₦100 converts to 1 TN.");
-      if (amt > S.cash) return say("Not enough cash", "You have " + fmtN(S.cash) + " in game cash.");
+      var conv = Math.max(0, S.cash - (S.bought || 0));
+      if (conv < 100) return say("Only hustle money converts", "Bought-in funds can't turn back into TN. Hustle " + fmtN(100) + "+ first.");
+      if (amt > conv){ amt = conv; say("Converting your hustle money", fmtN(conv) + " is convertible — bought-in funds stay in the game."); }
       busy = true;
       pushSave(true);
       try {
@@ -11344,6 +11351,11 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
           }
           S.cash = Number(d.cash);
           tnDelta += Number(d.credited) || 0;
+          if (d.blocked === "only_bought_funds"){
+            log("Conversion blocked: that money was bought in with TN — only hustled money converts.", true);
+            say("Only hustle money converts", "Bought-in funds can't turn back into TN.");
+            saveLocal(); tlRender(); return;
+          }
           if (Number(d.credited) > 0){
             log("🏦 Converted " + fmtN(d.debited) + " → +" + d.credited + " TN." + (Number(d.debited) < amt ? " Daily earn cap reached — the rest of your ₦ stayed in the game." : ""), true);
             say("+" + d.credited + " TrybCoin", "Converted from your hustle money.");
@@ -11372,6 +11384,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
             return say("Purchase failed", err === "insufficient_tn" ? "Your TrybCoin balance is lower than that." : err === "no_save" ? "Start your life first, then buy funds." : "Please try again in a moment.");
           }
           S.cash = Number(d.cash);
+          if (d.bought != null) S.bought = Number(d.bought);
           tnDelta -= Number(d.spent_tn) || 0;
           log("🏦 Bought " + fmtN(d.gained) + " of game funds with " + d.spent_tn + " TN.");
           say(fmtN(d.gained) + " added", "Bought with " + d.spent_tn + " TN. Rent stands no chance.");
@@ -11464,7 +11477,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
       var inp = $("tlConvIn"), est = $("tlConvEst");
       if (!inp || !est) return;
       var amt = Math.floor(Number(inp.value) || 0);
-      est.innerHTML = "You get ≈ <b>" + Math.floor(amt / 100).toLocaleString("en-US") + " TN</b>";
+      est.innerHTML = "You get ≈ <b>" + Math.floor(amt / 100).toLocaleString("en-US") + " TN</b>" + ((S && (S.bought || 0) > 0) ? " · hustle money available: <b>" + fmtN(Math.max(0, S.cash - (S.bought || 0))) + "</b>" : "");
     }
     function updBuyEst(){
       var inp = $("tlBuyIn"), est = $("tlBuyEst");
@@ -11483,7 +11496,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
         energy: createLane === "nepo" ? 120 : 100,
         job: createLane === "nepo" ? "banker" : "pos",
         home: createLane === "nepo" ? "family" : "face",
-        missed: 0, over: false, car: false, ms: {}, log: [],
+        missed: 0, over: false, car: false, bought: 0, ms: {}, log: [],
         streak: 0, lastSleep: "", lastStreakAward: 0
       };
       log(createLane === "nepo"
@@ -11537,7 +11550,7 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
       if (chip && S){
         var v = chip.getAttribute("data-tlchip");
         var inp = $("tlConvIn");
-        if (inp){ inp.value = v === "max" ? Math.floor(S.cash / 100) * 100 : v; updConvEst(); }
+        if (inp){ inp.value = v === "max" ? Math.floor(Math.max(0, S.cash - (S.bought || 0)) / 100) * 100 : v; updConvEst(); }
         return;
       }
       var jb = t.closest("[data-tljob]");
@@ -11550,14 +11563,14 @@ header.topbar{ position:sticky; top:0; z-index:55; background:#FFFFFF; backdrop-
       if (hb && S){
         var hid = hb.getAttribute("data-tlhome"), h = HOMES[hid];
         if (S.cash < h.rent) return say("Can't move yet", "Moving needs " + fmtN(h.rent) + " upfront — that's this week's rent.");
-        S.cash -= h.rent; S.home = hid; S.energy = Math.min(S.energy, maxEnergy());
+        spendCash(h.rent); S.home = hid; S.energy = Math.min(S.energy, maxEnergy());
         log("🏠 You moved to a " + h.name + " in " + h.area + " — " + fmtN(h.rent) + " paid upfront.");
         afterAction(); return;
       }
       var cb = t.closest("[data-tlcar]");
       if (cb && S && !S.car){
         if (S.cash < CAR_PRICE) return say("Not yet, chairman", "A car costs " + fmtN(CAR_PRICE) + ". Keep hustling.");
-        S.cash -= CAR_PRICE; S.car = true; S.ms.car = true;
+        spendCash(CAR_PRICE); S.car = true; S.ms.car = true;
         log("🚗 You bought your first car! Neighbours are already calling you chairman. +40 TN milestone on its way.", true);
         tlAward(40, "milestone_car");
         afterAction(); return;
