@@ -4094,6 +4094,39 @@
         return txs.slice(0, 120);
       }
 
+      /* Welcome bonus (2026-10-26): granted by the server via
+         tn_claim_welcome_bonus — one claim per account AND per device.
+         New wallets start at $0; this claims the $3 once per session
+         for eligible accounts and stays silent for everyone else. */
+      var welcomeClaimTried = false;
+      function tnDeviceKey(){
+        try {
+          var k = localStorage.getItem("tn_device_id");
+          if (!k){
+            k = localStorage.getItem("tn_vid") || "";
+            if (!k || k.length < 8) k = "dev-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+            localStorage.setItem("tn_device_id", k);
+          }
+          return k;
+        } catch(e){ return ""; }
+      }
+      function maybeClaimWelcome(){
+        if (welcomeClaimTried || !sb || !currentUser) return;
+        welcomeClaimTried = true;
+        if (state.main >= WELCOME_BONUS && state.bonusLocked) return; // bonus already in the wallet
+        var key = tnDeviceKey();
+        if (!key) return;
+        sb.rpc("tn_claim_welcome_bonus", { p_device_key: key }).then(function(res){
+          if (res.data && res.data.ok){
+            state.main = round2(state.main + WELCOME_BONUS);
+            state.bonusLocked = true;
+            walletServerMain = Math.round(state.main * 100) / 100;
+            renderWallets();
+            toast("Welcome bonus added", "$3.00 is in your Main Balance — it unlocks after you trade $10 of your own money.");
+          }
+        }).catch(function(){});
+      }
+
       function loadUserData(userId, opts){
         opts = opts || {};
         if (!sb) return Promise.resolve(false);
@@ -4172,6 +4205,7 @@
             + refRows.filter(function(r){ return r.reward_paid && !bonusByReferred[r.referred_id]; }).length * REFERRAL_REWARD) * 100) / 100;
           state = fresh;
           walletHydratedFor = userId;
+          maybeClaimWelcome();
           walletServerMain = Math.round((Number(state.main) || 0) * 100) / 100;
           walletServerTraded = Number(state.bonusTraded) || 0;
           state.txs = buildWalletTxs(reqs.data).concat(keep.localTxs);
@@ -4861,6 +4895,10 @@
         }
         if (usd > state.main){
           toast("Insufficient Main Balance", "Your stake exceeds your Main Balance of " + fmtUSD(state.main) + ".");
+          return { ok: false, coins: 0, source: "main" };
+        }
+        if (usd > movableMain()){
+          toast("Welcome bonus locked", "Your $3 welcome bonus unlocks after you trade $10 of your own money. You can stake " + fmtUSD(movableMain()) + " right now.");
           return { ok: false, coins: 0, source: "main" };
         }
         state.main = round2(state.main - usd);
