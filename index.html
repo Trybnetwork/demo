@@ -1122,7 +1122,7 @@
       #v2ExploreOverlay .sheet{ display:flex; flex-direction:column; max-height:calc(100dvh - 12px - env(safe-area-inset-top, 0px)); }
       #v2ExploreOverlay .v2-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; min-height:0; overscroll-behavior:contain; }
       #v2ExploreOverlay .v2-sheet-close{ flex:none; }
-      body.explore-open header.topbar{ visibility:hidden; }
+      body.explore-open header.topbar{ visibility:hidden; } body.sheet-open header.topbar{ visibility:hidden; }
       .v2-ref-linkbox{ border:1.5px dashed #C9A24B; border-radius:13px; padding:12px 14px; font-size:13.5px; font-weight:700; color:#6B7086; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:#FFFDF6; margin:10px 0; }
       .v2-ref-stats{ display:flex; gap:10px; margin:14px 0; }
       .v2-ref-stats .v2-rstat{ flex:1; background:#F2F3F8; border-radius:14px; padding:12px 8px; text-align:center; }
@@ -1933,7 +1933,7 @@
             <button class="btn ghost" id="btnCashout" type="button" disabled style="color:#0B1132;border-color:#D8DCE6;">Cashout</button>
           </div>
           <div class="lock-note card-info" id="miningInfo" style="color:#6B7086;">
-            <span>Put in any amount from <b>$5 to $50,000</b> with your Main Balance or TrybCoin — buying a miner is a straight purchase, and it earns <b>2% of what you put in every 24 hours</b>. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. <b>Make sure to come back every 24hrs to restart the miner</b> — it cools down after each cycle and mines nothing until restarted. Turn on <b>Cooldown alerts</b> under the miner status and your phone gets a notification the moment it cools down. Cashout moves your mining profits into Main Balance once a week — profits unlock 7 days after purchase, then 7 days after each cashout. Cashing out never closes your miner. One thing does end it: the contract runs <b>5 months</b> from purchase — after that the miner expires, and buying a new one starts a fresh contract. Topping up adds to your current rig; your Mining profits carry over.</span>
+            <span>Put in any amount from <b>$5 to $50,000</b> with your Main Balance or TrybCoin — buying a miner is a straight purchase, and it earns <b>2% of what you put in every 24 hours</b>. Tap Start Mining and the rig runs for 24 hours before stopping on its own; every completed cycle adds its profit to your Mining profits. <b>Make sure to come back every 24hrs to restart the miner</b> — it cools down after each cycle and mines nothing until restarted. Turn on <b>Cooldown alerts</b> under the miner status and your phone gets a notification the moment it cools down. Cashout moves your mining profits into Main Balance once a week — profits unlock 7 days after purchase, then 7 days after each cashout. Cashing out never closes your miner. One thing does end it: the contract runs <b>4 months</b> from purchase — after that the miner expires, and buying a new one starts a fresh contract. Topping up adds to your current rig; your Mining profits carry over.</span>
           </div>
         </article>
 
@@ -2500,7 +2500,7 @@
     <div class="overlay" id="minerOverlay">
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="minerTitle">
         <h3 id="minerTitle">Buy a Miner</h3>
-        <p class="sheet-sub">Enter how much to put in — <b>$5 to $50,000</b>, from your Main Balance or TrybCoin. Your miner earns <b>2% daily</b>: tap Start Mining on the Mining card and it runs for 24 hours, then credits its profit to your Mining profits. <b>Make sure to come back every 24hrs to restart the miner</b> — it cools down after each cycle and mines nothing until restarted. Profits unlock for cashout 7 days after purchase, then weekly after each cashout. Buying a miner is a straight purchase — the amount you put in is spent on the rig, not locked or returned. The contract runs for <b>5 months</b> from purchase; after it expires you'll need a new miner to keep mining. One miner per account: topping up adds to your current rig, and your Mining profits carry over.</p>
+        <p class="sheet-sub">Enter how much to put in — <b>$5 to $50,000</b>, from your Main Balance or TrybCoin. Your miner earns <b>2% daily</b>: tap Start Mining on the Mining card and it runs for 24 hours, then credits its profit to your Mining profits. <b>Make sure to come back every 24hrs to restart the miner</b> — it cools down after each cycle and mines nothing until restarted. Profits unlock for cashout 7 days after purchase, then weekly after each cashout. Buying a miner is a straight purchase — the amount you put in is spent on the rig, not locked or returned. The contract runs for <b>4 months</b> from purchase; after it expires you'll need a new miner to keep mining. One miner per account: topping up adds to your current rig, and your Mining profits carry over.</p>
         <div id="minerTiers" style="display:none;"></div>
         <div class="pack-form" id="packForm" style="display:none;">
           <div class="form-field" style="margin-bottom:0;">
@@ -2736,7 +2736,7 @@
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Mining work, and when can I cash out?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-            <div class="faq-a">Buy a miner from the Mining card — put in any amount from <b>$5 to $50,000</b> and it earns <b>2% of it every 24 hours</b>. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. A miner contract lasts <b>5 months</b> from purchase — when it expires, the miner stops earning and you'll need to buy a new one to keep mining; profits already earned stay yours to cash out. Profits unlock for cashout <b>7 days</b> after purchase, then <b>weekly</b> after each cashout. Buying a miner is a straight purchase — the amount you put in is spent on the rig and isn't returned. Cashout moves your mining profits into Main Balance and never closes your miner.</div>
+            <div class="faq-a">Buy a miner from the Mining card — put in any amount from <b>$5 to $50,000</b> and it earns <b>2% of it every 24 hours</b>. Tap <b>Start Mining</b> and the rig runs for <b>24 hours</b>, then stops and credits its profit to your Mining profits; you start each new cycle yourself. A miner contract lasts <b>4 months</b> from purchase — when it expires, the miner stops earning and you'll need to buy a new one to keep mining; profits already earned stay yours to cash out. Profits unlock for cashout <b>7 days</b> after purchase, then <b>weekly</b> after each cashout. Buying a miner is a straight purchase — the amount you put in is spent on the rig and isn't returned. Cashout moves your mining profits into Main Balance and never closes your miner.</div>
           </div>
           <div class="faq-item">
             <button class="faq-q" type="button">How does Fixed Savings work?<svg class="fq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
@@ -3101,7 +3101,7 @@
       // cashout-lock anchor) — exposed on the miner object as contractAt.
       // A repurchase after expiry writes a fresh created_at via
       // persistMiner's round-trip, starting a new contract.
-      var MINER_TERM_MONTHS = 5;
+      var MINER_TERM_MONTHS = 4;
       function minerExpiresAt(m){
         if (!m) return 0;
         var d = new Date(m.contractAt || m.purchasedAt || Date.now());
@@ -4105,7 +4105,7 @@
           line.innerHTML = 'Status: Running · <span class="cd num">' + fmtCountdown(left) + "</span> left · +" + fmtUSD(m.profit) + " when the cycle completes · Contract ends " + fmtContractDate(minerExpiresAt(m));
           startBtn.style.display = "none";
         } else if (minerExpired(now)){
-          line.textContent = "Status: Contract expired " + fmtContractDate(minerExpiresAt(m)) + " — this miner's 5 months are up. Buy a new miner to keep mining; profits already earned stay yours to cash out.";
+          line.textContent = "Status: Contract expired " + fmtContractDate(minerExpiresAt(m)) + " — this miner's 4 months are up. Buy a new miner to keep mining; profits already earned stay yours to cash out.";
           startBtn.style.display = "none";
         } else {
           line.textContent = "Status: Idle · start a 24h cycle to earn " + fmtUSD(m.profit) + " · Contract ends " + fmtContractDate(minerExpiresAt(m)) + ".";
@@ -4973,10 +4973,10 @@
         updateSheetConfirmState();
         $("sheetAmount").value = "";
         $("sheetErr").className = "sheet-err";
-        $("sheetOverlay").className = "overlay show";
+        $("sheetOverlay").className = "overlay show"; document.body.classList.add("sheet-open");
         setTimeout(function(){ $("sheetAmount").focus(); }, 60);
       }
-      function closeSheet(){ $("sheetOverlay").className = "overlay"; }
+      function closeSheet(){ $("sheetOverlay").className = "overlay"; document.body.classList.remove("sheet-open"); }
       function sheetError(msg){ var e = $("sheetErr"); e.textContent = msg; e.className = "sheet-err show"; }
       // The tn_requests "method", "receipt_url", "wallet_address",
       // "dest_type" and "dest_details" columns may not exist yet: the
@@ -5200,7 +5200,7 @@
           var sel = i === selectedPack;
           return '<div class="tier-row' + (owned ? " owned" : "") + (sel ? " selected" : "") + '"><div class="tier-main">' +
             '<div class="tier-name">' + p.name + (owned ? '<span class="owned-tag">' + (minerExpired() ? "Expired" : "Your rig") + '</span>' : "") + "</div>" +
-            '<div class="tier-sub"><b style="color:var(--green);">' + (p.rate * 100).toFixed(0) + '%</b> daily profit · ' + packLockText(p) + ' · 5-month contract</div></div>' +
+            '<div class="tier-sub"><b style="color:var(--green);">' + (p.rate * 100).toFixed(0) + '%</b> daily profit · ' + packLockText(p) + ' · 4-month contract</div></div>' +
             '<div class="tier-price num">' + packRangeText(p) + "</div>" +
             '<button class="buy-btn" type="button" data-tier="' + i + '"' + (minerBusy ? " disabled" : "") + ">" + (sel ? "Selected" : (owned ? "Replace" : "Select")) + "</button></div>";
         }).join("");
@@ -5317,10 +5317,10 @@
       });
       function openMinerSheet(){
         $("minerErr").className = "sheet-err";
-        $("minerOverlay").className = "overlay show";
+        $("minerOverlay").className = "overlay show"; document.body.classList.add("sheet-open");
         selectPack(0); // single miner — no tier picking
       }
-      function closeMinerSheet(){ $("minerOverlay").className = "overlay"; }
+      function closeMinerSheet(){ $("minerOverlay").className = "overlay"; document.body.classList.remove("sheet-open"); }
       // Buying deducts the entered amount from Main Balance (through the
       // wallet write path) and upserts the tn_miners row with the pack
       // name as tier and profit_24h = amount × rate. It's a straight
@@ -5347,7 +5347,7 @@
         // Additive: the top-up stacks onto the existing rig. A running
         // cycle keeps running, profits carry over, and the weekly
         // cashout lock keeps its original timer. An EXPIRED contract is
-        // different: the purchase starts a fresh 5-month contract at the
+        // different: the purchase starts a fresh 4-month contract at the
         // entered amount — earned profits still carry over.
         var newPrice = Math.round(((prevMiner && !expired ? prevMiner.price : 0) + amt) * 100) / 100;
         var newProfit = Math.round(newPrice * p.rate * 100) / 100;
@@ -9580,7 +9580,7 @@ s0.parentNode.insertBefore(s1,s0);
             var mExpired = false;
             if (m && (m.contractAt || m.purchasedAt)){
               var xd = new Date(m.contractAt || m.purchasedAt);
-              xd.setMonth(xd.getMonth() + 5);
+              xd.setMonth(xd.getMonth() + 4);
               mExpired = now >= xd.getTime();
             }
             var badge = $("minerStateBadge");
